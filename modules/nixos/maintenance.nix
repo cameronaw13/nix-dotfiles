@@ -4,6 +4,7 @@
     enable = true;
     flake = inputs.self.outPath;
     flags = [
+      # deprecated w/ no replacement lol
       "--update-input"
       "nixpkgs"
       "-L" # print build logs

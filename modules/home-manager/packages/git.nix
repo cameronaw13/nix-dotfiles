@@ -9,17 +9,7 @@
       userEmail = "cameronawichman@gmail.com";
       extraConfig = {
         init.defaultBranch = "master";
-        #commit.gpgsign = true;
-        #gpg.format = "ssh";
-        #user.signingkey = "~/.ssh/id_ed25519.pub";
       };
     };
-
-    # Allowed_signers must be managed within each user:
-    /* home.file.allowed_signers = {
-      enable = lib.mkDefault true;
-      target = ".config/git/allowed_signers";
-      text = "* ${builtins.readFile ssh-key}";
-    };*/
   };
 }

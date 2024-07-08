@@ -23,12 +23,6 @@
           alias sudo="sudo ";
         '';
       };
-
-      #home.file.allowed_signers = {
-      #  enable = true;
-      #  target = ".config/git/allowed_signers";
-      #  text = "* ${builtins.readFile ../keys/cameron_id_ed25519.pub}";
-      #};  
     };
   };
 }
