@@ -20,6 +20,7 @@
         set expandtab
         set backspace=indent,eol,start
         set smarttab
+        set cpoptions+=I
 
         " search "
         set hlsearch
