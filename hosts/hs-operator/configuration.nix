@@ -56,7 +56,9 @@
   ];
 
   /* Users */
-  cameron-user.enable = true;
+  nixusers = {
+    cameron.enable = true;
+  };
 
   /* Services */
   # ...

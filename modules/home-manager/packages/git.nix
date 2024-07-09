@@ -1,8 +1,8 @@
 { lib, config, ... }:
 {
-  options.git-cfg.enable = lib.mkEnableOption "enable git config module";
+  options.homepkgs.git.enable = lib.mkEnableOption "git config module";
 
-  config = lib.mkIf config.git-cfg.enable {
+  config = lib.mkIf config.homepkgs.git.enable {
     programs.git = {
       enable = lib.mkDefault true;
       userName = "cameronaw13";

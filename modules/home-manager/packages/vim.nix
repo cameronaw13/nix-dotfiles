@@ -1,8 +1,8 @@
 { lib, config, ... }:
 {
-  options.vim-cfg.enable = lib.mkEnableOption "enable vim config module";
+  options.homepkgs.vim.enable = lib.mkEnableOption "vim config module";
 
-  config = lib.mkIf config.vim-cfg.enable {
+  config = lib.mkIf config.homepkgs.vim.enable {
     programs.vim = {
       enable = lib.mkDefault true;
       defaultEditor = true;

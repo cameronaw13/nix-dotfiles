@@ -1,8 +1,8 @@
 { lib, config, pkgs, ... }:
 {
-  options.cameron-user.enable = lib.mkEnableOption "enable cameron user module";
+  options.nixusers.cameron.enable = lib.mkEnableOption "enable cameron user module";
 
-  config = lib.mkIf config.cameron-user.enable { 
+  config = lib.mkIf config.nixusers.cameron.enable { 
     users.users.cameron = {
       isNormalUser = true;
       description = "cameron";

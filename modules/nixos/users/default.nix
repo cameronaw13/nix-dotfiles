@@ -5,6 +5,8 @@
     ./filesystem.nix
   ];
 
-  cameron-user.enable = lib.mkDefault false;
-  filesystem-user.enable = lib.mkDefault false;
+  nixusers = {
+    cameron.enable = lib.mkDefault false;
+    filesystem.enable = lib.mkDefault false;
+  };
 }

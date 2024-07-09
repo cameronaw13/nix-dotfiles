@@ -1,8 +1,8 @@
 { lib, config, ... }:
 {
-  options.filesystem-home.enable = lib.mkEnableOption "enable filesystem home module";
+  options.homeusers.filesystem.enable = lib.mkEnableOption "filesystem home module";
 
-  config = lib.mkIf config.filesystem-home.enable {
+  config = lib.mkIf config.homeusers.filesystem.enable {
     home-manager.users.filesystem = {
       home = {
         username = "filesystem";

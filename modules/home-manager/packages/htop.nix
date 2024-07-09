@@ -1,8 +1,8 @@
 { lib, config, pkgs, ... }:
 {
-  options.htop-cfg.enable = lib.mkEnableOption "enable htop config module";
+  options.homepkgs.htop.enable = lib.mkEnableOption "htop config module";
 
-  config = lib.mkIf config.htop-cfg.enable {
+  config = lib.mkIf config.homepkgs.htop.enable {
     home.packages = with pkgs; [ htop ];
     home.file.htoprc = {
       enable = lib.mkDefault true;

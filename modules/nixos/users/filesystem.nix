@@ -1,8 +1,8 @@
 { lib, config, pkgs, ... }:
 {
-  options.filesystem-user.enable = lib.mkEnableOption "enable filesystem user module";
+  options.nixusers.filesystem.enable = lib.mkEnableOption "enable filesystem user module";
 
-  config = lib.mkIf config.filesystem-user.enable {
+  config = lib.mkIf config.nixusers.filesystem.enable {
     users.users.filesystem = {
       isNormalUser = true;
       description = "filesystem";

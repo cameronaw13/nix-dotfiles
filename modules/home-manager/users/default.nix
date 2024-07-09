@@ -6,6 +6,9 @@
     ./filesystem.nix
   ];
   home-manager.extraSpecialArgs = { inherit inputs; };
-  cameron-home.enable = lib.mkDefault false;
-  filesystem-home.enable = lib.mkDefault false;
+
+  homeusers = {
+    cameron.enable = lib.mkDefault false;
+    filesystem.enable = lib.mkDefault false;
+  };
 }

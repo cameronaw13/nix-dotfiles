@@ -5,8 +5,11 @@
     ./git.nix
     ./htop.nix
   ];
-  # Togglable user-specific packages
-  vim-cfg.enable = lib.mkDefault false;
-  git-cfg.enable = lib.mkDefault false;
-  htop-cfg.enable = lib.mkDefault false;
+
+  # Setup togglable user-specific packages
+  homepkgs = {
+    vim.enable = lib.mkDefault false;
+    git.enable = lib.mkDefault false;
+    htop.enable = lib.mkDefault false;
+  };
 }
