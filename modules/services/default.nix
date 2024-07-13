@@ -4,7 +4,9 @@
     ./ssh.nix
   ];
 
-  ssh-service.enable = lib.mkDefault true;
+  servicemgmt = {
+    ssh.enable = lib.mkDefault true;
+  };
 
   networking.firewall.allowedTCPPorts = lib.mkDefault [ 22 ];
   #networking.firewall.allowedUDPPorts = lib.mkDefault [ ];

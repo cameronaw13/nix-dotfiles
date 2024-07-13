@@ -5,7 +5,7 @@
     ./filesystem.nix
   ];
 
-  nixusers = {
+  usermgmt = {
     cameron.enable = lib.mkDefault false;
     filesystem.enable = lib.mkDefault false;
   };

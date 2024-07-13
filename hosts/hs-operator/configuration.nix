@@ -6,14 +6,15 @@
 # View rebuild errors:
 # sudo bash -c "nixos-rebuild switch &>/etc/nixos/nixos-switch.log || (cat /etc/nixos/nixos-switch.log | grep --color -e \"error\" -e \" at \" && exit 1)"
 
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 {
   imports = [ 
     ./hardware-configuration.nix
-    ../../modules/nixos/common.nix
-    ../../modules/nixos/maintenance.nix
-    ../../modules/nixos/users/default.nix
-    ../../modules/nixos/services/default.nix
+    ../../modules/common.nix
+    ../../modules/maintenance.nix
+    ../../modules/users/default.nix
+    ../../modules/services/default.nix
+    inputs.home-manager.nixosModules.home-manager
   ];
 
   /* Bootloader */
@@ -56,14 +57,21 @@
   ];
 
   /* Users */
-  nixusers = {
+  usermgmt = {
     cameron.enable = true;
   };
 
+  home-manager.users.cameron.homepkgs = {
+    vim.enable = true;
+    git.enable = true;
+    htop.enable = true;
+  };
+
   /* Services */
-  # ...
+  #servicemgmt = {
+  #  ssh.enable = true;
+  #};
 
   /* System */
-  # Account for breaking changes before updating!
   system.stateVersion = "24.05";
 }

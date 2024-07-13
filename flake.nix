@@ -20,7 +20,6 @@
         specialArgs = { inherit inputs; };
         modules = [
           ./hosts/hs-operator/configuration.nix
-          ./hosts/hs-operator/home.nix
         ];
       };
     };

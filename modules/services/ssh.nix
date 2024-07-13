@@ -1,8 +1,8 @@
 { lib, config, ... }:
 {
-  options.ssh-service.enable = lib.mkEnableOption "enable ssh service module";
+  options.servicemgmt.ssh.enable = lib.mkEnableOption "enable ssh service module";
 
-  config = lib.mkIf config.ssh-service.enable {
+  config = lib.mkIf config.servicemgmt.ssh.enable {
     services.openssh = {
       enable = lib.mkDefault true;
       settings = {
