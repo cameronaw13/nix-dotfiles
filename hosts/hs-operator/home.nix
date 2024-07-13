@@ -1,6 +1,7 @@
-{ lib, ... }:
+{ lib, inputs, ... }:
 {
   imports = [
+    inputs.home-manager.nixosModules.home-manager
     ../../modules/home-manager/users/default.nix
   ];
 

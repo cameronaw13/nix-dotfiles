@@ -50,7 +50,7 @@
   };
   
   /* System Packages */
-  nixpkgs.config.allowUnfree = true;
+  #nixpkgs.config.allowUnfree = true;
   environment.systemPackages = with pkgs; [
     # Host-specific system packages
   ];
