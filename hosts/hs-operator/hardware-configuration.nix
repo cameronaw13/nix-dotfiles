@@ -28,4 +28,25 @@
   # networking.interfaces.ens18.useDHCP = lib.mkDefault true;
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+
+
+  
+  /* Extra Hardware Config */
+
+  boot.loader.grub.enable = lib.mkDefault true;
+  # boot.loader.grub.useOSProber = true;
+  # boot.loader.grub.efiSupport = true;
+  # boot.loader.grub.efiInstallAsRemovable = true;
+  # boot.loader.efi.efiSysMountPoint = "/boot/efi";
+  # Define on which hard drive you want to install Grub.
+  boot.loader.grub.device = lib.mkDefault "/dev/sda"; # or "nodev" for efi only
+
+  networking.interfaces.ens18 = lib.mkDefault {
+    useDHCP = false;
+    wakeOnLan.enable = true;
+    ipv4.addresses = [ {
+      address = "192.168.4.200";
+      prefixLength = 24;
+    } ];
+  };
 }

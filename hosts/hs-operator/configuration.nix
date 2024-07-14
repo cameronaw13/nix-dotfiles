@@ -17,16 +17,6 @@
     inputs.home-manager.nixosModules.home-manager
   ];
 
-  /* Bootloader */
-  # dependent on hardware bios, move to hardware-config?
-  boot.loader.grub.enable = true;
-  # boot.loader.grub.useOSProber = true;
-  # boot.loader.grub.efiSupport = true;
-  # boot.loader.grub.efiInstallAsRemovable = true;
-  # boot.loader.efi.efiSysMountPoint = "/boot/efi";
-  # Define on which hard drive you want to install Grub.
-  boot.loader.grub.device = "/dev/sda"; # or "nodev" for efi only
-
   /* Virtual Console */
   console = {
     earlySetup = true;
@@ -37,18 +27,8 @@
   /* Networking */
   networking.hostName = "hs-operator";
   networking.networkmanager.enable = true;
-
-  networking.useDHCP = false;
   networking.defaultGateway = "192.168.4.1";
   networking.nameservers = [ "9.9.9.9" ];
-  # dependent on hardware's network interfaces, move to hardware-config?
-  networking.interfaces.ens18 = {
-    wakeOnLan.enable = true;
-    ipv4.addresses = [ {
-      address = "192.168.4.200";
-      prefixLength = 24;
-    } ];
-  };
   
   /* System Packages */
   #nixpkgs.config.allowUnfree = true;
@@ -60,11 +40,12 @@
   usermgmt = {
     cameron.enable = true;
   };
-
-  home-manager.users.cameron.homepkgs = {
-    vim.enable = true;
-    git.enable = true;
-    htop.enable = true;
+  home-manager.users = {
+    cameron.homepkgs = {
+      vim.enable = true;
+      git.enable = true;
+      htop.enable = true;
+    };
   };
 
   /* Services */
