@@ -11,7 +11,6 @@
   imports = [ 
     ./hardware-configuration.nix
     ../../modules/common.nix
-    ../../modules/maintenance.nix
     ../../modules/users/default.nix
     ../../modules/services/default.nix
     inputs.home-manager.nixosModules.home-manager
@@ -31,7 +30,6 @@
   networking.nameservers = [ "9.9.9.9" ];
   
   /* System Packages */
-  #nixpkgs.config.allowUnfree = true;
   environment.systemPackages = with pkgs; [
     # Host-specific system packages
   ];
@@ -49,9 +47,9 @@
   };
 
   /* Services */
-  #servicemgmt = {
-  #  ssh.enable = true;
-  #};
+  servicemgmt = {
+    maintenance.enable = true;
+  };
 
   /* System */
   system.stateVersion = "24.05";
