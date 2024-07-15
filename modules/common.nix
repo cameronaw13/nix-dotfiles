@@ -2,6 +2,7 @@
 {
   /* Global Nix Options */
   nix.settings.extra-experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.allowed-users = [ "@wheel" ];
 
   /* Global Environment Options */
   environment.systemPackages = with pkgs; [

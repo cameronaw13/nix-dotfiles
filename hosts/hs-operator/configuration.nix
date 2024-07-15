@@ -25,7 +25,6 @@
 
   /* Networking */
   networking.hostName = "hs-operator";
-  networking.networkmanager.enable = true;
   networking.defaultGateway = "192.168.4.1";
   networking.nameservers = [ "9.9.9.9" ];
   
