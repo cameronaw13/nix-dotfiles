@@ -32,7 +32,6 @@
 
   
   /* Extra Hardware Config */
-
   boot.loader.grub.enable = lib.mkDefault true;
   # boot.loader.grub.useOSProber = true;
   # boot.loader.grub.efiSupport = true;
