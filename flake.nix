@@ -8,8 +8,11 @@
     };
     sops-nix = {
       url = "github:Mic92/sops-nix";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-      inputs.nixpkgs-stable.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nix-secrets = {
+      url = "git+ssh://git@github.com/cameronaw13/nix-secrets?ref=master&shallow=1";
+      flake = false;
     };
   };
 

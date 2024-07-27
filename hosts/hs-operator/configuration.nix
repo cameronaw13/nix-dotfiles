@@ -14,6 +14,7 @@
     ../../modules/users/default.nix
     ../../modules/services/default.nix
     inputs.home-manager.nixosModules.home-manager
+    inputs.sops-nix.nixosModules.sops
   ];
 
   /* Virtual Console */
@@ -42,12 +43,28 @@
       vim.enable = true;
       git.enable = true;
       htop.enable = true;
+      ssh.enable = true;
     };
   };
 
   /* Services */
   servicemgmt = {
     maintenance.enable = true;
+  };
+
+  /* Secrets */
+  sops = {
+    defaultSopsFile = "${inputs.nix-secrets}/secrets.yaml";
+    #validateSopsFiles = false;
+    age = {
+      # Generate private host age key
+      sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+      keyFile = "/var/lib/sops-nix/keys.txt";
+      generateKey = true;
+    };
+    secrets = {
+      super_secret_password = {};
+    };
   };
 
   /* System */

@@ -21,6 +21,24 @@
         "type": "github"
       }
     },
+    "nix-secrets": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1722065984,
+        "narHash": "sha256-J7WEfohSaDPsp33qoG+9UpIHyOdAENEIHc8/E/UVXeg=",
+        "ref": "master",
+        "rev": "64219c2ee45277f055659ad8e59d9d798e343587",
+        "shallow": true,
+        "type": "git",
+        "url": "ssh://git@github.com/cameronaw13/nix-secrets"
+      },
+      "original": {
+        "ref": "master",
+        "shallow": true,
+        "type": "git",
+        "url": "ssh://git@github.com/cameronaw13/nix-secrets"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1720691131,
@@ -33,6 +51,22 @@
       "original": {
         "owner": "nixos",
         "ref": "nixos-24.05",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs-stable": {
+      "locked": {
+        "lastModified": 1722050607,
+        "narHash": "sha256-EUNni0Ngq/ZvQLs35smEic9cI+DuP9qdyyCj9/uUFbw=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "c5afc9f7f2133031756b452701083ff7b69f5c69",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "release-24.05",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -56,6 +90,7 @@
     "root": {
       "inputs": {
         "home-manager": "home-manager",
+        "nix-secrets": "nix-secrets",
         "nixpkgs": "nixpkgs",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "sops-nix": "sops-nix"
@@ -64,11 +99,9 @@
     "sops-nix": {
       "inputs": {
         "nixpkgs": [
-          "nixpkgs-unstable"
-        ],
-        "nixpkgs-stable": [
           "nixpkgs"
-        ]
+        ],
+        "nixpkgs-stable": "nixpkgs-stable"
       },
       "locked": {
         "lastModified": 1720479166,
