@@ -6,13 +6,6 @@ in
   options.usermgmt.${username}.enable = lib.mkEnableOption "${username} user module";
 
   config = lib.mkIf config.usermgmt.${username}.enable {
-    sops.secrets = {
-      "super_secret_password" = {
-        owner = config.users.users.${username}.name;
-        inherit (config.users.users.${username}) group;
-      };
-    };
-
     users.users.${username} = {
       isNormalUser = true;
       description = username;
