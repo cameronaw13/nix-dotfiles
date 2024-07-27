@@ -55,15 +55,15 @@
   /* Secrets */
   sops = {
     defaultSopsFile = "${inputs.nix-secrets}/secrets.yaml";
-    #validateSopsFiles = false;
     age = {
-      # Generate private host age key
+      # Generate private age key per host
       sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
       keyFile = "/var/lib/sops-nix/keys.txt";
       generateKey = true;
     };
     secrets = {
-      super_secret_password = {};
+      "postfix/smtp-email" = {};
+      "postfix/smtp-password" = {};
     };
   };
 

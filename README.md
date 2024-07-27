@@ -4,7 +4,7 @@ TODO:
 - Integrate nix flakes ✓
 - Modularize users and packages between hosts ✓
 - Add git & github integration ✓
-- Add sops-nix secrets management
+- Add sops-nix secrets management ✓
 - Flesh out essential hs-operator packages and services
 - Implement impermanence
 - Create microVMs (fully/partially declarative) and oci-containers
