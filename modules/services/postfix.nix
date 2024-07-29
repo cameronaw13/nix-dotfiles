@@ -1,4 +1,7 @@
 { lib, config, ... }:
+let
+  hostname = config.networking.hostName;
+in
 {
   options.servicemgmt.postfix.enable = lib.mkEnableOption "postfix service module";
 
@@ -19,7 +22,7 @@
       enableHeaderChecks = true;
       headerChecks = [
         { 
-          action = "REPLACE From: ${config.networking.hostName} <cameronserverlog@gmail.com>";
+          action = "REPLACE From: ${hostname} <cameronserverlog@gmail.com>";
           pattern = "/^From:.*/";
         }
       ];

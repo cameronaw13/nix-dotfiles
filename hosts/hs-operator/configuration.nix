@@ -35,18 +35,15 @@
   ];
 
   /* Users */
-  usermgmt = {
-    cameron.enable = true;
-  };
-  home-manager.users = {
-    cameron.homepkgs = {
+  usermgmt.cameron = {
+    enable = true;
+    homepkgs = {
       vim.enable = true;
       git.enable = true;
       htop.enable = true;
-      ssh.enable = true;
     };
   };
-
+  
   /* Services */
   servicemgmt = {
     maintenance.enable = true;
