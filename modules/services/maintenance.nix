@@ -1,7 +1,12 @@
 { lib, config, inputs, ... }:
 {
-  # NOTE: Replace with scheduled maintenance systemd service
-  options.servicemgmt.maintenance.enable = lib.mkEnableOption "maintenance service module";
+  # TODO: Add centralized backup management and restarting with custom options
+  options.servicemgmt.maintenance = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+    };
+  };
 
   config = lib.mkIf config.servicemgmt.maintenance.enable {
     nix.gc = {

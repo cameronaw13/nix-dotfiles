@@ -1,6 +1,9 @@
 { lib, config, ... }:
 {
-  options.homepkgs.vim.enable = lib.mkEnableOption "vim config module";
+  options.homepkgs.vim.enable = lib.mkOption {
+    type = lib.types.bool;
+    default = false;
+  };
 
   config = lib.mkIf config.homepkgs.vim.enable {
     programs.vim = {

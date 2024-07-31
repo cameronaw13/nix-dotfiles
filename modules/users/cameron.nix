@@ -1,30 +1,16 @@
 { lib, config, inputs, ... }:
 let
   username = "cameron";
-  hostname = config.networking.hostName;
+  hostname = config.usermgmt.cameron.hostname;
 in
 {
   options.usermgmt.${username} = {
-    enable = lib.mkEnableOption "${username} user module";
-    homepkgs = {
-      vim.enable = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-      };
-      git = {
-        enable = lib.mkOption {
-          type = lib.types.bool;
-          default = false;
-        };
-        hostname = lib.mkOption {
-          type = lib.types.str;
-          default = hostname;
-        };
-      };
-      htop.enable = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-      };
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+    };
+    hostname = lib.mkOption {
+      type = lib.types.str;
     };
   };
 
@@ -52,9 +38,9 @@ in
       };
 
       imports = [
-        ../packages/default.nix
+        ../programs/default.nix
       ];
-      homepkgs = config.usermgmt.${username}.homepkgs;
+      homepkgs.hostname = hostname;
 
       sops = {
         age.keyFile = "/home/${username}/.config/sops/age/keys.txt";

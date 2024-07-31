@@ -3,7 +3,10 @@ let
   username = "filesystem";
 in
 {
-  options.usermgmt.${username}.enable = lib.mkEnableOption "${username} user module";
+  options.usermgmt.${username}.enable = lib.mkOption {
+    type = lib.types.bool;
+    default = false;
+  };
 
   config = lib.mkIf config.usermgmt.${username}.enable {
     users.users.${username} = {
@@ -20,7 +23,7 @@ in
       };
 
       imports = [
-        ../packages/default.nix
+        ../programs/default.nix
       ];
 
       programs.bash = {

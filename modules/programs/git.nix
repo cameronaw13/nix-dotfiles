@@ -1,19 +1,29 @@
 { lib, config, ... }:
 let
   username = config.home.username;
-  hostname = config.homepkgs.git.hostname;
+  hostname = config.homepkgs.hostname;
 in
 {
-  options.homepkgs.git.enable = lib.mkEnableOption "git config module";
-  options.homepkgs.git.hostname = lib.mkOption {
-    type = lib.types.str;
+  options.homepkgs.git = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+    };
+    username = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+    };
+    email = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+    };
   };
 
   config = lib.mkIf config.homepkgs.git.enable {
     programs.git = {
       enable = lib.mkDefault true;
-      userName = "cameronaw13";
-      userEmail = "cameronawichman@gmail.com";
+      userName = config.homepkgs.git.username;
+      userEmail = config.homepkgs.git.email;
       extraConfig = {
         init.defaultBranch = "master";
         commit.gpgsign = true;

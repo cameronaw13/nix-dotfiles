@@ -1,12 +1,4 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
-
-# TODO: Create install, rebuild, flake, home-manager scripts for config management
-# View rebuild errors:
-# sudo bash -c "nixos-rebuild switch &>/etc/nixos/nixos-switch.log || (cat /etc/nixos/nixos-switch.log | grep --color -e \"error\" -e \" at \" && exit 1)"
-
-{ pkgs, inputs, ... }:
+{ pkgs, config, inputs, ... }:
 {
   imports = [ 
     ./hardware-configuration.nix
@@ -37,17 +29,26 @@
   /* Users */
   usermgmt.cameron = {
     enable = true;
-    homepkgs = {
-      vim.enable = true;
-      git.enable = true;
-      htop.enable = true;
+    hostname = config.networking.hostName;
+  };
+  home-manager.users.cameron.homepkgs = {
+    vim.enable = true;
+    htop.enable = true;
+    git = {
+      enable = true;
+      username = "cameronaw13";
+      email = "cameronawichman@gmail.com";
     };
   };
   
   /* Services */
   servicemgmt = {
     maintenance.enable = true;
-    postfix.enable = true;
+    postfix = {
+      enable = true;
+      sender = "cameronserverlog@gmail.com";
+      receiver = "cameronawichman@gmail.com";
+    };
   };
 
   /* Secrets */
