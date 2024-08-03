@@ -1,7 +1,7 @@
 { lib, config, inputs, ... }:
 let
   username = "cameron";
-  hostname = config.usermgmt.cameron.hostname;
+  hostname = config.networking.hostName;
 in
 {
   options.usermgmt.${username} = {
@@ -9,14 +9,10 @@ in
       type = lib.types.bool;
       default = false;
     };
-    hostname = lib.mkOption {
-      type = lib.types.str;
-    };
   };
 
   config = lib.mkIf config.usermgmt.${username}.enable {
     sops.secrets."${hostname}/${username}/password".neededForUsers = true;
-    users.mutableUsers = false;
     
     users.users.${username} = {
       isNormalUser = true;
@@ -25,10 +21,6 @@ in
       extraGroups = [ "networkmanager" "wheel" ];
       # TODO: add authorized keys through sops-nix
     };
-
-    home-manager.sharedModules = [
-      inputs.sops-nix.homeManagerModules.sops
-    ];
 
     home-manager.users.${username} = {
       home = {

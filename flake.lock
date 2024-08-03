@@ -24,10 +24,10 @@
     "nix-secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1722218096,
-        "narHash": "sha256-X4etRyxe6pe+FMmjBJFe67Usd2fPfNSuqrTME502bsU=",
+        "lastModified": 1722662704,
+        "narHash": "sha256-fkOgaOttJ3S9ukoftYHc1mIHbnqpe+ZvDa/n8Ud9xDI=",
         "ref": "master",
-        "rev": "e48968d76696c7682f6c996e4b796fd7b742ca60",
+        "rev": "ffbe04deef7f164eb0c25d458c348a2ffca018f3",
         "shallow": true,
         "type": "git",
         "url": "ssh://git@github.com/cameronaw13/nix-secrets"

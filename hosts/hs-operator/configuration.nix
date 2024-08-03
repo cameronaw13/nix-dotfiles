@@ -24,20 +24,25 @@
   /* System Packages */
   environment.systemPackages = with pkgs; [
     # Host-specific system packages
+    inxi
+    pciutils
+    tree
+    sops
   ];
 
   /* Users */
-  usermgmt.cameron = {
-    enable = true;
-    hostname = config.networking.hostName;
+  usermgmt = {
+    cameron.enable = true;
   };
-  home-manager.users.cameron.homepkgs = {
-    vim.enable = true;
-    htop.enable = true;
-    git = {
-      enable = true;
-      username = "cameronaw13";
-      email = "cameronawichman@gmail.com";
+  home-manager.users = {
+    cameron.homepkgs = {
+      vim.enable = true;
+      htop.enable = true;
+      git = {
+        enable = true;
+        username = "cameronaw13";
+        email = "cameronawichman@gmail.com";
+      };
     };
   };
   
