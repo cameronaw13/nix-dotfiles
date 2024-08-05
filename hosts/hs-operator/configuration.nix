@@ -5,6 +5,7 @@
     ../../modules/common.nix
     ../../modules/users/default.nix
     ../../modules/services/default.nix
+    ../../modules/maintenance/default.nix
     inputs.home-manager.nixosModules.home-manager
     inputs.sops-nix.nixosModules.sops
   ];
@@ -48,12 +49,22 @@
   
   /* Services */
   servicemgmt = {
-    maintenance.enable = true;
     postfix = {
       enable = true;
       sender = "cameronserverlog@gmail.com";
       receiver = "cameronawichman@gmail.com";
     };
+  };
+
+  local.maintenance = {
+    autoUpgrade = {
+      enable = true;
+      commit = true;
+    };
+    nix-gc.enable = true;
+    nix-optimise.enable = true;
+    
+    dates = "Mon *-*-* 02:00:00";
   };
 
   /* Secrets */

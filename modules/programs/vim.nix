@@ -17,12 +17,10 @@
         set laststatus=0
 
         " indentation "
-        set autoindent
         set softtabstop=2
         set shiftwidth=2
         set expandtab
         set backspace=indent,eol,start
-        set smarttab
         set cpoptions+=I
 
         " search "

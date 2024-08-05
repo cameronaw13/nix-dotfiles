@@ -1,15 +1,8 @@
 { lib, config, inputs, ... }:
 {
   # TODO: Add centralized backup management and restarting with custom options
-  options.servicemgmt.maintenance = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-    };
-  };
-
-  config = lib.mkIf config.servicemgmt.maintenance.enable {
-    nix.gc = {
+  config = /*lib.mkIf config.servicemgmt.maintenance.enable*/ {
+    /*nix.gc = {
       automatic = true;
       dates = "Mon *-*-* 01:40:00";
       options = "--delete-older-than 30d";
@@ -32,6 +25,6 @@
       ];
       dates = "Mon *-*-* 02:00:00";
       persistent = true;
-    };
+    };*/
   };
 }

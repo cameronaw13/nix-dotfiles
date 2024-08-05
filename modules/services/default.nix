@@ -2,7 +2,6 @@
 {
   imports = [
     ./ssh.nix
-    ./maintenance.nix
     ./postfix.nix
   ];
 
