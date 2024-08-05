@@ -3,7 +3,7 @@ let
   prev = "nix-gc.service";
 in
 {
-  options.local.maintenance.nix-optimise = {
+  options.local.services.maintenance.nix-optimise = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -18,10 +18,10 @@ in
     };
   };
 
-  config = lib.mkIf config.local.maintenance.nix-optimise.enable {
+  config = lib.mkIf config.local.services.maintenance.nix-optimise.enable {
     nix.optimise = {
       automatic = true;
-      dates = [ config.local.maintenance.dates ];
+      dates = [ config.local.services.maintenance.dates ];
     };
 
     systemd = {
@@ -32,8 +32,8 @@ in
 
       # remove RandomizedDelaySec - should probably add options upstream lol
       timers.nix-optimise.timerConfig = {
-        Persistent = lib.mkForce config.local.maintenance.nix-optimise.persistent;
-        RandomizedDelaySec = lib.mkForce config.local.maintenance.nix-optimise.randomizedDelaySec;
+        Persistent = lib.mkForce config.local.services.maintenance.nix-optimise.persistent;
+        RandomizedDelaySec = lib.mkForce config.local.services.maintenance.nix-optimise.randomizedDelaySec;
       };
     };
   };

@@ -1,10 +1,10 @@
 { lib, config, ... }:
 let
   username = config.home.username;
-  hostname = config.homepkgs.hostname;
+  hostname = config.local.homepkgs.hostname;
 in
 {
-  options.homepkgs.git = {
+  options.local.homepkgs.git = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -19,11 +19,11 @@ in
     };
   };
 
-  config = lib.mkIf config.homepkgs.git.enable {
+  config = lib.mkIf config.local.homepkgs.git.enable {
     programs.git = {
       enable = lib.mkDefault true;
-      userName = config.homepkgs.git.username;
-      userEmail = config.homepkgs.git.email;
+      userName = config.local.homepkgs.git.username;
+      userEmail = config.local.homepkgs.git.email;
       extraConfig = {
         init.defaultBranch = "master";
         commit.gpgsign = true;

@@ -1,11 +1,11 @@
 { lib, config, ... }:
 {
-  options.servicemgmt.ssh.enable = lib.mkOption {
+  options.local.services.ssh.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
   };
 
-  config = lib.mkIf config.servicemgmt.ssh.enable {
+  config = lib.mkIf config.local.services.ssh.enable {
     services.openssh = {
       enable = lib.mkDefault true;
       settings = {

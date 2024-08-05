@@ -1,6 +1,6 @@
 { lib, config, ... }:
 {
-  options.local.maintenance = {
+  options.local.services.maintenance = {
     dates = lib.mkOption {
       type = lib.types.str;
     };

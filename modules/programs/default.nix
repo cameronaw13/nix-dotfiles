@@ -6,7 +6,7 @@
     ./git.nix
   ];
 
-  options.homepkgs.hostname = lib.mkOption {
+  options.local.homepkgs.hostname = lib.mkOption {
     type = lib.types.str;
   };
 }

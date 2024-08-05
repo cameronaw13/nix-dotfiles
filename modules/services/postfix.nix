@@ -1,11 +1,11 @@
 { lib, config, ... }:
 let
   hostname = config.networking.hostName;
-  sender = config.servicemgmt.postfix.sender;
-  receiver = config.servicemgmt.postfix.receiver;
+  sender = config.local.services.postfix.sender;
+  receiver = config.local.services.postfix.receiver;
 in
 {
-  options.servicemgmt.postfix = {
+  options.local.services.postfix = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -20,7 +20,7 @@ in
     };
   };
 
-  config = lib.mkIf config.servicemgmt.postfix.enable {
+  config = lib.mkIf config.local.services.postfix.enable {
     services.postfix = {
       enable = lib.mkDefault true;
       relayHost = "smtp.gmail.com";

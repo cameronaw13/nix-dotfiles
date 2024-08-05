@@ -3,7 +3,7 @@ let
   prev = "nixos-upgrade.service";
 in
 {
-  options.local.maintenance.nix-gc = {
+  options.local.services.maintenance.nix-gc = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -14,11 +14,11 @@ in
     };
   };
 
-  config = lib.mkIf config.local.maintenance.nix-gc.enable {
+  config = lib.mkIf config.local.services.maintenance.nix-gc.enable {
     nix.gc = {
       automatic = true;
-      dates = config.local.maintenance.dates;
-      options = config.local.maintenance.nix-gc.options;
+      dates = config.local.services.maintenance.dates;
+      options = config.local.services.maintenance.nix-gc.options;
       persistent = true;
     };
 

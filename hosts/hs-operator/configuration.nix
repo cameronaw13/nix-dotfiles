@@ -5,7 +5,6 @@
     ../../modules/common.nix
     ../../modules/users/default.nix
     ../../modules/services/default.nix
-    ../../modules/maintenance/default.nix
     inputs.home-manager.nixosModules.home-manager
     inputs.sops-nix.nixosModules.sops
   ];
@@ -31,12 +30,12 @@
     sops
   ];
 
-  /* Users */
-  usermgmt = {
+  /* Local Users */
+  local.users = {
     cameron.enable = true;
   };
   home-manager.users = {
-    cameron.homepkgs = {
+    cameron.local.homepkgs = {
       vim.enable = true;
       htop.enable = true;
       git = {
@@ -47,26 +46,26 @@
     };
   };
   
-  /* Services */
-  servicemgmt = {
+  /* Local Services */
+  local.services = {
     postfix = {
       enable = true;
       sender = "cameronserverlog@gmail.com";
       receiver = "cameronawichman@gmail.com";
     };
-  };
-
-  local.maintenance = {
-    autoUpgrade = {
-      enable = true;
-      commit = true;
-    };
-    nix-gc.enable = true;
-    nix-optimise.enable = true;
     
-    dates = "Mon *-*-* 02:00:00";
+    maintenance = {
+      autoUpgrade = {
+        enable = true;
+        commit = true;
+      };
+      nix-gc.enable = true;
+      nix-optimise.enable = true;
+      
+      dates = "Mon *-*-* 02:00:00";
+    };
   };
-
+  
   /* Secrets */
   sops = {
     defaultSopsFile = "${inputs.nix-secrets}/secrets.yaml";

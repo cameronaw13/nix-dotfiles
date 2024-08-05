@@ -1,13 +1,13 @@
 { lib, config, inputs, ... }:
 let
   flakeUpdate =
-    if config.local.maintenance.autoUpgrade.commit then
+    if config.local.services.maintenance.autoUpgrade.commit then
       "nix flake update --commit-lock-file"
     else
       "nix flake update";
 in
 {
-  options.local.maintenance.autoUpgrade = {
+  options.local.services.maintenance.autoUpgrade = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -18,7 +18,7 @@ in
     };
   };
 
-  config = lib.mkIf config.local.maintenance.autoUpgrade.enable {
+  config = lib.mkIf config.local.services.maintenance.autoUpgrade.enable {
     system.autoUpgrade = {
       enable = true;
       operation = "boot";

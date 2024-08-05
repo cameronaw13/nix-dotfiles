@@ -1,11 +1,11 @@
 { lib, config, ... }:
 {
-  options.homepkgs.vim.enable = lib.mkOption {
+  options.local.homepkgs.vim.enable = lib.mkOption {
     type = lib.types.bool;
     default = false;
   };
 
-  config = lib.mkIf config.homepkgs.vim.enable {
+  config = lib.mkIf config.local.homepkgs.vim.enable {
     programs.vim = {
       enable = lib.mkDefault true;
       defaultEditor = true;

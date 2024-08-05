@@ -4,14 +4,14 @@ let
   hostname = config.networking.hostName;
 in
 {
-  options.usermgmt.${username} = {
+  options.local.users.${username} = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = false;
     };
   };
 
-  config = lib.mkIf config.usermgmt.${username}.enable {
+  config = lib.mkIf config.local.users.${username}.enable {
     sops.secrets."${hostname}/${username}/password".neededForUsers = true;
     
     users.users.${username} = {
@@ -32,7 +32,7 @@ in
       imports = [
         ../programs/default.nix
       ];
-      homepkgs.hostname = hostname;
+      local.homepkgs.hostname = hostname;
 
       sops = {
         age.keyFile = "/home/${username}/.config/sops/age/keys.txt";
