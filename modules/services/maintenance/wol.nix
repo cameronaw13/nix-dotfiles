@@ -24,20 +24,22 @@ in
 
   config = lib.mkIf config.local.services.maintenance.wakeOnLan.enable {
     systemd = {
-      services.maintenance-wakeOnLan = {
+      services.wakeOnLan = {
         description = "NixOS maintenance wakeonlan service";
         serviceConfig.Type = "oneshot";
         startAt = config.local.services.maintenance.dates;
         
-        script = ''
+        script = let
+          nix = "${config.nix.package}/bin/nix";
+        in ''
           macList=(${macList})
-          for i in "$\{macList[@]\}"; do
-            ${config.nix.package}/bin/nix shell nixpkgs#wakeonlan --command wakeonlan "$i"
+          for i in "''${macList[@]}"; do
+            ${nix} shell nixpkgs#wakeonlan --command wakeonlan "$i"
           done
         '';
       };
 
-      timers.maintenance-wakeOnLan = {
+      timers.wakeOnLan = {
         timerConfig = {
           Persistent = config.local.services.maintenance.wakeOnLan.persistent;
           RandomizedDelaySec = config.local.services.maintenance.wakeOnLan.randomizedDelaySec;

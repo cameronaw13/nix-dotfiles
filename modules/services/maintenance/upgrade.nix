@@ -1,7 +1,6 @@
 { lib, config, inputs, pkgs, ... }:
 let
-  prev = "maintenance-wakeOnLan.service";
-  user = config.local.services.maintenance.autoUpgrade.user;
+  prev = "wakeOnLan.service";
 in
 {
   options.local.services.maintenance.autoUpgrade = {
@@ -26,7 +25,13 @@ in
     };
 
     systemd.services.nixos-upgrade = {
-      preStart = "${pkgs.su}/bin/su ${user} -c \"nix flake update -L\"";
+      # separately update flake avoiding --update-input deprecation
+      preStart = let
+        su = "${pkgs.su}/bin/su";
+        user = config.local.services.maintenance.autoUpgrade.user;
+      in ''
+        ${su} ${user} -c "nix flake update -L"
+      '';
       serviceConfig.WorkingDirectory = "/etc/nixos";
 
       wants = lib.mkForce [ "network-online.target" prev ];

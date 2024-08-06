@@ -67,7 +67,7 @@
       nix-optimise.enable = true;
       poweroff.enable = true;
       
-      dates = "Mon *-*-* 20:14:00";
+      dates = "Mon *-*-* 02:00:00";
     };
   };
   

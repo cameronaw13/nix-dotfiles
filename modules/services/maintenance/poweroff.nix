@@ -1,4 +1,4 @@
-{ lib, config, ...}:
+{ lib, config, pkgs, ...}:
 let
   prev = "nix-optimise.service";
 in
@@ -27,18 +27,22 @@ in
 
   config = lib.mkIf config.local.services.maintenance.poweroff.enable {
     systemd = {
-      services.maintenance-poweroff = {
+      services.auto-poweroff = {
         description = "NixOs maintenance poweroff service";
         serviceConfig.Type = "oneshot";
         startAt = config.local.services.maintenance.dates;
 
-        script = ''
-          timer=$(echo "${config.local.services.maintenance.dates}" | cut -d " " -f3)
-          elapsed=$(( $(date +%s) - $(date -d $timer +%s) ))
+        script = let
+          date = "${pkgs.coreutils}/bin/date";
+          systemctl = "${config.systemd.package}/bin/systemctl";
+          timeframe = config.local.services.maintenance.poweroff.timeframe;
+        in ''
+          timer=$(${systemctl} show auto-poweroff.timer | grep "LastTriggerUSec=" | cut -d " " -f3) 
+          elapsed=$(( $(${date} +%s) - $(${date} -d $timer +%s) ))
 
           uptime=$(grep -Eo ^[0-9]+ -r /proc/uptime)
 
-          timeframe=${config.local.services.maintenance.poweroff.timeframe}
+          timeframe=${timeframe}
 
           if (( $uptime - $elapsed < $timeframe )); then
             shutdown
@@ -51,7 +55,7 @@ in
         after = [ prev ];
       };
 
-      timers.maintenance-poweroff = {
+      timers.auto-poweroff = {
         timerConfig = {
           Persistent = config.local.services.maintenance.poweroff.persistent;
           RandomizedDelaySec = config.local.services.maintenance.poweroff.randomizedDelaySec;

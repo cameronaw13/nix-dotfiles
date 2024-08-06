@@ -3,6 +3,7 @@
   options.local.services.maintenance = {
     dates = lib.mkOption {
       type = lib.types.str;
+      description = "Maintence schedule startup time. Specified through systemd.time(7)";
     };
   };  
   
