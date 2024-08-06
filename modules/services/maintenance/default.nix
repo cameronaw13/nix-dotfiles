@@ -7,10 +7,12 @@
   };  
   
   imports = [
-    ./autoUpgrade.nix
-    ./nix-gc.nix
-    ./nix-optimise.nix
-    #./reboot.nix
+    ./wol.nix
+    ./upgrade.nix
+    ./garbage.nix
+    ./optimise.nix
     #./snapshot.nix
+    #./mail.nix
+    ./poweroff.nix
   ];
 }

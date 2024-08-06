@@ -26,6 +26,7 @@ in
 
     systemd = {
       services.nix-optimise = {
+        serviceConfig.Type = "oneshot";
         wants = [ prev ];
         after = [ prev ];
       };

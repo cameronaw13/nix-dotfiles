@@ -55,14 +55,19 @@
     };
     
     maintenance = {
+      wakeOnLan = {
+        enable = true;
+        macList = [ "0c:9d:92:1a:49:94" ];
+      };
       autoUpgrade = {
         enable = true;
-        commit = true;
+        user = "cameron";
       };
       nix-gc.enable = true;
       nix-optimise.enable = true;
+      poweroff.enable = true;
       
-      dates = "Mon *-*-* 02:00:00";
+      dates = "Mon *-*-* 20:14:00";
     };
   };
   
