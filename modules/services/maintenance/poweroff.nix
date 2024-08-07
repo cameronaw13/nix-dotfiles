@@ -1,5 +1,6 @@
 { lib, config, pkgs, ...}:
 let
+  maintenance = config.local.services.maintenance;
   prev = "nix-optimise.service";
 in
 {
@@ -12,54 +13,49 @@ in
       type = lib.types.singleLineStr;
       default = "300"; # 5 min
       description = ''
-        Number of seconds system uptime must be under to determine if the system should shutdown afterwards. Otherwise the system reboots. Uptime is calculated at the start of the maintenance service.
+        Number of seconds system uptime must be under to determine if the system should shutdown
+        afterwards. Otherwise the system reboots. Uptime is calculated at the start of the maintenance
+        service.
       '';
-    };
-    persistent = lib.mkOption {
-      type = lib.types.bool;
-      default = true;
-    };
-    randomizedDelaySec = lib.mkOption {
-      type = lib.types.singleLineStr;
-      default = "0";
     };
   };
 
-  config = lib.mkIf config.local.services.maintenance.poweroff.enable {
-    systemd = {
-      services.auto-poweroff = {
-        description = "NixOs maintenance poweroff service";
-        serviceConfig.Type = "oneshot";
-        startAt = config.local.services.maintenance.dates;
+  config = lib.mkIf maintenance.poweroff.enable {
+    systemd.services.auto-poweroff = {
+      description = "NixOS maintenance poweroff service";
+      serviceConfig.Type = "oneshot";
+      startAt = maintenance.dates;
 
-        script = let
-          date = "${pkgs.coreutils}/bin/date";
-          systemctl = "${config.systemd.package}/bin/systemctl";
-          timeframe = config.local.services.maintenance.poweroff.timeframe;
-        in ''
-          timer=$(${systemctl} show auto-poweroff.timer | grep "LastTriggerUSec=" | cut -d " " -f3) 
-          elapsed=$(( $(${date} +%s) - $(${date} -d $timer +%s) ))
+      script = let
+        date = "${pkgs.coreutils}/bin/date";
+        timeframe = maintenance.poweroff.timeframe;
+      in ''
+        timer=$(systemctl show auto-poweroff.timer | grep "LastTriggerUSec=" | cut -d " " -f3) 
+        elapsed=$(( $(${date} +%s) - $(${date} -d $timer +%s) ))
 
-          uptime=$(grep -Eo ^[0-9]+ -r /proc/uptime)
+        uptime=$(grep -Eo ^[0-9]+ -r /proc/uptime)
+        initUptime=$(( $uptime - $elapsed ))
 
-          timeframe=${timeframe}
+        timeframe=${timeframe}
 
-          if (( $uptime - $elapsed < $timeframe )); then
-            shutdown
-          else
-            shutdown -r
-          fi
-        '';
+        echo "Uptime: ''${initUptime}s"
+        echo "Shutdown timeframe: ''${timeframe}s"
 
-        wants = [ prev ];
-        after = [ prev ];
-      };
+        if (( $initUptime < $timeframe )); then
+          shutdown
+        else
+          shutdown -r
+        fi
+      '';
 
-      timers.auto-poweroff = {
-        timerConfig = {
-          Persistent = config.local.services.maintenance.poweroff.persistent;
-          RandomizedDelaySec = config.local.services.maintenance.poweroff.randomizedDelaySec;
-        };
+      wants = [ prev ];
+      after = [ prev ];
+    };
+
+    systemd.timers.auto-poweroff = {
+      timerConfig = {
+        Persistent = true;
+        RandomizedDelaySec = "0";
       };
     };
   };

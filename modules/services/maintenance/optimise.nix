@@ -1,40 +1,32 @@
 { lib, config, ... }:
 let
+  maintenance = config.local.services.maintenance;
   prev = "nix-gc.service";
 in
 {
-  options.local.services.maintenance.nix-optimise = {
+  options.local.services.maintenance.optimise = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = false;
     };
-    persistent = lib.mkOption {
-      type = lib.types.bool;
-      default = true;
-    };
-    randomizedDelaySec = lib.mkOption {
-      type = lib.types.singleLineStr;
-      default = "0";
-    };
   };
 
-  config = lib.mkIf config.local.services.maintenance.nix-optimise.enable {
+  config = lib.mkIf maintenance.optimise.enable {
     nix.optimise = {
       automatic = true;
-      dates = [ config.local.services.maintenance.dates ];
+      dates = [ maintenance.dates ];
     };
 
-    systemd = {
-      services.nix-optimise = {
-        serviceConfig.Type = "oneshot";
-        wants = [ prev ];
-        after = [ prev ];
-      };
+    systemd.services.nix-optimise = {
+      serviceConfig.Type = "oneshot";
+      wants = [ prev ];
+      after = [ prev ];
+    };
 
-      # remove RandomizedDelaySec - should probably add options upstream lol
-      timers.nix-optimise.timerConfig = {
-        Persistent = lib.mkForce config.local.services.maintenance.nix-optimise.persistent;
-        RandomizedDelaySec = lib.mkForce config.local.services.maintenance.nix-optimise.randomizedDelaySec;
+    systemd.timers.nix-optimise = {
+      timerConfig = {
+        Persistent = lib.mkForce true;
+        RandomizedDelaySec = lib.mkForce "0";
       };
     };
   };

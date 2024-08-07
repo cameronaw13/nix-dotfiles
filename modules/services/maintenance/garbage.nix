@@ -1,9 +1,10 @@
 { lib, config, ... }:
 let
+  maintenance = config.local.services.maintenance;
   prev = "nixos-upgrade.service";
 in
 {
-  options.local.services.maintenance.nix-gc = {
+  options.local.services.maintenance.collectGarbage = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -14,15 +15,15 @@ in
     };
   };
 
-  config = lib.mkIf config.local.services.maintenance.nix-gc.enable {
+  config = lib.mkIf maintenance.collectGarbage.enable {
     nix.gc = {
       automatic = true;
-      dates = config.local.services.maintenance.dates;
-      options = config.local.services.maintenance.nix-gc.options;
+      dates = maintenance.dates;
+      options = maintenance.collectGarbage.options;
       persistent = true;
     };
 
-    systemd.services.nix-gc = {
+    systemd.services.garbage = {
       wants = [ prev ];
       after = [ prev ];
     };

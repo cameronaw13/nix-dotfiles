@@ -1,7 +1,6 @@
-{ lib, config, ... }:
+{ lib, config, pkgs, ... }:
 let
-  macs = map (x: "\"" + x + "\"") config.local.services.maintenance.wakeOnLan.macList;
-  macList = lib.strings.concatImapStrings (pos: x: " ") macs;
+  maintenance = config.local.services.maintenance;
 in
 {
   options.local.services.maintenance.wakeOnLan = {
@@ -12,38 +11,33 @@ in
     macList = lib.mkOption {
       type = lib.types.listOf lib.types.singleLineStr;
     };
-    persistent = lib.mkOption {
-      type = lib.types.bool;
-      default = true;
-    };
-    randomizedDelaySec = lib.mkOption {
-      type = lib.types.singleLineStr;
-      default = "0";
-    };
   };
 
-  config = lib.mkIf config.local.services.maintenance.wakeOnLan.enable {
-    systemd = {
-      services.wakeOnLan = {
-        description = "NixOS maintenance wakeonlan service";
-        serviceConfig.Type = "oneshot";
-        startAt = config.local.services.maintenance.dates;
-        
-        script = let
-          nix = "${config.nix.package}/bin/nix";
-        in ''
-          macList=(${macList})
-          for i in "''${macList[@]}"; do
-            ${nix} shell nixpkgs#wakeonlan --command wakeonlan "$i"
-          done
-        '';
-      };
+  config = lib.mkIf maintenance.wakeOnLan.enable {
+    systemd.services.auto-wol = {
+      description = "NixOS maintenance wakeonlan service";
+      serviceConfig.Type = "oneshot";
+      startAt = maintenance.dates;
+      
+      script = let
+        nix = "${config.nix.package}/bin/nix";
+        wakeonlan = "${pkgs.wakeonlan}/bin/wakeonlan";
+        macAddrs = lib.strings.concatStringsSep " " (
+          map (x: "\"" + x + "\"") maintenance.wakeOnLan.macList
+        );
+      in ''
+        macList=(${macAddrs})
+        for i in "''${macList[@]}"; do
+          #${nix} shell nixpkgs#wakeonlan --command wakeonlan "$i"
+          ${wakeonlan} "$i"
+        done
+      '';
+    };
 
-      timers.wakeOnLan = {
-        timerConfig = {
-          Persistent = config.local.services.maintenance.wakeOnLan.persistent;
-          RandomizedDelaySec = config.local.services.maintenance.wakeOnLan.randomizedDelaySec;
-        };
+    systemd.timers.auto-wol = {
+      timerConfig = {
+        Persistent = true;
+        RandomizedDelaySec = "0";
       };
     };
   };

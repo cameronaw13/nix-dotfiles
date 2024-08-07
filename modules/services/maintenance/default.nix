@@ -13,7 +13,7 @@
     ./garbage.nix
     ./optimise.nix
     #./snapshot.nix
-    #./mail.nix
     ./poweroff.nix
+    ./mail.nix
   ];
 }

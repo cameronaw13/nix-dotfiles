@@ -8,6 +8,7 @@
     # Multi-host system packages
     trash-cli
     sops
+    wakeonlan
   ];
   environment.shellAliases = {
     rm = "echo \"Consider using 'trash' or use the full command: $(which rm)\"";

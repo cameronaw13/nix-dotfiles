@@ -1,6 +1,7 @@
 { lib, config, inputs, pkgs, ... }:
 let
-  prev = "wakeOnLan.service";
+  maintenance = config.local.services.maintenance;
+  prev = "auto-wol.service";
 in
 {
   options.local.services.maintenance.autoUpgrade = {
@@ -11,12 +12,16 @@ in
     user = lib.mkOption {
       type = lib.types.singleLineStr;
     };
+    commit = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+    };
   };
 
-  config = lib.mkIf config.local.services.maintenance.autoUpgrade.enable {
+  config = lib.mkIf maintenance.autoUpgrade.enable {
     system.autoUpgrade = {
       enable = true;
-      dates = config.local.services.maintenance.dates;
+      dates = maintenance.dates;
       operation = "boot";
       flake = inputs.self.outPath;
       flags = [
@@ -25,15 +30,24 @@ in
     };
 
     systemd.services.nixos-upgrade = {
-      # separately update flake avoiding --update-input deprecation
-      preStart = let
-        su = "${pkgs.su}/bin/su";
-        user = config.local.services.maintenance.autoUpgrade.user;
-      in ''
-        ${su} ${user} -c "nix flake update -L"
-      '';
       serviceConfig.WorkingDirectory = "/etc/nixos";
-
+      
+      # Separately update flake avoiding 'nixos-rebuild --update-input' deprecation
+      preStart= let
+        su = "${pkgs.su}/bin/su";
+        user = maintenance.autoUpgrade.user;
+        commit = toString maintenance.autoUpgrade.commit;
+      in ''
+        ${su} ${user} <<'EOF'
+        if (( ${commit} )); then
+          nix flake update --commit-lock-file
+          git push
+        else
+          nix flake update
+        fi
+        EOF
+      '';
+      
       wants = lib.mkForce [ "network-online.target" prev ];
       after = lib.mkForce [ "network-online.target" prev ];
     };

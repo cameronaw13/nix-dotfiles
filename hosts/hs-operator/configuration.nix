@@ -62,12 +62,13 @@
       autoUpgrade = {
         enable = true;
         user = "cameron";
+        commit = true;
       };
-      nix-gc.enable = true;
-      nix-optimise.enable = true;
+      collectGarbage.enable = true;
+      optimise.enable = true;
       poweroff.enable = true;
       
-      dates = "Mon *-*-* 02:00:00";
+      dates = "Mon *-*-* 02:15:00";
     };
   };
   
