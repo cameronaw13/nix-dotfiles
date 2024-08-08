@@ -1,7 +1,6 @@
 { lib, config, ... }:
 let
   maintenance = config.local.services.maintenance;
-  prev = "nixos-upgrade.service";
 in
 {
   options.local.services.maintenance.collectGarbage = {
@@ -15,6 +14,7 @@ in
     };
   };
 
+  # TODO: Add custom garbage collection (max gen's per time periods)
   config = lib.mkIf maintenance.collectGarbage.enable {
     nix.gc = {
       automatic = true;
@@ -23,9 +23,8 @@ in
       persistent = true;
     };
 
-    systemd.services.garbage = {
-      wants = [ prev ];
-      after = [ prev ];
+    systemd.services.nix-gc = {
+      after = [ "auto-wol.service" "nixos-upgrade.service" ];
     };
   };
 }

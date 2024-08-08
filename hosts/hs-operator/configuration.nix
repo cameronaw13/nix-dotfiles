@@ -64,7 +64,10 @@
         user = "cameron";
         commit = true;
       };
-      collectGarbage.enable = true;
+      collectGarbage = {
+        enable = false;
+        options = "--delete-older-than 30d";
+      };
       optimise.enable = true;
       poweroff.enable = true;
       

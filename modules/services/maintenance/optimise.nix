@@ -1,7 +1,6 @@
 { lib, config, ... }:
 let
   maintenance = config.local.services.maintenance;
-  prev = "nix-gc.service";
 in
 {
   options.local.services.maintenance.optimise = {
@@ -19,8 +18,7 @@ in
 
     systemd.services.nix-optimise = {
       serviceConfig.Type = "oneshot";
-      wants = [ prev ];
-      after = [ prev ];
+      after = [ "auto-wol.service" "nixos-upgrade.service" ];
     };
 
     systemd.timers.nix-optimise = {

@@ -1,7 +1,6 @@
 { lib, config, inputs, pkgs, ... }:
 let
   maintenance = config.local.services.maintenance;
-  prev = "auto-wol.service";
 in
 {
   options.local.services.maintenance.autoUpgrade = {
@@ -33,10 +32,12 @@ in
       serviceConfig.WorkingDirectory = "/etc/nixos";
       
       # Separately update flake avoiding 'nixos-rebuild --update-input' deprecation
-      preStart= let
+      script = let
         su = "${pkgs.su}/bin/su";
         user = maintenance.autoUpgrade.user;
         commit = toString maintenance.autoUpgrade.commit;
+        nixos-rebuild = "${pkgs.nixos-rebuild}/bin/nixos-rebuild";
+        autoUpgrade = config.system.autoUpgrade;
       in ''
         ${su} ${user} <<'EOF'
         if (( ${commit} )); then
@@ -46,10 +47,11 @@ in
           nix flake update
         fi
         EOF
+
+        ${nixos-rebuild} ${autoUpgrade.operation} ${toString autoUpgrade.flags}
       '';
       
-      wants = lib.mkForce [ "network-online.target" prev ];
-      after = lib.mkForce [ "network-online.target" prev ];
+      after = [ "network-online.target" "auto-wol.service" ];
     };
   };
 }

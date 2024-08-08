@@ -1,7 +1,6 @@
 { lib, config, pkgs, ...}:
 let
   maintenance = config.local.services.maintenance;
-  prev = "nix-optimise.service";
 in
 {
   options.local.services.maintenance.poweroff = {
@@ -48,8 +47,12 @@ in
         fi
       '';
 
-      wants = [ prev ];
-      after = [ prev ];
+      after = [
+        "auto-wol.service"
+        "nixos-upgrade.service"
+        "nix-gc.service"
+        "nix-optimise.service"
+      ];
     };
 
     systemd.timers.auto-poweroff = {

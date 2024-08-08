@@ -22,9 +22,7 @@ in
       script = let
         nix = "${config.nix.package}/bin/nix";
         wakeonlan = "${pkgs.wakeonlan}/bin/wakeonlan";
-        macAddrs = lib.strings.concatStringsSep " " (
-          map (x: "\"" + x + "\"") maintenance.wakeOnLan.macList
-        );
+        macAddrs = lib.strings.concatStringsSep " " maintenance.wakeOnLan.macList;
       in ''
         macList=(${macAddrs})
         for i in "''${macList[@]}"; do

@@ -2,12 +2,13 @@
 {
   options.local.services.maintenance = {
     dates = lib.mkOption {
-      type = lib.types.str;
+      type = lib.types.singleLineStr;
       description = "Maintence schedule startup time. Specified through systemd.time(7)";
     };
   };  
   
   imports = [
+    ./start.nix
     ./wol.nix
     ./upgrade.nix
     ./garbage.nix
