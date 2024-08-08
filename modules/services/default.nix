@@ -1,7 +1,7 @@
 { lib, ... }:
 {
   imports = [
-    ./ssh.nix
+    ./openssh.nix
     ./postfix.nix
     ./maintenance/default.nix
   ];

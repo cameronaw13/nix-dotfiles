@@ -26,7 +26,6 @@ in
       in ''
         macList=(${macAddrs})
         for i in "''${macList[@]}"; do
-          #${nix} shell nixpkgs#wakeonlan --command wakeonlan "$i"
           ${wakeonlan} "$i"
         done
       '';

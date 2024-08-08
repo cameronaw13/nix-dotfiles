@@ -8,6 +8,10 @@ in
       type = lib.types.bool;
       default = config.local.services.postfix.enable;
     };
+    recipients = lib.mkOption {
+      type = lib.types.listOf lib.types.singleLineStr;
+      default = config.local.services.postfix.rootAliases;
+    };
   };
 
   config = lib.mkIf (maintenance.mail.enable && config.local.services.postfix.enable) {
@@ -16,26 +20,39 @@ in
       serviceConfig.Type = "oneshot";
       startAt = maintenance.dates;
 
-      # TODO: Account for disabled services and failures
-      # TODO: Improve log truncate system
       script = let
         services = lib.strings.concatStringsSep " " config.systemd.services.auto-mail.after; 
         sendmail = "${pkgs.postfix}/bin/sendmail";
         sender = config.local.services.postfix.sender;
-        receiver = config.local.services.postfix.receiver;
-        hostname = config.networking.hostName;
+        receivers = lib.strings.concatStringsSep "," maintenance.mail.recipients;
       in ''
         serviceList=(${services})
+        total=0
+        success=0
+        status="SUCCESS"
+        truncate="]: deleting '"
 
-        # complete pita
         for i in "''${serviceList[@]}"; do
-          contents+="$i:"$'\n' # prefix
-          contents+="$(journalctl -u "$i" --no-pager -S "$(systemctl show auto-start.service | grep "ExecMainStartTimestamp=" | cut -d " " -f2-)" | grep -A3 -B3 -v "]: deleting '" || true )"
-          contents+=$'\n\n' # suffix
+          logs="$(journalctl -u "$i" --no-pager -S "$(systemctl show auto-start.service | grep "ExecMainStartTimestamp=" | cut -d " " -f2-)")"
+          
+          contents+="$i: " 
+          if ! $(echo "$logs" | grep -qE "^-- No entries --$"); then
+            if $(systemctl is-failed --quiet "$i"); then
+              contents+="[failed]"
+              status="FAILURE"
+            else
+              contents+="[success]"
+              (( ++success ))
+            fi
+            (( ++total ))
+          fi
+          contents+=$'\n'
+          contents+="$(echo "$logs" | grep -C2 --group-separator="--[[ truncated $(( $(printf "$logs" | grep -c "$truncate") - 4 )) lines ]]--" -v "$truncate")"
+          contents+=$'\n\n'
         done
 
-        cat <<EOF | ${sendmail} -f ${sender} -t ${receiver}
-        Subject: ${hostname} maintenance job [14/14]: success
+        cat <<EOF | ${sendmail} -f ${sender} -t ${receivers}
+        Subject: Maintenance Job [$success/$total]: $status
         Content-Type: text/plain; charset="UTF-8"
 
         $contents

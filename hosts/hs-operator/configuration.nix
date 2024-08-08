@@ -51,7 +51,7 @@
     postfix = {
       enable = true;
       sender = "cameronserverlog@gmail.com";
-      receiver = "cameronawichman@gmail.com";
+      rootAliases = [ "cameronawichman@gmail.com" ];
     };
     
     maintenance = {
