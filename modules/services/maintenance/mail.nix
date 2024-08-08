@@ -35,19 +35,19 @@ in
         for i in "''${serviceList[@]}"; do
           logs="$(journalctl -u "$i" --no-pager -S "$(systemctl show auto-start.service | grep "ExecMainStartTimestamp=" | cut -d " " -f2-)")"
           
-          contents+="$i: " 
+          contents+="$i " 
           if ! $(echo "$logs" | grep -qE "^-- No entries --$"); then
             if $(systemctl is-failed --quiet "$i"); then
-              contents+="[failed]"
+              contents+="[failed]:"
               status="FAILURE"
             else
-              contents+="[success]"
+              contents+="[success]:"
               (( ++success ))
             fi
             (( ++total ))
           fi
           contents+=$'\n'
-          contents+="$(echo "$logs" | grep -C2 --group-separator="--[[ truncated $(( $(printf "$logs" | grep -c "$truncate") - 4 )) lines ]]--" -v "$truncate")"
+          contents+="$(echo "$logs" | grep -C2 --group-separator="-- truncated $(( $(echo "$logs" | grep -c "$truncate") - 4 )) lines --" -v "$truncate")"
           contents+=$'\n\n'
         done
 
