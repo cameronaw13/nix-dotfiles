@@ -24,7 +24,7 @@ in
     };
 
     systemd.services.nix-gc = {
-      after = [ "auto-wol.service" "nixos-upgrade.service" ];
+      after = [ "auto-wol.service" "nixos-upgrade.service" "nix-optimise.service" ];
     };
   };
 }

@@ -51,7 +51,7 @@ in
         ${nixos-rebuild} ${autoUpgrade.operation} ${toString autoUpgrade.flags}
       '';
       
-      after = [ "network-online.target" "auto-wol.service" ];
+      after = [ "auto-wol.service" ];
     };
   };
 }

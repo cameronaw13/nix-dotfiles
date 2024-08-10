@@ -18,7 +18,7 @@ in
       isNormalUser = true;
       description = username;
       hashedPasswordFile = config.sops.secrets."${hostname}/${username}/password".path;
-      extraGroups = [ "networkmanager" "wheel" ];
+      extraGroups = [ "wheel" ];
       # TODO: add authorized keys through sops-nix
     };
 
@@ -30,7 +30,7 @@ in
       };
 
       imports = [
-        ../programs/default.nix
+        ./programs/default.nix
       ];
       local.homepkgs.hostname = hostname;
 

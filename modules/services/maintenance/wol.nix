@@ -14,6 +14,10 @@ in
   };
 
   config = lib.mkIf maintenance.wakeOnLan.enable {
+    environment.systemPackages = with pkgs; [
+      wakeonlan
+    ];
+
     systemd.services.auto-wol = {
       description = "NixOS maintenance wakeonlan service";
       serviceConfig.Type = "oneshot";

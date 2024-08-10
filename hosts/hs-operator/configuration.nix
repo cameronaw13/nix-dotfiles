@@ -27,7 +27,7 @@
     inxi
     pciutils
     tree
-    sops
+    jq
   ];
 
   /* Local Users */
@@ -42,6 +42,7 @@
         enable = true;
         username = "cameronaw13";
         email = "cameronawichman@gmail.com";
+        signing = true;
       };
     };
   };
@@ -53,8 +54,12 @@
       sender = "cameronserverlog@gmail.com";
       rootAliases = [ "cameronawichman@gmail.com" ];
     };
-    
+    openssh = {
+      enable = true;
+      gitEnable = true;
+    };
     maintenance = {
+      dates = "Mon *-*-* 02:15:00";
       wakeOnLan = {
         enable = true;
         macList = [ "0c:9d:92:1a:49:94" ];
@@ -65,13 +70,13 @@
         commit = true;
       };
       collectGarbage = {
-        enable = false;
+        enable = true;
         options = "--delete-older-than 30d";
       };
-      optimise.enable = true;
-      poweroff.enable = true;
-      
-      dates = "Mon *-*-* 02:15:00";
+      poweroff = {
+        enable = true;
+        timeframe = "120";
+      };
     };
   };
   

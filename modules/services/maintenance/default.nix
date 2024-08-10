@@ -11,8 +11,8 @@
     ./start.nix
     ./wol.nix
     ./upgrade.nix
-    ./garbage.nix
     ./optimise.nix
+    ./garbage.nix
     #./snapshot.nix
     ./poweroff.nix
     ./mail.nix

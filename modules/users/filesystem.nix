@@ -28,7 +28,7 @@ in
       };
 
       imports = [
-        ../programs/default.nix
+        ./programs/default.nix
       ];
       local.homepkgs.hostname = hostname;
 

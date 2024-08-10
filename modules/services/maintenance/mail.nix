@@ -62,8 +62,8 @@ in
       after = [
         "auto-wol.service"
         "nixos-upgrade.service"
-        "nix-gc.service"
         "nix-optimise.service"
+        "nix-gc.service"
         "auto-poweroff.service"
       ];
     };

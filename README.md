@@ -15,3 +15,11 @@ TODO:
 - Create media, *linux iso*, password mgmt, etc. environments  
 - Create multi-host maintenance services
 - Install nixos on bare-metal
+
+References:
+- https://www.youtube.com/@librephoenix
+- https://www.youtube.com/@vimjoyer
+- https://www.youtube.com/@Emergent_Mind
+
+- https://github.com/NixOS/nixpkgs
+- https://github.com/nix-community/srvos

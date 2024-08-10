@@ -22,6 +22,8 @@ in
 
     requiredBy = dependants;
     before = dependants;
+    wants = [ "network-online.target" ];
+    after = [ "network-online.target" ];
   };
 
   systemd.timers.auto-start = {
