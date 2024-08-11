@@ -1,4 +1,7 @@
 { lib, config, ... }:
+let
+  homepkgs = config.local.homepkgs;
+in
 {
   options.local.homepkgs.ssh = {
     enable = lib.mkOption {
@@ -7,9 +10,18 @@
     };
   };
 
-  config = lib.mkIf config.local.homepkgs.ssh.enable {
+  config = lib.mkIf (homepkgs.ssh.enable && homepkgs.git.enable) {
+    home.file.known_hosts = {
+      enable = lib.mkDefault true;
+      target = ".ssh/known_hosts";
+      force = true;
+      text = ''
+        github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
+      '';
+    };
+
     programs.ssh = {
-      enable = true;
+      enable = lib.mkDefault true;
       matchBlocks = {
         "config" = {
           host = "github.com";

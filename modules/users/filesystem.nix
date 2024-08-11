@@ -37,7 +37,7 @@ in
         defaultSopsFile = "${inputs.nix-secrets}/secrets.yaml";
       };
 
-      programs.bash.enable = true;
+      programs.bash.enable = lib.mkDefault true;
     };
   };
 }

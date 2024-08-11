@@ -24,7 +24,6 @@ in
       startAt = maintenance.dates;
       
       script = let
-        nix = "${config.nix.package}/bin/nix";
         wakeonlan = "${pkgs.wakeonlan}/bin/wakeonlan";
         macAddrs = lib.strings.concatStringsSep " " maintenance.wakeOnLan.macList;
       in ''

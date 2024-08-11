@@ -8,6 +8,6 @@
   ];
 
   options.local.homepkgs.hostname = lib.mkOption {
-    type = lib.types.str;
+    type = lib.types.singleLineStr;
   };
 }

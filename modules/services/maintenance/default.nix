@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ lib, ... }:
 {
   options.local.services.maintenance = {
     dates = lib.mkOption {

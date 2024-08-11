@@ -2,11 +2,10 @@
 # and may be overwritten by future invocations.  Please make changes
 # to /etc/nixos/configuration.nix instead.
 { config, lib, pkgs, modulesPath, ... }:
-
 {
-  imports =
-    [ (modulesPath + "/profiles/qemu-guest.nix")
-    ];
+  imports = [
+    (modulesPath + "/profiles/qemu-guest.nix")
+  ];
 
   boot.initrd.availableKernelModules = [ "ata_piix" "uhci_hcd" "virtio_pci" "virtio_scsi" "sd_mod" "sr_mod" ];
   boot.initrd.kernelModules = [ ];
@@ -29,7 +28,6 @@
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
-
   
   /* Extra Hardware Config */
   boot.loader.grub.enable = lib.mkDefault true;
@@ -39,13 +37,4 @@
   # boot.loader.efi.efiSysMountPoint = "/boot/efi";
   # Define on which hard drive you want to install Grub.
   boot.loader.grub.device = lib.mkDefault "/dev/sda"; # or "nodev" for efi only
-
-  networking.interfaces.ens18 = lib.mkDefault {
-    useDHCP = false;
-    wakeOnLan.enable = true;
-    ipv4.addresses = [ {
-      address = "192.168.4.200";
-      prefixLength = 24;
-    } ];
-  };
 }

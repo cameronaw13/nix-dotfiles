@@ -2,7 +2,7 @@
 let
   hostname = config.networking.hostName;
   sender = config.local.services.postfix.sender;
-  receiver = config.local.services.postfix.receiver;
+  aliases = lib.strings.concatStringsSep ", " config.local.services.postfix.rootAliases;
 in
 {
   options.local.services.postfix = {
@@ -25,9 +25,7 @@ in
       enable = lib.mkDefault true;
       relayHost = "smtp.gmail.com";
       relayPort = 587;
-      config = let
-        aliases = lib.strings.concatStringsSep ", " config.local.services.postfix.rootAliases;
-      in {
+      config = {
         smtp_use_tls = "yes";
         smtp_sasl_auth_enable = "yes";
         smtp_sasl_security_options = "";

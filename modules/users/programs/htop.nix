@@ -1,11 +1,14 @@
 { lib, config, pkgs, ... }:
+let
+  homepkgs = config.local.homepkgs;
+in
 {
   options.local.homepkgs.htop.enable = lib.mkOption {
     type = lib.types.bool;
     default = false;
   };
 
-  config = lib.mkIf config.local.homepkgs.htop.enable {
+  config = lib.mkIf homepkgs.htop.enable {
     home.packages = with pkgs; [ htop ];
     home.file.htoprc = {
       enable = lib.mkDefault true;

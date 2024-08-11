@@ -14,7 +14,6 @@ in
     };
   };
 
-  # TODO: Add custom garbage collection (max gen's per time periods)
   config = lib.mkIf maintenance.collectGarbage.enable {
     nix.gc = {
       automatic = true;

@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ config, ... }:
 let
   maintenance = config.local.services.maintenance;
   dependants = [

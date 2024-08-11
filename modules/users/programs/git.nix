@@ -1,7 +1,7 @@
 { lib, config, ... }:
 let
   username = config.home.username;
-  hostname = config.local.homepkgs.hostname;
+  homepkgs = config.local.homepkgs;
 in
 {
   options.local.homepkgs.git = {
@@ -23,14 +23,14 @@ in
     };
   };
 
-  config = lib.mkIf config.local.homepkgs.git.enable {
+  config = lib.mkIf homepkgs.git.enable {
     programs.git = {
       enable = lib.mkDefault true;
-      userName = config.local.homepkgs.git.username;
-      userEmail = config.local.homepkgs.git.email;
+      userName = homepkgs.git.username;
+      userEmail = homepkgs.git.email;
       extraConfig = lib.mkMerge [
         { init.defaultBranch = "master"; }
-        ( lib.mkIf config.local.homepkgs.git.signing {
+        (lib.mkIf homepkgs.git.signing {
           commit.gpgsign = true;
           gpg.format = "ssh";
           gpg.ssh.allowedSignersFile = "~/.ssh/allowed_signers";
@@ -40,13 +40,13 @@ in
     };
 
     sops.secrets = {
-      "${hostname}/${username}/id_ed25519" = {
+      "${homepkgs.hostname}/${username}/id_ed25519" = {
         path = "/home/${username}/.ssh/id_ed25519";
       };
-      "${hostname}/${username}/id_ed25519.pub" = {
+      "${homepkgs.hostname}/${username}/id_ed25519.pub" = {
         path = "/home/${username}/.ssh/id_ed25519.pub";
       };
-      "${hostname}/${username}/allowed_signers" = {
+      "${homepkgs.hostname}/${username}/allowed_signers" = {
         path = "/home/${username}/.ssh/allowed_signers";
       };
     };

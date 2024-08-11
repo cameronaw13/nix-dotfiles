@@ -40,7 +40,7 @@ in
       };
 
       programs.bash = {
-        enable = true;
+        enable = lib.mkDefault true;
         bashrcExtra = ''
           alias sudo="sudo ";
         '';

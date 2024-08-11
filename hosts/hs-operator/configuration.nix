@@ -1,8 +1,8 @@
-{ pkgs, config, inputs, ... }:
+{ pkgs, inputs, ... }:
 {
   imports = [ 
     ./hardware-configuration.nix
-    ../../modules/common.nix
+    ../../modules/common/default.nix
     ../../modules/users/default.nix
     ../../modules/services/default.nix
     inputs.home-manager.nixosModules.home-manager
@@ -17,9 +17,23 @@
   };
 
   /* Networking */
-  networking.hostName = "hs-operator";
-  networking.defaultGateway = "192.168.4.1";
-  networking.nameservers = [ "9.9.9.9" ];
+  systemd.network = {
+    enable = true;
+    networks."50-ens18" = {
+      matchConfig.Name = "ens18";
+      address = [ "192.168.4.200/24" ];
+      gateway = [ "192.168.4.1" ];
+      dns = [ "9.9.9.9" ];
+    };
+    links."50-ens18" = {
+      matchConfig.OriginalName = "ens18";
+      linkConfig.WakeOnLan = "magic";
+    };
+  };
+  networking = {
+    useDHCP = false;
+    hostName = "hs-operator";
+  };
   
   /* System Packages */
   environment.systemPackages = with pkgs; [
@@ -34,6 +48,7 @@
   local.users = {
     cameron.enable = true;
   };
+
   home-manager.users = {
     cameron.local.homepkgs = {
       vim.enable = true;
@@ -44,6 +59,7 @@
         email = "cameronawichman@gmail.com";
         signing = true;
       };
+      ssh.enable = true;
     };
   };
   
@@ -53,10 +69,6 @@
       enable = true;
       sender = "cameronserverlog@gmail.com";
       rootAliases = [ "cameronawichman@gmail.com" ];
-    };
-    openssh = {
-      enable = true;
-      gitEnable = true;
     };
     maintenance = {
       dates = "Mon *-*-* 02:15:00";
@@ -91,6 +103,23 @@
     };
   };
 
-  /* System */
+  /* Cleanup */
+  nix.settings.min-free = (7000 * 1024 * 1024); # 7000 MiB, Start when free space < min-free
+  nix.settings.max-free = (7000 * 1024 * 1024); # 7000 MiB, Stop when used space < max-free
+
+  /* Systemd */
+  systemd = {
+    enableEmergencyMode = false; # try to allow remote access during emergencies
+    watchdog = {
+      runtimeTime = "30s"; # time system hangs before reboot # watchdog sends signal every runtimeTime/2
+      rebootTime = "30s"; # time reboot hangs before force reboot
+    };
+    sleep.extraConfig = ''
+      AllowSuspend=no
+      AllowHibernation=no
+    '';
+  };
+
+  /* State */
   system.stateVersion = "24.05";
 }
