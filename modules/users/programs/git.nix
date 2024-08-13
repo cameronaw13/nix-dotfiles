@@ -1,7 +1,7 @@
 { lib, config, ... }:
 let
-  username = config.home.username;
   homepkgs = config.local.homepkgs;
+  username = config.home.username;
 in
 {
   options.local.homepkgs.git = {

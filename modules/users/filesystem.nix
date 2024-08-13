@@ -36,8 +36,6 @@ in
         age.keyFile = "/home/${username}/.config/sops/age/keys.txt";
         defaultSopsFile = "${inputs.nix-secrets}/secrets.yaml";
       };
-
-      programs.bash.enable = lib.mkDefault true;
     };
   };
 }
