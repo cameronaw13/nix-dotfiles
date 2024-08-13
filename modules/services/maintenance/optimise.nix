@@ -18,7 +18,7 @@ in
 
     systemd.services.nix-optimise = {
       serviceConfig.Type = "oneshot";
-      after = [ "auto-wol.service" "nixos-upgrade.service" ];
+      after = [ "auto-wol.service" "auto-pull.service" "nixos-upgrade.service" ];
     };
 
     systemd.timers.nix-optimise = {

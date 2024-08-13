@@ -1,4 +1,4 @@
-{ lib, config, inputs, ... }:
+{ lib, config, inputs, pkgs, ... }:
 let
   username = "filesystem";
   hostname = config.networking.hostName;
@@ -25,6 +25,10 @@ in
         username = username;
         homeDirectory = "/home/${username}";
         stateVersion = "24.05";
+        packages = with pkgs; [
+          # filesystem packages
+          sops
+        ];
       };
 
       imports = [

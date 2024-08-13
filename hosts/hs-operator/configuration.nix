@@ -89,6 +89,13 @@
         enable = true;
         timeframe = "120";
       };
+      mail = {
+        filters = [
+          "]: deleting '/"
+          "]: removing stale link from '/"
+          "]: Rebasing ("
+        ];
+      };
     };
   };
   
