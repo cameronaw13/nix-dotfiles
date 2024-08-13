@@ -34,7 +34,7 @@ in
         virtual_alias_maps = "inline:{ {root=${aliases}} }";
         smtp_header_checks = pcre:/etc/postfix/header_checks;
       };
-      enableHeaderChecks = true;
+      enableHeaderChecks = lib.mkDefault true;
       headerChecks = [
         { 
           action = "REPLACE From: ${hostname} <${sender}>";
