@@ -12,22 +12,5 @@
         fi
       '';
     };
-    /*git = {
-      supportsDryActivation = false;
-      text = let 
-        git = "${pkgs.gitMinimal}/bin/git";
-        hostname = config.networking.hostName;
-      in ''
-        ${git} checkout ${hostname}
-        ${git} add -Av
-        message=$(${git} diff --cached --stat)
-        if [ "$message" != "" ]; then
-          ${git} commit -m "$message"
-          ${git} push origin ${hostname}
-        else
-          echo "No changes, skipping commit..."
-        fi
-      '';
-    };*/
   };
 }

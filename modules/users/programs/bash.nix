@@ -47,15 +47,19 @@ in
           exit 1
         fi
 
-        if [ -z $1 ]; then
+        if [ -z "$1" ]; then
           echo "No operation specified. Refer to nixos-rebuild(8)"
           exit 1
         fi
-        
+
         git checkout ${homepkgs.hostname}
         git add -Av
-        sudo nixos-rebuild $1 --option eval-cache=false
-        
+        sudo nixos-rebuild "$1" --option eval-cache false
+        if (( $? )); then
+          echo "nixos-rebuild $1 failed, exiting..."
+          exit 1
+        fi
+
         message=$(git diff --cached --numstat)
         if [ "$message" = "" ]; then
           echo "No changes found, skipping commit..."
