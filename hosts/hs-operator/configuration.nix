@@ -38,10 +38,7 @@
   /* System Packages */
   environment.systemPackages = with pkgs; [
     # Host-specific system packages
-    inxi
-    pciutils
     tree
-    jq
   ];
 
   /* Local Users */
@@ -74,16 +71,16 @@
       rootAliases = [ "cameronawichman@gmail.com" ];
     };
     maintenance = {
-      dates = "Mon *-*-* 02:15:00";
+      dates = "Thu *-*-* 04:15:00";
       wakeOnLan = {
         enable = true;
         macList = [ "0c:9d:92:1a:49:94" ];
       };
-      autoUpgrade = {
+      gitPull= {
         enable = true;
         user = "cameron";
-        commit = true;
       };
+      nixosRebuild.enable = true;
       collectGarbage = {
         enable = true;
         options = "--delete-older-than 14d";

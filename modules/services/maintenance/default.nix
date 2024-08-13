@@ -10,7 +10,8 @@
   imports = [
     ./start.nix
     ./wol.nix
-    ./upgrade.nix
+    ./pull.nix
+    ./rebuild.nix
     ./optimise.nix
     ./garbage.nix
     #./snapshot.nix

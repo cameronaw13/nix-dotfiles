@@ -46,9 +46,7 @@ in
             fi
             (( ++total ))
           fi
-          contents+=$'\n'
-          contents+="$(echo "$logs" | grep -C2 --group-separator="-- truncated $(( $(echo "$logs" | grep -c "$truncate") - 4 )) lines --" -v "$truncate")"
-          contents+=$'\n\n'
+          contents+=$'\n'"$(echo "$logs" | grep -C2 --group-separator="-- truncated $(( $(echo "$logs" | grep -c "$truncate") - 4 )) lines --" -v "$truncate")"$'\n\n'
         done
 
         cat <<EOF | ${sendmail} -f ${sender} -t ${receivers}
@@ -61,6 +59,7 @@ in
 
       after = [
         "auto-wol.service"
+        "auto-rebase.service"
         "nixos-upgrade.service"
         "nix-optimise.service"
         "nix-gc.service"
