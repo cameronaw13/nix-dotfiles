@@ -46,17 +46,19 @@ in
           echo "Please run within '/etc/nixos' directory"
           exit 1
         fi
-
         if [ -z "$1" ]; then
           echo "No operation specified. Refer to nixos-rebuild(8)"
           exit 1
         fi
 
-        git checkout ${homepkgs.hostname}
+        time=$(date --iso-8601=seconds)
+        sudo systemctl start auto-pull.service
+        journalctl -u auto-pull.service --no-pager -S "$time"
+        
         git add -Av
         sudo nixos-rebuild "$1" --option eval-cache false
         if (( $? )); then
-          echo "nixos-rebuild $1 failed, exiting..."
+          echo "'nixos-rebuild $1' failed, exiting..."
           exit 1
         fi
 
@@ -65,7 +67,6 @@ in
           echo "No changes found, skipping commit..."
           exit 0
         fi
-
         git commit -m "nixos-rebuild: $1" -m "added   deleted"$'\n'"$message"
         git push origin ${homepkgs.hostname}
       '';

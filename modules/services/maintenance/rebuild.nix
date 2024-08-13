@@ -1,4 +1,4 @@
-{ lib, config, inputs, ... }:
+{ lib, config, inputs, pkgs, ... }:
 let
   maintenance = config.local.services.maintenance;
 in
@@ -16,13 +16,18 @@ in
       dates = maintenance.dates;
       operation = "boot";
       flake = inputs.self.outPath;
-      flags = [
-        "-L" # print build logs
-      ];
+      flags = [ "-L" ];
     };
 
     systemd.services.nixos-upgrade = {
-      after = [ "auto-rebase.service" ];
+      script = let
+        nixos-rebuild = "${pkgs.nixos-rebuild}/bin/nixos-rebuild";
+      in lib.mkForce ''
+        ${nixos-rebuild} ${config.system.autoUpgrade.operation} ${toString config.system.autoUpgrade.flags}
+      '';
+
+      after = [ "auto-wol.service" "auto-pull.service" ];
+      requires = lib.lists.optionals maintenance.gitPull.enable [ "auto-pull.service" ];
     };
   };
 }
