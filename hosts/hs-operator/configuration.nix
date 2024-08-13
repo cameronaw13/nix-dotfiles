@@ -51,8 +51,10 @@
 
   home-manager.users = {
     cameron.local.homepkgs = {
+      bash.scripts = {
+        rebuild = true;
+      };
       vim.enable = true;
-      htop.enable = true;
       git = {
         enable = true;
         username = "cameronaw13";
@@ -60,6 +62,7 @@
         signing = true;
       };
       ssh.enable = true;
+      htop.enable = true;
     };
   };
   
@@ -83,7 +86,7 @@
       };
       collectGarbage = {
         enable = true;
-        options = "--delete-older-than 30d";
+        options = "--delete-older-than 14d";
       };
       poweroff = {
         enable = true;
