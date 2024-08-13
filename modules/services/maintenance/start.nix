@@ -3,6 +3,7 @@ let
   maintenance = config.local.services.maintenance;
   dependants = [
     "auto-wol.service"
+    "auto-pull.service"
     "nixos-upgrade.service"
     "nix-gc.service"
     "nix-optimise.service"

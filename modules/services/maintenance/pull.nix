@@ -1,7 +1,6 @@
 { lib, config, pkgs, ... }:
 let
   maintenance = config.local.services.maintenance;
-  user = maintenance.gitPull.user;
 in
 {
   options.local.services.maintenance.gitPull = {
@@ -14,14 +13,12 @@ in
     };
   };
 
-  config = let
-    hasGit = config.home-manager.users.${user}.local.homepkgs.git.enable;
-  in lib.mkIf (maintenance.gitPull.enable && hasGit) {
+  config = lib.mkIf (maintenance.nixosRebuild.enable && maintenance.gitPull.enable) {
     systemd.services.auto-pull = {
       description = "NixOS maintenance rebase service";
       serviceConfig = {
         Type = "oneshot";
-        User = user;
+        User = maintenance.gitPull.user;
         WorkingDirectory = "/etc/nixos";
       };
       startAt = maintenance.dates;
@@ -34,17 +31,18 @@ in
         git = "${pkgs.gitMinimal}/bin/git";
         hostname = config.networking.hostName;
       in ''
-        if [ "$(${git} rev-parse origin/master)" = "$(${git} ls-remote --head origin master | cut -f1)" ]; then
-          echo "No changes from remote master, skipping..."
-          exit 0
+        ${git} fetch -v
+        ${git} stash -u
+        ${git} rebase --committer-date-is-author-date origin/master
+        status=$?
+
+        if [ -n "$(${git} stash list)" ]; then
+          ${git} stash pop
+          status=$(( $status || $? ))
         fi
 
-        ${git} stash
-        ${git} pull --rebase -v origin master
-        status=$?
-        ${git} stash pop
-        if (( $status || $? )); then
-          echo "Rebase conflict! Manual intervention needed."
+        if (( $status )); then
+          echo "Rebase conflicts found. Manual intervention needed."
           exit 1
         fi
         ${git} push --force-with-lease origin ${hostname}
