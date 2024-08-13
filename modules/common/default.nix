@@ -1,7 +1,7 @@
 { lib, pkgs, inputs, ... }:
 {
   imports = [
-    ./upgrade-diff.nix
+    ./activation.nix
   ];
 
   /* Environment */
