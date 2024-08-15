@@ -1,0 +1,53 @@
+name: "flake updates"
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 11 * * 3' # UTC
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  flake-update:
+    runs-on: ubuntu-latest
+    steps:
+      # https://github.com/actions/checkout/pull/1707
+      - uses: actions/checkout@v4.1.7
+        with:
+          ref: master
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - uses: cachix/install-nix-action@v27
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "SSH private repo auth"
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          ssh-agent -a $SSH_AUTH_SOCK >/dev/null
+          ssh-add - <<< "${{ secrets.SSH_KEY_NIX_SECRETS }}"
+          
+      - name: "Commit flake.lock updates"
+        id: update
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          nix flake update --commit-lock-file
+          nix flake check
+          title="$(git log --format=%s -n 1)"
+          body="$(git log --format=%b -n 1)"
+
+      - name: "Pull request & rebase into master"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git push origin master:flake-update
+          url=$(gh pr create --base master --head flake-update --title "${{ steps.update.outputs.title }}" --body "${{ steps.update.outputs.body }}" --label "nix") && {
+            gh pr merge --rebase --auto "$url"
+          } || echo "$(git status)"
+          git push -d origin flake-update
