@@ -57,6 +57,7 @@
         username = "cameronaw13";
         email = "cameronawichman@gmail.com";
         signing = true;
+        gh.enable = true;
       };
       ssh.enable = true;
       htop.enable = true;
@@ -71,16 +72,18 @@
       rootAliases = [ "cameronawichman@gmail.com" ];
     };
     maintenance = {
-      dates = "Thu *-*-* 04:15:00";
+      dates = "Fri *-*-* 04:15:00";
       wakeOnLan = {
         enable = true;
         macList = [ "0c:9d:92:1a:49:94" ];
       };
-      gitPull= {
+      nixosRebuild = {
         enable = true;
-        user = "cameron";
+        pull = {
+          enable = true;
+          user = "cameron";
+        };
       };
-      nixosRebuild.enable = true;
       collectGarbage = {
         enable = true;
         options = "--delete-older-than 14d";

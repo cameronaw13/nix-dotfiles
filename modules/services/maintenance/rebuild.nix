@@ -27,7 +27,7 @@ in
       '';
 
       after = [ "auto-wol.service" "auto-pull.service" ];
-      requires = lib.lists.optionals maintenance.gitPull.enable [ "auto-pull.service" ];
+      requires = lib.lists.optionals maintenance.nixosRebuild.pull.enable [ "auto-pull.service" ];
     };
   };
 }
