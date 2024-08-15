@@ -1,0 +1,53 @@
+name: "flake updates"
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 18 * * 4' # UTC
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  flake-update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.1.7
+        with:
+          ref: master
+
+      - uses: cachix/install-nix-action@v27
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "ssh setup"
+        run: |
+          ssh-agent -a $SSH_AUTH_SOCK >/dev/null
+          ssh-add - <<< "${{ secrets.SSH_KEY_NIX_SECRETS }}"
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+          
+
+      - name: "commit flake.lock updates"
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          nix flake update --commit-lock-file
+          nix flake check
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+
+      - name: "rebase into master"
+        run: |
+          title="$(git log --format=%s -n 1)"
+          body="$(git log --format=%b -n 1)"
+
+          git push origin master:flake-update
+          url=$(gh pr create --base master --head flake-update --title "$title" --body "$body") && {
+            gh pr merge --rebase --auto "$url"
+          } || echo "$(git status)"
+          git push -d origin flake-update
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

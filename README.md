@@ -17,8 +17,17 @@ TODO:
 - Install nixos on bare-metal
 
 References:
-- https://www.youtube.com/@librephoenix
-- https://www.youtube.com/@vimjoyer
-- https://www.youtube.com/@Emergent_Mind
-- https://github.com/NixOS/nixpkgs
-- https://github.com/nix-community/srvos
+- Flakes, modularization, sops-nix:
+    - https://www.youtube.com/@vimjoyer
+- Modularization, flakes options, home-manager, git:
+    - https://www.youtube.com/@librephoenix
+- Sops-nix, secrets submodule:
+    - https://www.youtube.com/@Emergent_Mind
+- Option implementations/syntax:
+    - https://github.com/NixOS/nixpkgs
+- Server security options:
+    - https://github.com/nix-community/srvos
+- Various configurations:
+    - https://github.com/Mic92/dotfiles
+- Flake workflows:
+    - https://github.com/dmadisetti/.dots/blob/template/.github/workflows

@@ -3,7 +3,7 @@ let
   maintenance = config.local.services.maintenance;
 in
 {
-  options.local.services.maintenance.gitPull = {
+  options.local.services.maintenance.nixosRebuild.pull = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -13,12 +13,12 @@ in
     };
   };
 
-  config = lib.mkIf (maintenance.nixosRebuild.enable && maintenance.gitPull.enable) {
+  config = lib.mkIf (maintenance.nixosRebuild.enable && maintenance.nixosRebuild.pull.enable) {
     systemd.services.auto-pull = {
       description = "NixOS maintenance rebase service";
       serviceConfig = {
         Type = "oneshot";
-        User = maintenance.gitPull.user;
+        User = maintenance.nixosRebuild.pull.user;
         WorkingDirectory = "/etc/nixos";
       };
       startAt = maintenance.dates;
