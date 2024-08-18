@@ -1,11 +1,10 @@
 { lib, pkgs, inputs, ... }:
 {
   imports = [
-    ./activation.nix
+    ./activate.nix
   ];
 
   /* Environment */
-  #nix.settings.extra-experimental-features = [ "nix-command" "flakes" ];
   environment = {
     systemPackages = with pkgs; [
       # Multi-host system packages
