@@ -1,6 +1,6 @@
 { lib, config, pkgs, ...}:
 let
-  maintenance = config.local.services.maintenance;
+  inherit (config.local.services) maintenance;
 in
 {
   options.local.services.maintenance.poweroff = {
@@ -27,7 +27,7 @@ in
 
       script = let
         date = "${pkgs.coreutils}/bin/date";
-        timeframe = maintenance.poweroff.timeframe;
+        inherit (maintenance.poweroff) timeframe;
       in ''
         timer=$(systemctl show auto-poweroff.timer | grep "LastTriggerUSec=" | cut -d " " -f3) 
         elapsed=$(( $(${date} +%s) - $(${date} -d $timer +%s) ))

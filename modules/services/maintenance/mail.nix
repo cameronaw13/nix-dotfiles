@@ -1,6 +1,6 @@
 { lib, config, pkgs, ... }:
 let
-  maintenance = config.local.services.maintenance;
+  inherit (config.local.services) maintenance;
 in
 {
   options.local.services.maintenance.mail = {
@@ -28,7 +28,7 @@ in
         services = lib.strings.concatStringsSep " " (map (x: "\"" + x + "\"") config.systemd.services.auto-mail.after); 
         truncates = lib.strings.concatStringsSep " " (map (x: "\"" + x + "\"") maintenance.mail.filters);
         sendmail = "${pkgs.postfix}/bin/sendmail";
-        sender = config.local.services.postfix.sender;
+        inherit (config.local.services.postfix) sender;
         receivers = lib.strings.concatStringsSep "," maintenance.mail.recipients;
       in ''
         serviceList=(${services})

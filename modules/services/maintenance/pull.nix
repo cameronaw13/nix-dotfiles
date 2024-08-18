@@ -1,6 +1,6 @@
 { lib, config, pkgs, ... }:
 let
-  maintenance = config.local.services.maintenance;
+  inherit (config.local.services) maintenance;
 in
 {
   options.local.services.maintenance.upgrade.pull = {
