@@ -114,8 +114,8 @@
   };
 
   /* Cleanup */
-  nix.settings.min-free = (7000 * 1024 * 1024); # 7000 MiB, Start when free space < min-free
-  nix.settings.max-free = (7000 * 1024 * 1024); # 7000 MiB, Stop when used space < max-free
+  nix.settings.min-free = 7000 * 1024 * 1024; # 7000 MiB, Start when free space < min-free
+  nix.settings.max-free = 7000 * 1024 * 1024; # 7000 MiB, Stop when used space < max-free
 
   /* Systemd */
   systemd = {

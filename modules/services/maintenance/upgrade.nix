@@ -1,6 +1,6 @@
 { lib, config, inputs, pkgs, ... }:
 let
-  maintenance = config.local.services.maintenance;
+  inherit (config.local.services) maintenance;
 in
 {
   options.local.services.maintenance.upgrade = {
@@ -13,7 +13,7 @@ in
   config = lib.mkIf maintenance.upgrade.enable {
     system.autoUpgrade = {
       enable = lib.mkDefault true;
-      dates = maintenance.dates;
+      inherit (maintenance) dates;
       operation = "boot";
       flake = inputs.self.outPath;
       flags = [ "-L" ];

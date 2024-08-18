@@ -1,7 +1,6 @@
 { lib, config, ... }:
 let
-  homepkgs = config.local.homepkgs;
-  username = config.home.username;
+  inherit (config.local) homepkgs;
 in
 {
   options.local.homepkgs.bash = {
@@ -25,7 +24,7 @@ in
     programs.bash = {
       enable = lib.mkDefault true;
       bashrcExtra = lib.strings.concatStringsSep "\n" (
-        lib.lists.optional (homepkgs.bash.scripts.sudo) ''
+        lib.lists.optional homepkgs.bash.scripts.sudo ''
           alias sudo="sudo "
         '' ++
         lib.lists.optional (homepkgs.bash.scripts.rebuild && homepkgs.git.enable) ''

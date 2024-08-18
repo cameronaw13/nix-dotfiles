@@ -1,7 +1,7 @@
 { lib, config, ... }:
 let
   hostname = config.networking.hostName;
-  sender = config.local.services.postfix.sender;
+  inherit (config.local.services.postfix) sender;
   aliases = lib.strings.concatStringsSep ", " config.local.services.postfix.rootAliases;
 in
 {
@@ -32,7 +32,7 @@ in
         smtp_sasl_password_maps = "texthash:${config.sops.secrets."postfix/sasl-passwd".path}";
         # optional: Forward mails to root (e.g. from cron jobs, smartd) to me privately:
         virtual_alias_maps = "inline:{ {root=${aliases}} }";
-        smtp_header_checks = pcre:/etc/postfix/header_checks;
+        smtp_header_checks = "pcre:/etc/postfix/header_checks";
       };
       enableHeaderChecks = lib.mkDefault true;
       headerChecks = [

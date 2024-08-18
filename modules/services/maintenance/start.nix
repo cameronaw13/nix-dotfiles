@@ -1,6 +1,6 @@
 { config, ... }:
 let
-  maintenance = config.local.services.maintenance;
+  inherit (config.local.services) maintenance;
   dependants = [
     "auto-wol.service"
     "auto-pull.service"
