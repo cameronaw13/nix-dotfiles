@@ -1,9 +1,9 @@
-name: "flake updates"
+name: "Nix-Flake Updates"
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '15 11 * * 3' # UTC
+    - cron: '15 23 * * 2' # UTC
 
 permissions:
   pull-requests: write
@@ -24,6 +24,7 @@ jobs:
       - uses: cachix/install-nix-action@v27
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: DeterminateSystems/magic-nix-cache-action@v7
 
       - name: "SSH private repo auth"
         env:
@@ -38,7 +39,6 @@ jobs:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
           nix flake update --commit-lock-file
-          nix flake check
           title="$(git log --format=%s -n 1)"
           body="$(git log --format=%b -n 1)"
 

@@ -77,7 +77,7 @@
         enable = true;
         macList = [ "0c:9d:92:1a:49:94" ];
       };
-      nixosRebuild = {
+      upgrade = {
         enable = true;
         pull = {
           enable = true;
