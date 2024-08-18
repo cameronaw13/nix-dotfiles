@@ -1,6 +1,6 @@
 { lib, config, ... }:
 let
-  homepkgs = config.local.homepkgs;
+  inherit (config.local) homepkgs;
 in
 {
   options.local.homepkgs.git.gh = {

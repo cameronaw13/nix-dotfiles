@@ -1,6 +1,6 @@
 { lib, config, pkgs, ... }:
 let
-  homepkgs = config.local.homepkgs;
+  inherit (config.local) homepkgs;
 in
 {
   options.local.homepkgs.htop.enable = lib.mkOption {

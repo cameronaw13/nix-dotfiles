@@ -22,7 +22,7 @@ in
 
     home-manager.users.${username} = {
       home = {
-        username = username;
+        inherit (username);
         homeDirectory = "/home/${username}";
         stateVersion = "24.05";
         packages = with pkgs; [
