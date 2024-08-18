@@ -3,7 +3,7 @@ name: "Nix-Flake Updates"
 on:
   workflow_dispatch:
   schedule:
-    - cron: '15 23 * * 2' # UTC
+    - cron: '15 23 * * 3' # UTC
 
 permissions:
   pull-requests: write
@@ -54,6 +54,6 @@ jobs:
           HASH="$(git log --format=%h -n 1)"
           
           git push origin master:flake-update-$HASH
-          url=$(gh pr create --base master --head flake-update-$HASH --title "$TITLE" --body "$BODY" --label "nix") && {
+          url=$(gh pr create --base master --head flake-update-$HASH --title "$TITLE" --body "$BODY" --label "nixos") && {
             gh pr merge --rebase --delete-branch --auto "$url"
           } || echo "$(git status)"

@@ -29,8 +29,8 @@ in
         date = "${pkgs.coreutils}/bin/date";
         inherit (maintenance.poweroff) timeframe;
       in ''
-        timer=$(systemctl show auto-poweroff.timer | grep "LastTriggerUSec=" | cut -d " " -f3) 
-        elapsed=$(( $(${date} +%s) - $(${date} -d $timer +%s) ))
+        timer=$(systemctl show auto-start.service | grep "ExecMainStartTimestamp=" | cut -d " " -f2-) 
+        elapsed=$(( $(${date} +%s) - $(${date} -d "$timer" +%s) ))
 
         uptime=$(grep -Eo ^[0-9]+ -r /proc/uptime)
         initUptime=$(( $uptime - $elapsed ))
