@@ -2,10 +2,10 @@ version: 2
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
-    schedule:
+    schedule: # UTC
       interval: "weekly"
-      day: "wednesday"
-      time: "11:15"
+      day: "tuesday"
+      time: "23:15"
     commit-message:
       prefix: "[actions] "
     groups:

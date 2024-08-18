@@ -3,14 +3,14 @@ let
   maintenance = config.local.services.maintenance;
 in
 {
-  options.local.services.maintenance.nixosRebuild = {
+  options.local.services.maintenance.upgrade = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = false;
     };
   };
 
-  config = lib.mkIf maintenance.nixosRebuild.enable {
+  config = lib.mkIf maintenance.upgrade.enable {
     system.autoUpgrade = {
       enable = lib.mkDefault true;
       dates = maintenance.dates;
@@ -27,7 +27,7 @@ in
       '';
 
       after = [ "auto-wol.service" "auto-pull.service" ];
-      requires = lib.lists.optionals maintenance.nixosRebuild.pull.enable [ "auto-pull.service" ];
+      requires = lib.lists.optionals maintenance.upgrade.pull.enable [ "auto-pull.service" ];
     };
   };
 }

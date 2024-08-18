@@ -11,7 +11,7 @@
     ./start.nix
     ./wol.nix
     ./pull.nix
-    ./rebuild.nix
+    ./upgrade.nix
     ./optimise.nix
     ./garbage.nix
     #./snapshot.nix
