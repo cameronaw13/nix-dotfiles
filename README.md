@@ -5,7 +5,9 @@ TODO:
 - Modularize users and packages between hosts ✓
 - Add git & github integration ✓
 - Add sops-nix secrets management ✓
-- Flesh out essential hs-operator packages and services
+- Flesh out essential hs-operator packages and services ✓
+- Add github workflows, branching, ci, etc ✓
+- Implement disko
 - Implement impermanence
 - Create microVMs (fully/partially declarative) and oci-containers
 - Create vpn/forward-proxy, public & private reverse-proxy, and IAM environments
