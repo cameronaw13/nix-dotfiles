@@ -50,6 +50,8 @@ in
           exit 1
         fi
 
+        git fetch -v
+        
         time=$(date --iso-8601=seconds)
         sudo systemctl start auto-pull.service
         journalctl -u auto-pull.service --no-pager -S "$time"

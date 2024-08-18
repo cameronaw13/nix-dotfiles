@@ -4,10 +4,12 @@ updates:
     directory: "/"
     schedule: # UTC
       interval: "weekly"
-      day: "tuesday"
+      day: "wednesday"
       time: "23:15"
     commit-message:
       prefix: "[actions] "
+    labels:
+      - "actions"
     groups:
       action-dependencies:
         patterns:
