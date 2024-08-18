@@ -54,6 +54,11 @@ in
         time=$(date --iso-8601=seconds)
         sudo systemctl start auto-pull.service
         journalctl -u auto-pull.service --no-pager -S "$time"
+
+        if (( $(systemctl is-failed auto-pull.service) = 0 )); then
+          echo "auto-pull.service failed, exiting..."
+          exit 1
+        fi
         
         git add -Av
         sudo nixos-rebuild "$1" --option eval-cache false
@@ -64,7 +69,7 @@ in
 
         message=$(git diff --cached --numstat)
         if [ "$message" = "" ]; then
-          echo "No changes found, skipping commit..."
+          echo "no changes found, skipping commit..."
           exit 0
         fi
         git commit -m "nixos-rebuild: $1" -m "added   deleted"$'\n'"$message"
