@@ -1,7 +1,7 @@
 { lib, config, ... }:
 let
-  homepkgs = config.local.homepkgs;
-  username = config.home.username;
+  inherit (config.local) homepkgs;
+  inherit (config.home) username;
 in
 {
   options.local.homepkgs.git = {

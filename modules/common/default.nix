@@ -5,7 +5,7 @@
   ];
 
   /* Environment */
-  nix.settings.extra-experimental-features = [ "nix-command" "flakes" ];
+  #nix.settings.extra-experimental-features = [ "nix-command" "flakes" ];
   environment = {
     systemPackages = with pkgs; [
       # Multi-host system packages
@@ -28,18 +28,21 @@
   time.timeZone = lib.mkDefault "America/Los_Angeles";
   i18n.defaultLocale = lib.mkDefault "en_US.UTF-8";
 
-  /* Security */
+  /* Nix Settings */
+  nix = {
+    settings = {
+      extra-experimental-features = [ "nix-command" "flakes" ];
+      trusted-users = lib.mkDefault [ "root" "@wheel" ];
+      auto-optimise-store = lib.mkDefault true;
+      connect-timeout = lib.mkDefault 10; # cache.nixos.org timeout
+    };
+    daemonCPUSchedPolicy = lib.mkDefault "batch"; # nix daemon process priority
+    daemonIOSchedClass = lib.mkDefault "idle";
+    daemonIOSchedPriority = lib.mkDefault 7;
+  };
+
+  /* Other */
   security.sudo.execWheelOnly = lib.mkDefault true;
-  nix.settings.trusted-users = lib.mkDefault [ "root" "@wheel" ];
-
-  /* Cleanup */
-  nix.settings.auto-optimise-store = lib.mkDefault true;
   boot.tmp.cleanOnBoot = lib.mkDefault true;
-
-  /* Performance */
-  nix.settings.connect-timeout = lib.mkDefault 10; # cache.nixos.org timeout
-  nix.daemonCPUSchedPolicy = lib.mkDefault "batch"; # nix daemon process priority
-  nix.daemonIOSchedClass = lib.mkDefault "idle";
-  nix.daemonIOSchedPriority = lib.mkDefault 7;
   systemd.services.nix-daemon.serviceConfig.OOMScoreAdjust = lib.mkDefault 250; # kill nix builds before user services
 }

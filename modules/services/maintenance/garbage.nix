@@ -1,6 +1,6 @@
 { lib, config, ... }:
 let
-  maintenance = config.local.services.maintenance;
+  inherit (config.local.services) maintenance;
 in
 {
   options.local.services.maintenance.collectGarbage = {
@@ -17,8 +17,8 @@ in
   config = lib.mkIf maintenance.collectGarbage.enable {
     nix.gc = {
       automatic = true;
-      dates = maintenance.dates;
-      options = maintenance.collectGarbage.options;
+      inherit (maintenance) dates;
+      inherit (maintenance.collectGarbage) options;
       persistent = true;
     };
 
