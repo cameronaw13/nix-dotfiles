@@ -36,11 +36,7 @@ jobs:
           ssh-agent -a $SSH_AUTH_SOCK >/dev/null
           ssh-add - <<< "${{ secrets.SSH_KEY_NIX_SECRETS }}"
 
-      - name: "Flake check"
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: nix flake check --keep-going
-      - name: "Omnix check"
+      - name: "Omnix ci check"
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: nix run --accept-flake-config github:juspay/omnix -- ci
