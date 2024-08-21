@@ -2,12 +2,26 @@ name: "Nix CI"
 
 on:
   pull_request:
+  workflow_run:
+    workflows: [Nix-Flake Updates]
+    types: [completed]
 
 jobs:
   nix-lints:
     runs-on: ubuntu-latest
     steps:
+      - if: ${{ github.event_name == 'workflow_run' }}
+        id: latest-pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.actions_repository }}
+        run: |
+          output="$(gh pr list -R "$REPO" --json headRefName -q .[0].headRefName)"
+          echo "HEAD-REF=$output" >> "$GITHUB_OUTPUT"
+
       - uses: actions/checkout@v4.1.7
+        with:
+          ref: ${{ github.event.pull_request.base.ref || steps.latest-pr.outputs.HEAD-REF }}
 
       - uses: cachix/install-nix-action@v27
         with:
@@ -22,8 +36,18 @@ jobs:
   nix-checks:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.7
+      - if: ${{ github.event_name == 'workflow_run' }}
+        id: latest-pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          output="$(gh pr list -R ${{ github.action_repository }} --json headRefName -q .[0].headRefName)"
+          echo "HEAD-REF=$output" >> "$GITHUB_OUTPUT"
 
+      - uses: actions/checkout@v4.1.7
+        with:
+          ref: ${{ github.event.pull_request.base.ref || steps.latest-pr.outputs.HEAD-REF }}
+    
       - uses: cachix/install-nix-action@v27
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
