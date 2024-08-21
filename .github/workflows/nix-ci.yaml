@@ -2,13 +2,28 @@ name: "Nix CI"
 
 on:
   pull_request:
+  workflow_run:
+    workflows: [Nix-Flake Updates]
+    types: [completed]
 
 jobs:
   nix-lints:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion != 'failure' }}
     steps:
+      - id: find-ref
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            output="${{ github.event.pull_request.head.ref }}"
+          else
+            output="flake-update"
+          fi
+          echo "HEAD_REF=$output" << "$GITHUB_OUTPUT"
+      
       - uses: actions/checkout@v4.1.7
-
+        with:
+          ref: ${{ steps.find-ref.outputs.HEAD_REF }}
+      
       - uses: cachix/install-nix-action@v27
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
@@ -21,9 +36,21 @@ jobs:
 
   nix-checks:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion != 'failure' }}
     steps:
+      - id: find-ref
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            output="${{ github.event.pull_request.head.ref }}"
+          else
+            output="flake-update"
+          fi
+          echo "HEAD_REF=$output" >> "$GITHUB_OUTPUT"
+      
       - uses: actions/checkout@v4.1.7
-
+        with:
+          ref: ${{ steps.find-ref.outputs.HEAD_REF }}
+      
       - uses: cachix/install-nix-action@v27
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
