@@ -2,19 +2,22 @@ name: "Nix CI"
 
 on:
   pull_request:
-  workflow_call:
-    inputs:
-      head-ref:
-        required: true
-        type: string
+  workflow_run:
+    workflows: [Nix-Flake Updates]
+    types: [completed]
 
 jobs:
   nix-lints:
     runs-on: ubuntu-latest
     steps:
+      - id: latest-pr
+        run: |
+          output="$(gh pr list --json headRefName -q .[0].headRefName)"
+          echo "HEAD-REF=$output" >> "$GITHUB_OUTPUT"
+      
       - uses: actions/checkout@v4.1.7
         with:
-          ref: ${{ github.event.pull_request.head.ref || inputs.head-ref }}
+          ref: ${{ github.event.pull_request.head.ref || steps.latest-pr.outputs.HEAD-REF }}
       
       - uses: cachix/install-nix-action@v27
         with:
@@ -29,9 +32,14 @@ jobs:
   nix-checks:
     runs-on: ubuntu-latest
     steps:
+      - id: latest-pr
+        run: |
+          output="$(gh pr list --json headRefName -q .[0].headRefName)"
+          echo "HEAD-REF=$output" >> "$GITHUB_OUTPUT"
+      
       - uses: actions/checkout@v4.1.7
         with:
-          ref: ${{ github.event.pull_request.head.ref || inputs.head-ref }}
+          ref: ${{ github.event.pull_request.head.ref || steps.latest-pr.outputs.HEAD-REF }}
       
       - uses: cachix/install-nix-action@v27
         with:
