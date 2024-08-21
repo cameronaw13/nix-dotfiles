@@ -24,7 +24,6 @@ jobs:
       - uses: cachix/install-nix-action@v27
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: DeterminateSystems/magic-nix-cache-action@v7
 
       - name: "SSH private repo auth"
         env:
@@ -34,20 +33,29 @@ jobs:
           ssh-add - <<< "${{ secrets.SSH_KEY_NIX_SECRETS }}"
           
       - name: "Commit flake.lock updates"
-        id: update
+        id: flake-update
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: |
-          nix flake update --commit-lock-file
-          title="$(git log --format=%s -n 1)"
-          body="$(git log --format=%b -n 1)"
+        run: nix flake update --commit-lock-file
+
+      # https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md
+      - name: "Github app token generation"
+        id: generate-token
+        uses: actions/create-github-app-token@v1.10.3
+        with:
+          app_id: ${{ secrets.PR_APP_ID }}
+          private_key: ${{ secrets.PR_APP_KEY }}
 
       - name: "Pull request & rebase into master"
+        id: pull-request
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
-          git push origin master:flake-update
-          url=$(gh pr create --base master --head flake-update --title "${{ steps.update.outputs.title }}" --body "${{ steps.update.outputs.body }}" --label "nix") && {
-            gh pr merge --rebase --auto "$url"
+          TITLE="$(git log --format=%s -n 1)"
+          BODY="$(git log --format=%b -n 1)"
+          HASH="$(git log --format=%h -n 1)"
+          
+          git push origin master:flake-update-$HASH
+          url=$(gh pr create --base master --head flake-update-$HASH --title "$TITLE" --body "$BODY" --label "nix") && {
+            gh pr merge --rebase --delete-branch --auto "$url"
           } || echo "$(git status)"
-          git push -d origin flake-update
