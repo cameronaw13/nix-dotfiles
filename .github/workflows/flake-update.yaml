@@ -46,15 +46,9 @@ jobs:
           TITLE="$(git log --format=%s -n 1)"
           BODY="$(git log --format=%b -n 1)"
           HASH="$(git log --format=%H -n 1)"
-          echo "HASH=$HASH" >> "$GITHUB_OUTPUT"
+          echo "HEAD-REF=flake-update-$HASH" >> "$GITHUB_OUTPUT"
           
           git push origin master:flake-update-$HASH
           url=$(gh pr create --base master --head flake-update-$HASH --title "$TITLE" --body "$BODY" --label "nix") && {
             gh pr merge --rebase --delete-branch --auto "$url"
           } || echo "$(git status)"
-
-  call-nix-ci:
-    needs: flake-update
-    uses: ./.github/workflows/nix-ci.yaml
-    with:
-      head-ref: flake-update-${{ steps.pull-request.outputs.HASH }}
