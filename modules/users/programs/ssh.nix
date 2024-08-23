@@ -10,16 +10,7 @@ in
     };
   };
 
-  config = lib.mkIf (homepkgs.ssh.enable && homepkgs.git.enable) {
-    home.file.known_hosts = {
-      enable = lib.mkDefault true;
-      target = ".ssh/known_hosts";
-      force = true;
-      text = ''
-        github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
-      '';
-    };
-
+  config = lib.mkIf homepkgs.ssh.enable {
     programs.ssh = {
       enable = lib.mkDefault true;
       matchBlocks = {
@@ -31,6 +22,15 @@ in
           ];
         };
       };
+    };
+
+    home.file.known_hosts = lib.mkIf homepkgs.git.enable {
+      enable = lib.mkDefault true;
+      target = ".ssh/known_hosts";
+      force = true;
+      text = ''
+        github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
+      '';
     };
   };
 }

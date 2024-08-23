@@ -29,7 +29,10 @@ in
       userName = homepkgs.git.username;
       userEmail = homepkgs.git.email;
       extraConfig = lib.mkMerge [
-        { init.defaultBranch = "master"; }
+        { 
+          init.defaultBranch = "master";
+          core.sharedRepository = "group";
+        }
         (lib.mkIf homepkgs.git.signing {
           commit.gpgsign = true;
           gpg.format = "ssh";
