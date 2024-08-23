@@ -43,12 +43,23 @@
 
   /* Local Users */
   local.users = {
-    cameron.enable = true;
+    cameron = {
+      enable = true;
+      uid = 1000;
+      groups = [ "wheel" ];
+      linger = true;
+    };
+    filesystem = {
+      enable = true;
+      uid = 1001;
+      groups = [ "wheel" ];
+    };
   };
 
   home-manager.users = {
     cameron.local.homepkgs = {
       bash.scripts = {
+        sudo = true;
         rebuild = true;
       };
       vim.enable = true;
@@ -62,6 +73,18 @@
       ssh.enable = true;
       htop.enable = true;
     };
+    filesystem.local.homepkgs = {
+      bash.scripts = {
+        sudo = true;
+      };
+      htop.enable = true;
+      vim.enable = true;
+      git = {
+        enable = true;
+        username = "cameronaw13";
+        email = "cameronawichman@gmail.com";
+      };
+    };
   };
   
   /* Local Services */
@@ -72,7 +95,7 @@
       rootAliases = [ "cameronawichman@gmail.com" ];
     };
     maintenance = {
-      dates = "Fri *-*-* 04:15:00";
+      dates = "Fri *-*-* 12:22:40";
       wakeOnLan = {
         enable = true;
         macList = [ "0c:9d:92:1a:49:94" ];

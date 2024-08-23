@@ -11,10 +11,10 @@ in
     scripts = {
       sudo = lib.mkOption {
         type = lib.types.bool;
-        default = true;
+        default = false;
       };
       rebuild = lib.mkOption {
-        type = lib.types.bool;
+        type = lib.types.addCheck lib.types.bool (x: !x || homepkgs.git.enable);
         default = false;
       };
     };
@@ -27,13 +27,13 @@ in
         lib.lists.optional homepkgs.bash.scripts.sudo ''
           alias sudo="sudo "
         '' ++
-        lib.lists.optional (homepkgs.bash.scripts.rebuild && homepkgs.git.enable) ''
+        lib.lists.optional homepkgs.bash.scripts.rebuild ''
           alias rebuild="bash ~/Scripts/rebuild.sh"
         ''
       );
     };
 
-    home.file.rebuild = lib.mkIf (homepkgs.bash.scripts.rebuild && homepkgs.git.enable) {
+    home.file.rebuild = lib.mkIf homepkgs.bash.scripts.rebuild {
       enable = lib.mkDefault true;
       target = "Scripts/rebuild.sh";
       force = true;
@@ -50,17 +50,24 @@ in
           exit 1
         fi
 
+        ## Rebase ##
         git fetch -v
-        
-        time=$(date --iso-8601=seconds)
-        sudo systemctl start auto-pull.service
-        journalctl -u auto-pull.service --no-pager -S "$time"
+        git stash -u
+        git rebase origin/master
+        status=$?
 
-        if (( $(systemctl is-failed auto-pull.service) = 0 )); then
-          echo "auto-pull.service failed, exiting..."
+        if [ -n "$(git stash list)" ]; then
+          git stash pop
+          status=$(( $status || $? ))
+        fi
+
+        if (( $status )); then
+          echo "Rebase conflicts found. Manual intervention needed."
           exit 1
         fi
-        
+        git push --force-with-lease origin ${homepkgs.hostname}
+
+        ## Rebuild ##
         git add -Av
         sudo nixos-rebuild "$1" --option eval-cache false
         if (( $? )); then
