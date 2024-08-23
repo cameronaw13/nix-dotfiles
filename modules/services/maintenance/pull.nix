@@ -5,15 +5,17 @@ in
 {
   options.local.services.maintenance.upgrade.pull = {
     enable = lib.mkOption {
-      type = lib.types.bool;
+      type = lib.types.addCheck lib.types.bool (x: !x || maintenance.upgrade.enable);
       default = false;
     };
     user = lib.mkOption {
-      type = lib.types.singleLineStr;
+      type = lib.types.addCheck lib.types.singleLineStr (
+        x: config.users.users.${x}.linger && config.home-manager.users.${x}.local.homepkgs.git.enable
+      );
     };
   };
 
-  config = lib.mkIf (maintenance.upgrade.enable && maintenance.upgrade.pull.enable) {
+  config = lib.mkIf maintenance.upgrade.pull.enable {
     systemd.services.auto-pull = {
       description = "NixOS maintenance rebase service";
       serviceConfig = {
@@ -30,7 +32,9 @@ in
       script = let
         git = "${pkgs.gitMinimal}/bin/git";
         hostname = config.networking.hostName;
+        user = maintenance.upgrade.pull.user;
       in ''
+        #${git} config --global --add safe.directory /etc/nixos
         ${git} fetch -v
         ${git} stash -u
         ${git} rebase origin/master
