@@ -36,56 +36,63 @@
   };
   
   /* System Packages */
-  environment.systemPackages = with pkgs; [
-    # Host-specific system packages
-    tree
-  ];
+  environment.systemPackages = builtins.attrValues {
+    inherit (pkgs)
+    ;
+  };
 
   /* Local Users */
-  local.users = {
-    cameron = {
-      enable = true;
-      uid = 1000;
-      groups = [ "wheel" ];
-      linger = true;
+  ## Cameron ##
+  local.users.cameron = {
+    enable = true;
+    uid = 1000;
+    groups = [ "wheel" ];
+    packages = builtins.attrValues {
+      inherit (pkgs)
+      sops
+      age
+      tree
+      ;
     };
-    filesystem = {
+    linger = true;
+  };
+  home-manager.users.cameron.local.homepkgs = {
+    bash.scripts = {
+      sudo.enable = true;
+      rebuild.enable = true;
+    };
+    vim.enable = true;
+    git = {
       enable = true;
-      uid = 1001;
-      groups = [ "wheel" ];
+      username = "cameronaw13";
+      email = "cameronawichman@gmail.com";
+      signing = true;
+      gh.enable = true;
+    };
+    ssh.enable = true;
+    htop.enable = true;
+  };
+  ## Filesystem ##
+  /*local.users.filesystem = {
+    enable = true;
+    uid = 1001;
+    groups = [ ];
+    packages = builtins.attrValues {
+      inherit (pkgs)
+      tree
+      ;
     };
   };
-
-  home-manager.users = {
-    cameron.local.homepkgs = {
-      bash.scripts = {
-        sudo = true;
-        rebuild = true;
-      };
-      vim.enable = true;
-      git = {
-        enable = true;
-        username = "cameronaw13";
-        email = "cameronawichman@gmail.com";
-        signing = true;
-        gh.enable = true;
-      };
-      ssh.enable = true;
-      htop.enable = true;
+  home-manager.users.filesystem.local.homepkgs = {
+    vim.enable = true;
+    git = {
+      enable = true;
+      username = "cameronaw13";
+      email = "cameronawichman@gmail.com";
+      signing = true;
+      gh.enable = true;
     };
-    filesystem.local.homepkgs = {
-      bash.scripts = {
-        sudo = true;
-      };
-      htop.enable = true;
-      vim.enable = true;
-      git = {
-        enable = true;
-        username = "cameronaw13";
-        email = "cameronawichman@gmail.com";
-      };
-    };
-  };
+  };*/
   
   /* Local Services */
   local.services = {
@@ -95,7 +102,7 @@
       rootAliases = [ "cameronawichman@gmail.com" ];
     };
     maintenance = {
-      dates = "Fri *-*-* 12:22:40";
+      dates = "Fri *-*-* 04:15:00";
       wakeOnLan = {
         enable = true;
         macList = [ "0c:9d:92:1a:49:94" ];

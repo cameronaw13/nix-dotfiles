@@ -1,8 +1,9 @@
 { lib, config, ... }:
 let
+  inherit (config.local) services;
+  inherit (services.postfix) sender;
   hostname = config.networking.hostName;
-  inherit (config.local.services.postfix) sender;
-  aliases = lib.strings.concatStringsSep ", " config.local.services.postfix.rootAliases;
+  aliases = lib.strings.concatStringsSep ", " services.postfix.rootAliases;
 in
 {
   options.local.services.postfix = {
@@ -20,7 +21,7 @@ in
     };
   };
 
-  config = lib.mkIf config.local.services.postfix.enable {
+  config = lib.mkIf services.postfix.enable {
     services.postfix = {
       enable = lib.mkDefault true;
       relayHost = "smtp.gmail.com";
@@ -35,12 +36,10 @@ in
         smtp_header_checks = "pcre:/etc/postfix/header_checks";
       };
       enableHeaderChecks = lib.mkDefault true;
-      headerChecks = [
-        { 
+      headerChecks = [ { 
           action = "REPLACE From: ${hostname} <${sender}>";
           pattern = "/^From:.*/";
-        }
-      ];
+      } ];
     };
 
     sops.secrets."postfix/sasl-passwd" = {
