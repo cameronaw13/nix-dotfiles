@@ -17,6 +17,10 @@ in
       type = lib.types.listOf lib.types.singleLineStr;
       default = [ ];
     };
+    packages = lib.mkOption {
+      type = lib.types.listOf lib.types.package;
+      default = [ ];
+    };
     linger = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -41,10 +45,7 @@ in
         inherit (username);
         homeDirectory = "/home/${username}";
         stateVersion = "24.05";
-        packages = with pkgs; [
-          # filesystem packages
-          sops
-        ];
+        packages = users.${username}.packages;
       };
 
       imports = [

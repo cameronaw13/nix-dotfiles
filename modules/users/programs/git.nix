@@ -31,7 +31,7 @@ in
       extraConfig = lib.mkMerge [
         { 
           init.defaultBranch = "master";
-          core.sharedRepository = "group";
+          safe.directory = [ "/etc/nixos" "/etc/nixos/secrets" ];
         }
         (lib.mkIf homepkgs.git.signing {
           commit.gpgsign = true;
