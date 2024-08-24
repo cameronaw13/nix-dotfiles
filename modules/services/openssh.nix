@@ -1,4 +1,7 @@
 { lib, config, ... }:
+let
+  inherit (config.local) services;
+in
 {
   options.local.services.openssh = {
     enable = lib.mkOption {
@@ -7,7 +10,7 @@
     };
   };
 
-  config = lib.mkIf config.local.services.openssh.enable {
+  config = lib.mkIf services.openssh.enable {
     services.openssh = {
       enable = lib.mkDefault true;
       settings = {

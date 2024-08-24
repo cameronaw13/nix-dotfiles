@@ -7,8 +7,8 @@ TODO:
 - Add sops-nix secrets management ✓
 - Flesh out essential hs-operator packages and services ✓
 - Add github workflows, branching, ci, etc ✓
-- Implement disko
-- Implement impermanence
+- Handle multi-user permissions ✓
+- Implement disko & impermanence
 - Create microVMs (fully/partially declarative) and oci-containers
 - Create vpn/forward-proxy, public & private reverse-proxy, and IAM environments
 - Write multi-host management scripts

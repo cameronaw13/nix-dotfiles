@@ -13,6 +13,10 @@ in
         x: config.users.users.${x}.linger && config.home-manager.users.${x}.local.homepkgs.git.enable
       );
     };
+    path = lib.mkOption {
+      type = lib.types.path;
+      default = "/etc/nixos";
+    };
   };
 
   config = lib.mkIf maintenance.upgrade.pull.enable {
@@ -21,7 +25,7 @@ in
       serviceConfig = {
         Type = "oneshot";
         User = maintenance.upgrade.pull.user;
-        WorkingDirectory = "/etc/nixos";
+        WorkingDirectory = maintenance.upgrade.pull.path; 
       };
       startAt = maintenance.dates;
 

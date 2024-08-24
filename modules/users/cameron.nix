@@ -1,4 +1,4 @@
-{ lib, config, inputs, pkgs, ... }:
+{ lib, config, inputs, ... }:
 let
   username = "cameron";
   hostname = config.networking.hostName;
@@ -15,6 +15,10 @@ in
     };
     groups = lib.mkOption {
       type = lib.types.listOf lib.types.singleLineStr;
+      default = [ ];
+    };
+    packages = lib.mkOption {
+      type = lib.types.listOf lib.types.package;
       default = [ ];
     };
     linger = lib.mkOption {
@@ -41,10 +45,7 @@ in
         inherit (username);
         homeDirectory = "/home/${username}";
         stateVersion = "24.05";
-        packages = with pkgs; [
-          # cameron packages
-          sops
-        ];
+        packages = users.${username}.packages;
       };
 
       imports = [
