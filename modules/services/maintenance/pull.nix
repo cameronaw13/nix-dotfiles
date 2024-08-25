@@ -36,7 +36,7 @@ in
       script = let
         git = "${pkgs.gitMinimal}/bin/git";
         hostname = config.networking.hostName;
-        user = maintenance.upgrade.pull.user;
+        inherit (maintenance.upgrade.pull.user);
       in ''
         #${git} config --global --add safe.directory /etc/nixos
         ${git} fetch -v

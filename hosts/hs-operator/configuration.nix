@@ -41,96 +41,96 @@
     ;
   };
 
-  /* Local Users */
-  ## Cameron ##
-  local.users.cameron = {
-    uid = 1000;
-    groups = [ "wheel" ];
-    packages = builtins.attrValues {
-      inherit (pkgs)
-      sops
-      age
-      tree
-      ;
-    };
-    linger = true;
-  };
-  home-manager.users.cameron.local.homepkgs = {
-    bash.scripts = {
-      sudo.enable = true;
-      rebuild.enable = true;
-    };
-    vim.enable = true;
-    git = {
-      enable = true;
-      username = "cameronaw13";
-      email = "cameronawichman@gmail.com";
-      signing = true;
-      gh.enable = true;
-    };
-    ssh.enable = true;
-    htop.enable = true;
-  };
-
-  ## Filesystem ##
-  local.users.filesystem = {
-    uid = 1001;
-    groups = [ "wheel" ];
-    packages = builtins.attrValues {
-      inherit (pkgs)
-      tree
-      ;
-    };
-  };
-  home-manager.users.filesystem.local.homepkgs = {
-    vim.enable = true;
-    git = {
-      enable = true;
-      username = "cameronaw13";
-      email = "cameronawichman@gmail.com";
-      signing = true;
-      gh.enable = true;
-    };
-  };
-  
-  /* Local Services */
-  local.services = {
-    postfix = {
-      enable = true;
-      sender = "cameronserverlog@gmail.com";
-      rootAliases = [ "cameronawichman@gmail.com" ];
-    };
-    maintenance = {
-      dates = "Fri *-*-* 04:15:00";
-      wakeOnLan = {
-        enable = true;
-        macList = [ "0c:9d:92:1a:49:94" ];
+  /* Local Config */
+  local = {
+    ## Cameron ##
+    users.cameron = {
+      uid = 1000;
+      extraGroups = [ "wheel" ];
+      linger = true;
+      userPackages = builtins.attrValues {
+        inherit (pkgs)
+        sops
+        age
+        tree
+        ;
       };
-      upgrade = {
-        enable = true;
-        pull = {
+      homePackages = {
+        bash.scripts = {
+          sudo.enable = true;
+          rebuild.enable = true;
+        };
+        vim.enable = true;
+        git = {
           enable = true;
-          user = "cameron";
+          username = "cameronaw13";
+          email = "cameronawichman@gmail.com";
+          signing = true;
+          gh.enable = true;
+        };
+        ssh.enable = true;
+        htop.enable = true;
+      };
+    };
+    ## Filesystem ##
+    users.filesystem = {
+      uid = 1001;
+      extraGroups = [ "wheel" ];
+      userPackages = builtins.attrValues {
+        inherit (pkgs)
+        tree
+        ;
+      };
+      homePackages = {
+        vim.enable = true;
+        git = {
+          enable = true;
+          username = "cameronaw13";
+          email = "cameronawichman@gmail.com";
+          signing = true;
+          gh.enable = true;
         };
       };
-      collectGarbage = {
+    };
+    ## Services ##
+    services = {
+      postfix = {
         enable = true;
-        options = "--delete-older-than 14d";
+        sender = "cameronserverlog@gmail.com";
+        rootAliases = [ "cameronawichman@gmail.com" ];
       };
-      poweroff = {
-        enable = true;
-        timeframe = "120";
-      };
-      mail = {
-        filters = [
-          "]: deleting '/"
-          "]: removing stale link from '/"
-          "]: Rebasing ("
-        ];
+      maintenance = {
+        dates = "Fri *-*-* 04:15:00";
+        wakeOnLan = {
+          enable = true;
+          macList = [ "0c:9d:92:1a:49:94" ];
+        };
+        upgrade = {
+          enable = true;
+          pull = {
+            enable = true;
+            user = "cameron";
+          };
+        };
+        collectGarbage = {
+          enable = true;
+          options = "--delete-older-than 14d";
+        };
+        poweroff = {
+          enable = true;
+          timeframe = "120";
+        };
+        mail = {
+          filters = [
+            "]: deleting '/"
+            "]: removing stale link from '/"
+            "]: Rebasing ("
+          ];
+        };
       };
     };
   };
-  
+
   /* Secrets */
   sops = {
     defaultSopsFile = "${inputs.nix-secrets}/secrets.yaml";
