@@ -3,7 +3,7 @@
   imports = [ 
     ./hardware-configuration.nix
     ../../modules/common/default.nix
-    ../../modules/users/default.nix
+    ../../modules/users.nix
     ../../modules/services/default.nix
     inputs.home-manager.nixosModules.home-manager
     inputs.sops-nix.nixosModules.sops
@@ -44,7 +44,6 @@
   /* Local Users */
   ## Cameron ##
   local.users.cameron = {
-    enable = true;
     uid = 1000;
     groups = [ "wheel" ];
     packages = builtins.attrValues {
@@ -72,11 +71,11 @@
     ssh.enable = true;
     htop.enable = true;
   };
+
   ## Filesystem ##
-  /*local.users.filesystem = {
-    enable = true;
+  local.users.filesystem = {
     uid = 1001;
-    groups = [ ];
+    groups = [ "wheel" ];
     packages = builtins.attrValues {
       inherit (pkgs)
       tree
@@ -92,7 +91,7 @@
       signing = true;
       gh.enable = true;
     };
-  };*/
+  };
   
   /* Local Services */
   local.services = {
