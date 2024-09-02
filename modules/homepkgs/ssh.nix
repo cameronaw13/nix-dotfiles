@@ -25,7 +25,6 @@ in
     };
 
     home.file.known_hosts = lib.mkIf homepkgs.git.enable {
-      enable = lib.mkDefault true;
       target = ".ssh/known_hosts";
       force = true;
       text = ''

@@ -10,6 +10,10 @@ in
       default = true;
     };
     scripts = {
+      path = lib.mkOption {
+        type = lib.types.path;
+        default = "/etc/nixos";
+      };
       sudo = {
         enable = lib.mkOption {
           type = lib.types.bool;
@@ -21,9 +25,11 @@ in
           type = lib.types.addCheck lib.types.bool (x: !x || homepkgs.git.enable);
           default = false;
         };
-        path = lib.mkOption {
-          type = lib.types.path;
-          default = "/etc/nixos";
+      };
+      createpr = {
+        enable = lib.mkOption {
+          type = lib.types.addCheck lib.types.bool (x: !x || homepkgs.git.enable);
+          default = false;
         };
       };
     };
@@ -38,19 +44,21 @@ in
         '' ++
         lib.lists.optional scripts.rebuild.enable ''
           alias rebuild="bash ~/Scripts/rebuild.sh"
+        '' ++
+        lib.lists.optional scripts.createpr.enable ''
+          alias createpr="bash ~/Scripts/createpr.sh"
         ''
       );
     };
 
     home.file.rebuild = lib.mkIf scripts.rebuild.enable {
-      enable = lib.mkDefault true;
       target = "Scripts/rebuild.sh";
       force = true;
       text = ''
         #!/usr/bin/env bash
         toplevel=$(git rev-parse --show-toplevel)
-        if [ "$toplevel" != "${scripts.rebuild.path}" ]; then
-          echo "Please run within '${scripts.rebuild.path}' directory"
+        if [ "$toplevel" != "${scripts.path}" ]; then
+          echo "Please run within '${scripts.path}' directory"
           exit 1
         fi
         if [ -z "$1" ]; then
@@ -64,10 +72,10 @@ in
         git rebase origin/master
         status=$?
         if [ -n "$(git stash list)" ]; then
-          git stash pop
-          status=$(( $status || $? ))
+          git stash pop -q
+          status=$(( status || $? ))
         fi
-        if (( $status )); then
+        if (( status )); then
           echo "Rebase conflicts found. Manual intervention needed."
           exit 1
         fi
@@ -75,8 +83,7 @@ in
 
         echo "-- Rebuild --"
         git add -Av
-        sudo nixos-rebuild "$1" --option eval-cache false
-        if (( $? )); then
+        if ! sudo nixos-rebuild "$1" --option eval-cache false; then
           echo "'nixos-rebuild $1' failed, exiting..."
           exit 1
         fi
@@ -89,6 +96,34 @@ in
         fi
         git commit -m "nixos-rebuild: $1" -m "added   deleted"$'\n'"$message"
         git push origin ${homepkgs.hostname}
+      '';
+    };
+    home.file.createpr = lib.mkIf scripts.createpr.enable {
+      target = "Scripts/createpr.sh";
+      force = true;
+      text = ''
+        #!/usr/bin/env bash
+        tabs 4
+        toplevel=$(git rev-parse --show-toplevel)
+        if [ "$toplevel" != "${scripts.path}" ]; then
+          echo "Please run within '${scripts.path}' directory"
+          exit 1
+        fi
+        base="master"
+        head="${homepkgs.hostname}"
+        read -rp "PR Title: " title
+        body="$(git log origin/master..HEAD --reverse --format=%s$'\n```\n'%b$'```')"
+        fmtbody="$(sed "s/^/\t/g" <<< "$body")"
+
+        printf "\nBase: %s" "$base"
+        printf "\nHead: %s" "$head"
+        printf "\nTitle: '%s'" "$title"
+        printf "\nBody:\n%s\n\n" "$fmtbody"
+
+        read -rp "Do you wish to continue? (y/N): " choice
+        case "$choice" in
+          y|Y) gh pr create --base "$base" --head "$head" --title "$title" --body "$body";;
+        esac
       '';
     };
   };

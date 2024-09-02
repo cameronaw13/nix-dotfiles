@@ -3,9 +3,11 @@ let
   inherit (config.local) homepkgs;
 in
 {
-  options.local.homepkgs.vim.enable = lib.mkOption {
-    type = lib.types.bool;
-    default = false;
+  options.local.homepkgs.vim = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+    };
   };
 
   config = lib.mkIf homepkgs.vim.enable {

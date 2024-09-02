@@ -27,7 +27,7 @@ in
       relayHost = "smtp.gmail.com";
       relayPort = 587;
       config = {
-        smtp_use_tls = "yes";
+        smtp_tls_security_level = "may";
         smtp_sasl_auth_enable = "yes";
         smtp_sasl_security_options = "";
         smtp_sasl_password_maps = "texthash:${config.sops.secrets."postfix/sasl-passwd".path}";

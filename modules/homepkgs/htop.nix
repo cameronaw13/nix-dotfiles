@@ -3,15 +3,16 @@ let
   inherit (config.local) homepkgs;
 in
 {
-  options.local.homepkgs.htop.enable = lib.mkOption {
-    type = lib.types.bool;
-    default = false;
+  options.local.homepkgs.htop = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+    };
   };
 
   config = lib.mkIf homepkgs.htop.enable {
     home.packages = with pkgs; [ htop ];
     home.file.htoprc = {
-      enable = lib.mkDefault true;
       target = ".config/htop/htoprc";
       force = true; # Force repleace htop's custom cfgs
       text = ''
