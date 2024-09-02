@@ -2,6 +2,7 @@
 {
   imports = [ 
     ./hardware-configuration.nix
+    ./extra-hardware-config.nix
     ../../modules/common/default.nix
     ../../modules/users.nix
     ../../modules/services/default.nix
@@ -9,32 +10,6 @@
     inputs.sops-nix.nixosModules.sops
   ];
 
-  /* Virtual Console */
-  console = {
-    earlySetup = true;
-    #font = "";
-    keyMap = "us";
-  };
-
-  /* Networking */
-  systemd.network = {
-    enable = true;
-    networks."50-ens18" = {
-      matchConfig.Name = "ens18";
-      address = [ "192.168.4.200/24" ];
-      gateway = [ "192.168.4.1" ];
-      dns = [ "9.9.9.9" ];
-    };
-    links."50-ens18" = {
-      matchConfig.OriginalName = "ens18";
-      linkConfig.WakeOnLan = "magic";
-    };
-  };
-  networking = {
-    useDHCP = false;
-    hostName = "hs-operator";
-  };
-  
   /* System Packages */
   environment.systemPackages = builtins.attrValues {
     inherit (pkgs)
@@ -59,6 +34,7 @@
         bash.scripts = {
           sudo.enable = true;
           rebuild.enable = true;
+          createpr.enable = true;
         };
         vim.enable = true;
         git = {
@@ -90,6 +66,7 @@
           signing = true;
           gh.enable = true;
         };
+        htop.enable = true;
       };
     };
     ## Services ##
@@ -125,6 +102,7 @@
             "]: deleting '/"
             "]: removing stale link from '/"
             "]: Rebasing ("
+            "]: removing profile version "
           ];
         };
       };
@@ -145,6 +123,13 @@
   /* Cleanup */
   nix.settings.min-free = 7000 * 1024 * 1024; # 7000 MiB, Start when free space < min-free
   nix.settings.max-free = 7000 * 1024 * 1024; # 7000 MiB, Stop when used space < max-free
+
+  /* Virtual Console */
+  console = {
+    earlySetup = true;
+    #font = "";
+    keyMap = "us";
+  };
 
   /* Systemd */
   systemd = {
