@@ -5,7 +5,7 @@ updates:
     schedule: # UTC
       interval: "weekly"
       day: "wednesday"
-      time: "23:00"
+      time: "22:00"
     commit-message:
       prefix: "[actions] "
     labels:

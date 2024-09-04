@@ -3,6 +3,7 @@
   imports = [ 
     ./hardware-configuration.nix
     ./extra-hardware-config.nix
+    #./disko.nix
     ../../modules/common/default.nix
     ../../modules/users.nix
     ../../modules/services/default.nix
@@ -95,7 +96,7 @@
         };
         poweroff = {
           enable = true;
-          timeframe = "120";
+          timeframe = 120; # 2 min
         };
         mail = {
           filters = [
@@ -120,10 +121,6 @@
     };
   };
 
-  /* Cleanup */
-  nix.settings.min-free = 7000 * 1024 * 1024; # 7000 MiB, Start when free space < min-free
-  nix.settings.max-free = 7000 * 1024 * 1024; # 7000 MiB, Stop when used space < max-free
-
   /* Virtual Console */
   console = {
     earlySetup = true;
@@ -143,6 +140,10 @@
       AllowHibernation=no
     '';
   };
+
+  /* Cleanup */
+  nix.settings.min-free = 7000 * 1024 * 1024; # 7000 MiB, Start when free space < min-free
+  nix.settings.max-free = 7000 * 1024 * 1024; # 7000 MiB, Stop when used space < max-free
 
   /* State */
   system.stateVersion = "24.05";
