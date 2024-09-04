@@ -9,8 +9,8 @@ in
       default = false;
     };
     timeframe = lib.mkOption {
-      type = lib.types.singleLineStr;
-      default = "300"; # 5 min
+      type = lib.types.int;
+      default = 300; # 5 min
       description = ''
         Number of seconds system uptime must be under to determine if the system should shutdown
         afterwards. Otherwise the system reboots. Uptime is calculated at the start of the maintenance
@@ -35,7 +35,7 @@ in
         uptime=$(grep -Eo ^[0-9]+ -r /proc/uptime)
         initUptime=$(( $uptime - $elapsed ))
 
-        timeframe=${timeframe}
+        timeframe=${toString timeframe}
 
         echo "Uptime: ''${initUptime}s"
         echo "Shutdown timeframe: ''${timeframe}s"

@@ -17,5 +17,6 @@ in
         PermitRootLogin = "no";
       };
     };
+    networking.firewall.allowedTCPPorts = lib.mkDefault [ 22 ];
   };
 }

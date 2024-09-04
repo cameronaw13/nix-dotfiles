@@ -1,7 +1,6 @@
 name: "Nix CI"
 
-on:
-  pull_request:
+on: pull_request
 
 jobs:
   nix-lints:
