@@ -1,4 +1,4 @@
-name: "Auto Delete CI"
+name: "Nix Auto Delete"
 
 on:
   pull_request:
@@ -10,9 +10,7 @@ permissions:
 jobs:
   auto-delete:
     runs-on: ubuntu-latest
-    if: |
-      contains(github.event.pull_request.labels.*.name, 'nixos')
-      || contains(github.event.pull_request.labels.*.name, 'actions')
+    if: contains(github.event.pull_request.labels.*.name, 'nixos')
     steps:
       - uses: actions/checkout@v4.1.7
       - env:
