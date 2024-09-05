@@ -6,8 +6,8 @@ on:
     - cron: '15 23 * * 3' # UTC
 
 permissions:
-  pull-requests: write
   contents: write
+  pull-requests: write
 
 jobs:
   flake-update:
