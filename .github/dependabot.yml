@@ -6,8 +6,6 @@ updates:
       interval: "weekly"
       day: "wednesday"
       time: "22:00"
-    commit-message:
-      prefix: "[actions] "
     labels:
       - "actions"
     groups:

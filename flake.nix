@@ -14,15 +14,28 @@
       url = "git+ssh://git@github.com/cameronaw13/nix-secrets?ref=master&shallow=1";
       flake = false;
     };
+    microvm = {
+      url = "github:astro/microvm.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { nixpkgs, ... }@inputs: {
+  outputs = { nixpkgs, self, ... } @inputs: let
+    system = "x86_64-linux";
+  in {
     nixosConfigurations = {
       hs-operator = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
+        inherit system;
         specialArgs = { inherit inputs; };
         modules = [
           ./hosts/hs-operator/configuration.nix
+        ];
+      };
+      hs-caddy = nixpkgs.lib.nixosSystem {
+        inherit system;
+        specialArgs = { inherit inputs; };
+        modules = [
+          ./hosts/hs-operator/vms/caddy.nix
         ];
       };
     };

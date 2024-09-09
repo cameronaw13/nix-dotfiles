@@ -42,6 +42,5 @@
 
   /* Other */
   security.sudo.execWheelOnly = lib.mkDefault true;
-  boot.tmp.cleanOnBoot = lib.mkDefault true;
   systemd.services.nix-daemon.serviceConfig.OOMScoreAdjust = lib.mkDefault 250; # kill nix builds before user services
 }

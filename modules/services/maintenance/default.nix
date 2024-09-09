@@ -4,6 +4,7 @@
     dates = lib.mkOption {
       type = lib.types.singleLineStr;
       description = "Maintence schedule startup time. Specified through systemd.time(7)";
+      default = "Mon *-*-* 00:00:00";
     };
   };  
   

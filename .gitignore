@@ -1,5 +1,4 @@
 # nix build results
-result
+/result
 # temporary files
 *.swp
-*.swo
