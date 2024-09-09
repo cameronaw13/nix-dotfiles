@@ -1,4 +1,4 @@
-{ pkgs, inputs, ... }:
+{ lib, pkgs, inputs, flake, ... }:
 {
   imports = [ 
     ./hardware-configuration.nix
@@ -7,8 +7,8 @@
     ../../modules/common/default.nix
     ../../modules/users.nix
     ../../modules/services/default.nix
-    inputs.home-manager.nixosModules.home-manager
     inputs.sops-nix.nixosModules.sops
+    inputs.microvm.nixosModules.host
   ];
 
   /* System Packages */
@@ -110,6 +110,8 @@
     };
   };
 
+  microvm.autostart = [ "hs-caddy" ];
+
   /* Secrets */
   sops = {
     defaultSopsFile = "${inputs.nix-secrets}/secrets.yaml";
@@ -144,7 +146,8 @@
   /* Cleanup */
   nix.settings.min-free = 7000 * 1024 * 1024; # 7000 MiB, Start when free space < min-free
   nix.settings.max-free = 7000 * 1024 * 1024; # 7000 MiB, Stop when used space < max-free
+  boot.tmp.cleanOnBoot = lib.mkDefault true;
 
-  /* State */
+  /* Statever */
   system.stateVersion = "24.05";
 }

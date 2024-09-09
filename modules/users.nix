@@ -1,5 +1,9 @@
 { lib, config, inputs, ... }:
 {
+  imports = [
+    inputs.home-manager.nixosModules.home-manager
+  ];
+  
   options.local.users = lib.mkOption {
     type = lib.types.attrsOf (lib.types.submodule ({ name, lib, ... }: {
       options = {
@@ -28,6 +32,7 @@
         };
       };
     }));
+    default = { };
   };
 
   config = let

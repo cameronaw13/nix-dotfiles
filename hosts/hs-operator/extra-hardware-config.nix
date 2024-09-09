@@ -10,21 +10,26 @@
   boot.loader.grub.device = lib.mkDefault "/dev/sda"; # or "nodev" for efi only
 
   /* Networking */
+  networking = {
+    useDHCP = false;
+    hostName = "hs-operator";
+  };
   systemd.network = {
     enable = true;
     networks."50-ens18" = {
       matchConfig.Name = "ens18";
-      address = [ "192.168.4.200/24" ];
-      gateway = [ "192.168.4.1" ];
-      dns = [ "9.9.9.9" ];
+      networkConfig = {
+        Address = "192.168.4.200/24";
+        Gateway = "192.168.4.1";
+        DNS = "9.9.9.9";
+      };
     };
     links."50-ens18" = {
       matchConfig.OriginalName = "ens18";
       linkConfig.WakeOnLan = "magic";
     };
   };
-  networking = {
-    useDHCP = false;
-    hostName = "hs-operator";
-  };
+
+  /* QEMU */
+  services.qemuGuest.enable = true;
 }
