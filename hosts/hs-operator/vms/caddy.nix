@@ -1,4 +1,4 @@
-{ lib, config, pkgs, inputs, ... }:
+{ config, inputs, ... }:
 let
   inherit (config.local) microvms;
 in

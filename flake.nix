@@ -24,7 +24,7 @@
     };
   };
 
-  outputs = { nixpkgs, self, ... } @inputs: let
+  outputs = { nixpkgs, ... } @inputs: let
     system = "x86_64-linux";
   in {
     nixosConfigurations = {

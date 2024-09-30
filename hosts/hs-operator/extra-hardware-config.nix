@@ -1,4 +1,4 @@
-{ lib, inputs, ... }:
+{ lib, ... }:
 let
   rootDisk = "/dev/sda";
 in
