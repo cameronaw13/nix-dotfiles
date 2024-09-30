@@ -33,3 +33,6 @@ References:
     - https://github.com/Mic92/dotfiles
 - Flake workflows:
     - https://github.com/dmadisetti/.dots/blob/template/.github/workflows
+- ZFS configuration:
+    - https://wiki.nixos.org/wiki/ZFS
+    - https://openzfs.github.io/openzfs-docs/Getting%20Started/NixOS/

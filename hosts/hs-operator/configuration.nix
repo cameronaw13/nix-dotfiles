@@ -3,7 +3,6 @@
   imports = [ 
     ./hardware-configuration.nix
     ./extra-hardware-config.nix
-    #./disko.nix
     ../../modules/common/default.nix
     ../../modules/users.nix
     ../../modules/services/default.nix
@@ -110,6 +109,7 @@
     };
   };
 
+  /* MicroVMs */
   microvm.autostart = [ "hs-caddy" ];
 
   /* Secrets */
