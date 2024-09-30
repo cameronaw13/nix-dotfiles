@@ -25,21 +25,27 @@ in
         tag = "ro-store";
         source = "/nix/store";
         mountPoint = "/nix/.ro-store";
-      } {
+      } /*{
         proto = "virtiofs";
         tag = "secrets-for-users";
         source = "/run/secrets-for-users";
         mountPoint = "/run/secrets-for-users";
-      } ];
+      }*/ ];
 
-      interfaces = [ {
+      /*interfaces = [ {
         type = "macvtap";
         id = "hs-caddy";
-        inherit (microvms.caddy) mac;
+       inherit (microvms.caddy) mac;
         macvtap = {
           inherit (microvms) link;
           mode = "bridge";
         };
+      } ];*/
+
+      interfaces = [ {
+        type = "tap";
+        id = "hs-caddy";
+        inherit (microvms.caddy) mac;
       } ];
     };
 
@@ -50,13 +56,12 @@ in
     };
     systemd.network = {
       enable = true;
-      networks."50-hs-caddy" = {
+      networks."20-lan" = {
         networkConfig = {
           Address = "192.168.4.199/24";
           Gateway = "192.168.4.1";
           DNS = "9.9.9.9";
         };
-        #linkConfig.RequiredForOnline = "routable";
       };
     };
 
@@ -74,11 +79,11 @@ in
 
     sops = {
       defaultSopsFile = "${inputs.nix-secrets}/secrets.yaml";
-      /*age = {
+      age = {
         sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
         keyFile = "/var/lib/sops-nix/keys.txt";
         generateKey = true;
-      };*/
+      };
     };
     
     /* Statever */
