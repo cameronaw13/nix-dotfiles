@@ -3,6 +3,13 @@
 # Notes:
 # 1) https://manpages.ubuntu.com/manpages/xenial/en/man3/sd_booted.3.html
 
+set -e
+if [ "$UID" -lt 1000 ]; then
+  echo "Please do not run with a system account!"
+  echo "Exiting..."
+  exit 1
+fi
+
 user_continue() {
   read -rp "Do you wish to continue? [y/N]; " choice
   if [ "${choice,,}" != "y" ]; then
@@ -10,12 +17,6 @@ user_continue() {
     exit 2
   fi
 }
-
-if [ "$UID" -lt 1000 ]; then
-  echo "Please do not run with a system account!"
-  echo "Exiting..."
-  exit 1
-fi
 
 echo "Welcome to the nixos-anywhere script!"
 echo "You will need to perform a couple manual steps before running this script"
@@ -45,4 +46,16 @@ while ! nix --version; do
   fi
 done
 
+# Variables
+read -rp "Enter the user@ip_addr of the machine nixos will be installed on: " clientssh_choice
+read -rp "Enter the password for $clientssh_choice: " clientpwd_choice
+export SSHPASS="$clientpwd_choice"
+read -rp "Choose a directory to store the nixos-anywhere templates: " dir_choice
+
 # Generate flake.nix config
+wget -P dir_choice -nc https://raw.githubusercontent.com/cameronaw13/nix-dotfiles/refs/heads/installation/templates/nixos-anywhere
+
+# Grab client information
+client_ouptut=$(ssh "$clientssh_choice" /usr/bin/env bash << EOF
+EOF
+)
