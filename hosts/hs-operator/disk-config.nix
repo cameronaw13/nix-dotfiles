@@ -1,9 +1,7 @@
-{ device ? throw "Define a disk device (eg: /dev/sda)", ... }:
 {
   disko.devices = {
     disk = {
       root-disk = {
-        inherit device;
         type = "disk";
         content = {
           type = "gpt";

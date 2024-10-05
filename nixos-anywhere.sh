@@ -46,16 +46,39 @@ while ! nix --version; do
   fi
 done
 
-# Variables
-read -rp "Enter the user@ip_addr of the machine nixos will be installed on: " clientssh_choice
-read -rp "Enter the password for $clientssh_choice: " clientpwd_choice
-export SSHPASS="$clientpwd_choice"
+# Set template directory
 read -rp "Choose a directory to store the nixos-anywhere templates: " dir_choice
+dir_choice="$(echo "$dir_choice" | sed -r "s@~@$HOME@g")"
+mkdir -p "$dir_choice"
 
-# Generate flake.nix config
-wget -P dir_choice -nc https://raw.githubusercontent.com/cameronaw13/nix-dotfiles/refs/heads/installation/templates/nixos-anywhere
+# Set client ssh access
+read -rp "Enter the user@ip_addr of the machine nixos will be installed on: " addr_choice
+mkdir -p "$HOME"/.ssh
+yes '' | ssh-keygen -t ed25519 -C "${USER}@${HOSTNAME}" -f "$dir_choice"/temp-nix
+ssh-copy-id -i "$dir_choice"/temp-nix "$addr_choice"
 
-# Grab client information
-client_ouptut=$(ssh "$clientssh_choice" /usr/bin/env bash << EOF
-EOF
-)
+# Set hostname
+read -rp "Enter the desired hostname for the client machine: " hostname_choice
+
+# Pull nixos-anywhere template # NOTE: Change branch to master when merged
+zip_file="$dir_choice"/nix-dotfiles.zip
+template_dir="nix-dotfiles-installation/templates/nixos-anywhere/*"
+wget -P "$dir_choice" -O "$zip_file" -nc https://github.com/cameronaw13/nix-dotfiles/archive/refs/heads/installation.zip
+unzip -j "$zip_file" "$template_dir" -d "$dir_choice"/nixos-anywhere
+
+# Pull/create disk-config.nix
+hostname_dir="nix-dotfiles-installation/hosts/${hostname_choice}"
+if unzip -l "$zip_file" | grep -q "$hostname_dir"; then
+  unzip -j "$zip_file" "$hostname_dir"/disk-config.nix -d "$dir_choice"/nixos-anywhere
+
+  # Insert list of defined disks from hostname's disk-config.nix
+  disk_list="$(nix-instantiate --strict --eval --expr 'with import <nixpkgs> { };
+  lib.attrsets.mapAttrsToList (name: value: name) (import '"${dir_choice}"'/nixos-anywhere/disk-config.nix { }).disko.devices.disk' \
+  | sed -r "s/^\[(.*)\]$/\1/g" | tr , ' ')"
+  
+  curr=$(( $(grep -n "disko.devices.disk" "$dir_choice"/nixos-anywhere/configuration.nix | cut -d: -f1) + 2 ))
+  for disk in "${disk_list[@]}"; do
+    sed -i "${curr}i \    ${disk}.device = ...;" "${dir_choice}"/nixos-anywhere/configuration.nix
+    ((curr++))
+  done
+fi
