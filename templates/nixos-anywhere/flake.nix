@@ -1,14 +1,13 @@
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
-    dikso = {
+    disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
   };
 
-  outputs = { nixpkgs, ... } @inputs: {
+  outputs = { nixpkgs, disko, ... } @inputs: {
     nixosConfigurations = {
       template-server = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";

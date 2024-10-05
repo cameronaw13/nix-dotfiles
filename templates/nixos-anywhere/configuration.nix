@@ -13,12 +13,12 @@
     efiInstallAsRemovable = true;
   };
   disko.devices.disk = {
-    TEMP_DISKS
+    # Example: root-disk.device = "/dev/sda";
   };
 
   services.openssh.enable = true;
   users.users.root.openssh.authorizedKeys.keys = [
-    TEMP_KEY
+    # Example: ssh-ed25519 AAAA... cameron@nix-env"
   ];
   
   system.stateVersion = "24.05";
