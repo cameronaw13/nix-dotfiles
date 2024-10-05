@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-# Notes:
-# 1) https://manpages.ubuntu.com/manpages/xenial/en/man3/sd_booted.3.html
-
+# Script setup
 set -e
 if [ "$UID" -lt 1000 ]; then
   echo "Please do not run with a system account!"
@@ -33,7 +31,7 @@ user_continue
 while ! nix --version; do
   read -rp "It seems that nix isn't installed! Would you like to install nix? [y/N]: " nix_choice
   if [ "${nix_choice,,}" = "y" ]; then
-    # Install multi/single-user nix dependant on systemd init [1]
+    # Install multi/single-user nix dependant on systemd init location
     ls /run/systemd/system && nix_option="--daemon" || nix_option="--no-daemon"
     echo "Installing nix in $nix_option mode"
     sh <(curl -L https://nixos.org/nix/install) "$nix_option"
@@ -46,6 +44,7 @@ while ! nix --version; do
   fi
 done
 
+# TODO: Add confirmation page before mkdir/ssh-keygen for user variables
 # Set template directory
 read -rp "Choose a directory to store the nixos-anywhere templates: " dir_choice
 dir_choice="$(echo "$dir_choice" | sed -r "s@~@$HOME@g")"
@@ -55,15 +54,16 @@ mkdir -p "$dir_choice"
 read -rp "Enter the user@ip_addr of the machine nixos will be installed on: " addr_choice
 mkdir -p "$HOME"/.ssh
 yes '' | ssh-keygen -t ed25519 -C "${USER}@${HOSTNAME}" -f "$dir_choice"/temp-nix
-ssh-copy-id -i "$dir_choice"/temp-nix "$addr_choice"
+ssh-copy-id -i "$dir_choice"/temp-nix "$addr_choice" # TODO: Is this necessary?
 
 # Set hostname
 read -rp "Enter the desired hostname for the client machine: " hostname_choice
 
+# TODO: Add echo output for each section for readibility in case of error
 # Pull nixos-anywhere template # NOTE: Change branch to master when merged
 zip_file="$dir_choice"/nix-dotfiles.zip
 template_dir="nix-dotfiles-installation/templates/nixos-anywhere/*"
-wget -P "$dir_choice" -O "$zip_file" -nc https://github.com/cameronaw13/nix-dotfiles/archive/refs/heads/installation.zip
+wget -P "$dir_choice" -O "$zip_file" https://github.com/cameronaw13/nix-dotfiles/archive/refs/heads/installation.zip
 unzip -j "$zip_file" "$template_dir" -d "$dir_choice"/nixos-anywhere
 
 # Pull/create disk-config.nix
