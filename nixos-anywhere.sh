@@ -63,7 +63,7 @@ while :; do
   echo "Client Hostname: '$hostname_choice'"
   echo
   user_continue "(else, repeat options)" && break
-done;
+done
 
 # Variable setup
 mkdir -p "$dir_choice"
@@ -124,7 +124,8 @@ while :; do
   user_continue "(else, exit)" || exit 2
 
   echo
-  echo "Are you *completely* sure that everything is configured properly? EVERY hard drive on $hostname_choice will be COMPLETELY ERASED if improperly set up!"
+  echo "Are you *completely* sure that everything is configured properly? EVERY hard drive on"
+  echo "$hostname_choice will be COMPLETELY ERASED if improperly set up!"
   echo
   user_continue "(else, repeat verification)" && break
 done
