@@ -18,7 +18,7 @@
 
   services.openssh.enable = true;
   users.users.root.openssh.authorizedKeys.keys = [
-    # Example: ssh-ed25519 AAAA... cameron@nix-env"
+    # Example: ssh-ed25519 AAAA... nixos@dotfiles"
   ];
   
   system.stateVersion = "24.05";
