@@ -9,7 +9,7 @@
 
   outputs = { nixpkgs, disko, ... } @inputs: {
     nixosConfigurations = {
-      template-server = nixpkgs.lib.nixosSystem {
+      nixos-client = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = { inherit inputs; };
         modules = [
