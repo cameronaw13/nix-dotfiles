@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-if [ "$UID" -lt 1000 ]; then
+#set -x
+if [ "$(id -u)" -lt 1000 ]; then
   echo "Do not run with a system account!"
   echo "Exiting..."
   sleep 1
@@ -28,27 +29,25 @@ echo
 echo "Note: It's recommended to run this within distrobox or your choice of container/virtualization"
 echo "software to isolate the script from critical environments."
 echo
-user_continue "(else, exit)" || exit 2
+user_continue "(else, exit)" && echo || exit 128
 
 # Check if nix exists
-while ! nix --version; do
-  read -rp "Cannot find nix installation. Would you like to automatically install nix? [y/N]: " nix_choice
-  case "$nix_choice" in
-    y|Y)
-      # Install multi/single-user nix based on existance of systemd init directory
-      [ -d /run/systemd/system ] && nix_option="--daemon" || nix_option="--no-daemon"
-      echo "Installing nix in $nix_option mode"
-      sh <(curl -L https://nixos.org/nix/install) "$nix_option"
-      echo "Nix install completed!"
-      ;;
-    n|N|"")
-      echo "Suspend the process (^Z) and visit 'https://nixos.org/download/' to manually install nix."
-      echo "You can return to this script with the 'fg' command, see builtins(1)."
-      echo
-      user_continue "(else, exit)" || exit 2
-      ;;
-  esac
-done
+if ! command -v nix; then
+  echo "Cannot find nix installation. Nix will be automatically installed"
+  user_continue "(else, exit)" && echo || exit 128
+
+  # Install multi/single-user nix based on existance of systemd init directory
+  [ -d /run/systemd/system ] && nix_option="--daemon" || nix_option="--no-daemon"
+  echo "Installing nix in '$nix_option' mode"
+  sh <(curl -L https://nixos.org/nix/install) "$nix_option"
+  echo "Nix install completed!"
+
+  echo "The current user shell will need to be restarted for changes to take affect"
+  echo "Login and restart this script to continue"
+  read -sn 1 -p "(Press any key to exit...)"
+  echo
+  exit 129
+fi
   
 # Set options
 while :; do
@@ -62,7 +61,7 @@ while :; do
   echo "Client SSH Address: '$addr_choice'"
   echo "Client Hostname: '$hostname_choice'"
   echo
-  user_continue "(else, repeat options)" && break
+  user_continue "(else, repeat options)" && echo && break
 done
 
 # Variable setup
@@ -73,7 +72,7 @@ ssh-copy-id -i "$dir_choice"/temp-nixos "$addr_choice"
 
 # Pull nixos-anywhere templates # TODO: Change branch to master when merged
 wget -P "$dir_choice" -O "$dir_choice"/nix-dotfiles.zip https://github.com/cameronaw13/nix-dotfiles/archive/refs/heads/installation.zip
-unzip -j "$dir_choice"/nix-dotfiles.zip "nix-dotfiles-installation/templates/nixos-anywhere/*" -d "$dir_choice"/templates
+unzip -Bj "$dir_choice"/nix-dotfiles.zip "nix-dotfiles-installation/templates/nixos-anywhere/*" -d "$dir_choice"/templates
 
 # Add ssh key to configuration.nix template
 ssh_curr=$(( $(grep -n "users.users.root.openssh.authorizedKeys.keys" "$dir_choice"/templates/configuration.nix | cut -d: -f1) + 2 ))
@@ -82,7 +81,7 @@ sed -i "${ssh_curr}i \    $(cat "$dir_choice"/temp-nix.pub)" "$dir_choice"/templ
 # Pull disk-config.nix if hostname exists
 hostname_dir="nix-dotfiles-installation/hosts/$hostname_choice"
 if unzip -l "$dir_choice"/nix-dotfiles.zip | grep -q "$hostname_dir"; then
-  unzip -j "$dir_choice"/nix-dotfiles.zip "$hostname_dir"/disk-config.nix -d "$dir_choice"/templates
+  unzip -Bj "$dir_choice"/nix-dotfiles.zip "$hostname_dir"/disk-config.nix -d "$dir_choice"/templates
   
   # Get list of defined disks from hostname
   disk_list="$(nix-instantiate --strict --eval --expr 'with import <nixpkgs> { };
@@ -103,6 +102,7 @@ while :; do
   case "$block_choice" in
     y|Y)
       ssh -i "$dir_choice"/temp-nixos "$addr_choice" -t "sudo fdisk -l"
+      break
       ;;
     n|N|"")
       break
@@ -121,13 +121,12 @@ while :; do
   echo "Suspend the process (^Z) and cd into '$dir_choice/templates' to perform verification."
   echo "You can return to this script with the 'fg' command, see builtins(1)."
   echo
-  user_continue "(else, exit)" || exit 2
+  user_continue "(else, exit)" && echo || exit 128
 
-  echo
   echo "Are you *completely* sure that everything is configured properly? EVERY hard drive on"
   echo "$hostname_choice will be COMPLETELY ERASED if improperly set up!"
   echo
-  user_continue "(else, repeat verification)" && break
+  user_continue "(else, repeat verification)" && echo && break
 done
 
 
