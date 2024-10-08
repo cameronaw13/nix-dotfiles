@@ -20,6 +20,6 @@
   users.users.root.openssh.authorizedKeys.keys = [
     # Example: ssh-ed25519 AAAA... nixos@dotfiles"
   ];
-  
+
   system.stateVersion = "24.05";
 }
