@@ -19,7 +19,7 @@ After installation is complete, 'nixos-boostrap.sh' is ran on the client to set 
 2. Set up networking on the client
     - Information for wireless networking setup can be found in [the nixos manual](https://nixos.org/manual/nixos/stable/index.html#sec-installation-manual-networking)
     - Make sure both an ip address and dns are given to the client
-    - Take note of the client's ip address for installation 
+    - Take note of the client's username and ip address for installation 
 3. Set a password for the default user (nixos) on the client
 4. On the host machine, run the 'nixos-anywhere.sh' script
     - Its recommended to run the script in Distrobox or some other container/virtualization layer with systemd init to ensure system security
