@@ -6,9 +6,9 @@ jobs:
   nix-lints:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.2.0
+      - uses: actions/checkout@v4.2.1
 
-      - uses: cachix/install-nix-action@v29
+      - uses: cachix/install-nix-action@v30
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
       - uses: DeterminateSystems/magic-nix-cache-action@v8
@@ -21,9 +21,9 @@ jobs:
   nix-checks:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.2.0
+      - uses: actions/checkout@v4.2.1
     
-      - uses: cachix/install-nix-action@v29
+      - uses: cachix/install-nix-action@v30
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
       - uses: DeterminateSystems/magic-nix-cache-action@v8
