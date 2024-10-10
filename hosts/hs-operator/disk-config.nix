@@ -7,10 +7,20 @@
         content = {
           type = "gpt";
           partitions = {
-            boot = {
+            BIOS = {
               size = "1M";
               type = "EF02"; # BIOS
               priority = 1;
+            };
+            ESP = {
+              size = "64M"; 
+              type = "EF00"; # EFI
+              content = {
+                type = "filesystem";
+                format = "vfat";
+                mountpoint = "/boot";
+                mountOptions = [ "umask=0077" ];
+              };
             };
             swap = {
               size = "2G";
@@ -34,11 +44,13 @@
     zpool = {
       zroot = {
         type = "zpool";
+        options = {
+          autotrim = "on";
+        };
         rootFsOptions = {
           mountpoint = "none";
           canmount = "off";
           compression = "lz4";
-          autotrim = "on";
           acltype = "posixacl";
           xattr = "sa";
           dnodesize = "auto";
@@ -47,7 +59,7 @@
         };
         datasets = {
           # Main filesystem
-          "zroot/root" = {
+          "root" = {
             type = "zfs_fs";
             mountpoint = "/";
             options = {
@@ -57,7 +69,7 @@
             postCreateHook = "zfs list -t snapshot -H -o name | grep -E '^zroot/root@blank$' || zfs snapshot zroot/root@blank";
           };
           # Nix store - required on boot
-          "zroot/nix" = {
+          "nix" = {
             type = "zfs_fs";
             mountpoint = "/nix";
             options = {
@@ -66,7 +78,7 @@
             };
           };
           # Persistent directory
-          "zroot/persist" = {
+          "persist" = {
             type = "zfs_fs";
             mountpoint = "/persist";
             options = {
