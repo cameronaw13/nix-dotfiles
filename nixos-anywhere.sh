@@ -86,39 +86,49 @@ unzip -Bj "$dir_choice"/nix-dotfiles.zip "nix-dotfiles-installation/templates/ni
 
 # Add ssh key to configuration.nix template
 ssh_curr=$(( $(grep -n "users.users.root.openssh.authorizedKeys.keys" "$dir_choice"/templates/configuration.nix | cut -d: -f1) + 2 ))
-sed -i "${ssh_curr}i \    $(cat "$dir_choice"/client-key.pub)" "$dir_choice"/templates/configuration.nix
+sed -i "${ssh_curr}i \    \"$(cat "$dir_choice"/client-key.pub)\"" "$dir_choice"/templates/configuration.nix
 
 # Pull disk-config.nix if hostname exists
 hostname_dir="nix-dotfiles-installation/hosts/$hostname_choice"
 if unzip -l "$dir_choice"/nix-dotfiles.zip | grep -q "$hostname_dir"; then
   unzip -Bj "$dir_choice"/nix-dotfiles.zip "$hostname_dir"/disk-config.nix -d "$dir_choice"/templates
   
-  # Get list of defined disks from hostname
+  # Get list of defined disks from hostname's dotfiles
   IFS=" " read -ra disk_list <<< "$(nix-instantiate --strict --eval --expr 'with import <nixpkgs> { };
   lib.strings.concatStringsSep " " (lib.attrsets.mapAttrsToList (name: value: name) (
     import '"$dir_choice"'/templates/disk-config.nix { }
   ).disko.devices.disk)' | tr -d '"')"
   
-  # Add disks into configuration.nix template
+  # Add disks to configuration.nix template
   disk_curr=$(( $(grep -n "disko.devices.disk" "$dir_choice"/templates/configuration.nix | cut -d: -f1) + 2 ))
   for disk in "${disk_list[@]}"; do
     sed -i "${disk_curr}i \    $disk.device = ...;" "$dir_choice"/templates/configuration.nix
     ((disk_curr++))
   done
+else
+  # Add template ESP size depending on UEFI support
+  esp_size=$(ssh -i "$dir_choice"/client-key "$addr_choice" -t -- \
+    "! [ -d /sys/firmware/efi/efivars ]" && echo "64M" || echo "512M")
+  esp_curr=$(( $(grep -n "ESP" "$dir_choice"/templates/configuration.nix | cut -d: -f1) + 2 ))
+  sed -i "${esp_curr}i \              size = \"${esp_size}\";" "$dir_choice"/templates/disk-config.nix
 fi
 echo
 
-# Add hostname to configuration.nix template
+# Add hostname & hostId to configuration.nix template
 hostname_curr=$(grep -n "services.openssh.enable" "$dir_choice"/templates/configuration.nix | cut -d: -f1)
-sed -i "${hostname_curr}i \  networking.hostName = \""$hostname_choice"\";" "$dir_choice"/templates/configuration.nix
+hostId=$(head -c4 /dev/urandom | od -A none -t x4 | tr -d " ")
+sed -i "${hostname_curr}i\\
+  networking.hostName = \"$hostname_choice\";\\
+  networking.hostId = \"$hostId\";
+" "$dir_choice"/templates/configuration.nix
 
-# Obtain fdisk info from client
+# Print client block devices
 while :; do
-  echo "Do you want to obtain block device information rom '$addr_choice'?"
-  read -rp "(Knowing each block device location on the client is needed to complete installation) [y/N]: " block_choice
+  echo "Do you want to print block device information from '$addr_choice'?"
+  read -rp "(Client disk locations need to be manually added before install) [Y/n]: " block_choice
   echo
   case "$block_choice" in
-    y|Y)
+    y|Y|"")
       ssh -i "$dir_choice"/client-key "$addr_choice" -t "sudo fdisk -l"
       echo
       echo "Block device information retrieved!"
@@ -126,13 +136,13 @@ while :; do
       user_continue "exit" && echo || exit 0
       break
       ;;
-    n|N|"")
+    n|N)
       break
       ;;
   esac
 done
 
-# User verification of nixos-anywhere templates
+# Final user verification
 while :; do
   echo "Setup for nixos-anywhere is partially complete. You still need to verify the template files!"
   echo "Make sure to define 'disko.devices.disk' in templates/configuration.nix based on the"
@@ -141,6 +151,10 @@ while :; do
   echo
   echo "Suspend the process (Ctrl+Z) and cd into '$dir_choice/templates' to perform verification."
   echo "You can return to this script with the 'fg' command, see builtins(1)."
+  echo
+  echo "Note: to edit files, you can use either 'nix run' or 'nix shell' with the"
+  echo "'--experimental-features \"nix-command flakes\"' flag enabled to run packages"
+  echo "More details of their usage are found using their '--help' flag"
   echo
   user_continue "exit" && echo || exit 0
 
@@ -153,8 +167,15 @@ done
 # Nixos-Anywhere
 nix run --experimental-features "nix-command flakes" \
   github:nix-community/nixos-anywhere -- \
-  --print-build-logs \
-  --generate-hardware-config ./hardware-configuration.nix \
+  --generate-hardware-config nixos-generate-config "$dir_choice"/templates/hardware-configuration.nix \
   --flake "$dir_choice"/templates#nixos-client \
   -i "$dir_choice"/client-key \
   "$addr_choice"
+
+# Remove old host identification
+ssh-keygen -R "$(echo "$addr_choice" | cut -d@ -f2)"
+
+echo "Nixos is now installed!"
+user_continue "exit" && echo || exit 0
+
+# Continue into client via ssh - could pass in a script to run to retain variables?

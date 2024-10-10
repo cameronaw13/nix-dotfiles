@@ -16,7 +16,7 @@
               priority = 1;
             };
             ESP = {
-              size = "512M";
+              # size = "64M/512M"; # BIOS/UEFI
               type = "EF00"; # UEFI
               content = {
                 type = "filesystem";
