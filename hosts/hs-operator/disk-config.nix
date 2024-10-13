@@ -13,7 +13,7 @@
               priority = 1;
             };
             ESP = {
-              size = "64M"; 
+              size = "512M"; 
               type = "EF00"; # EFI
               content = {
                 type = "filesystem";

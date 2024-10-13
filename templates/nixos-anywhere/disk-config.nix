@@ -1,5 +1,5 @@
 { ... }:
-# Hybrid setup, more examples shown here: 
+# A Hybrid setup, more examples shown below: 
 # https://github.com/nix-community/disko/blob/master/example
 # https://github.com/nix-community/disko-templates
 {
@@ -16,7 +16,7 @@
               priority = 1;
             };
             ESP = {
-              # size = "64M/512M"; # BIOS/UEFI
+              size = "512M";
               type = "EF00"; # UEFI
               content = {
                 type = "filesystem";

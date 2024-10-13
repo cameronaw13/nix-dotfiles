@@ -16,11 +16,13 @@ After installation is complete, 'nixos-boostrap.sh' is ran on the client to set 
 ### Nixos-Anywhere.sh setup
 1. Boot the [nixos-minimal iso](https://nixos.org/download/) on the client computer
     - [Ventoy](https://www.ventoy.net/en/index.html) is recommended to set up the bootable medium
+    - Can also use an existing linux machine if you're willing to overwrite its current installation
 2. Set up networking on the client
     - Information for wireless networking setup can be found in [the nixos manual](https://nixos.org/manual/nixos/stable/index.html#sec-installation-manual-networking)
     - Make sure both an ip address and dns are given to the client
     - Take note of the client's username and ip address for installation 
-3. Set a password for the default user (nixos) on the client
+3. Set a password for the desired user on the client
+    - If using the root user, make sure that 'PermitRootLogin' is set to 'yes' to access the client
 4. On the host machine, run the 'nixos-anywhere.sh' script
     - Its recommended to run the script in Distrobox or some other container/virtualization layer with systemd init to ensure system security
     - Example:
