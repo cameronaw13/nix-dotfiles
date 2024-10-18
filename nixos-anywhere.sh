@@ -81,7 +81,7 @@ template_dir="$dir_choice"/templates/nixos-anywhere
 mkdir -p "$template_dir"
 mkdir -p "$HOME"/.ssh
 if [ ! -f "$dir_choice"/client-key ]; then
-  yes '' | ssh-keygen -t ed25519 -C "$USER@$HOSTNAME" -f "$dir_choice"/client-key
+  ssh-keygen -t ed25519 -C "$USER@$HOSTNAME" -N "" -f "$dir_choice"/client-key
 fi
 ssh-copy-id -i "$dir_choice"/client-key "$addr_choice"
 
@@ -198,4 +198,5 @@ user_continue "exit" && echo || exit 0
 echo "| Installation and boostrap completed! NixOS is now ready to use!"
 echo "|"
 read -rn 1 -p "(Press any key to exit) "
+echo
 exit 0
