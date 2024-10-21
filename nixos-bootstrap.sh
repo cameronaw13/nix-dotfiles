@@ -35,65 +35,71 @@ fi
 echo "| Welcome to the nixos-boostrap script!"
 echo "| This script will load and rebuild the nix-dotfiles repo onto a nixos system."
 echo "| This script is ran as an extension of the 'nixos-anywhere.sh' script, please take note of any"
-echo "| potential discrepancies when running separately!"
+echo "| changes you may need to make if running separately!"
 echo "|"
 echo "| Make sure you've audited the contents of this script before running!"
 echo "|"
 user_continue "exit" && echo || exit 0
 
-# Initial setup
-#expfeats=(--experimental-features "nix-command flakes")
-hostDir=/etc/nixos/hosts/"$HOSTNAME"
-cd /etc/nixos
+# Variable setup
+expfeats=(--experimental-features "nix-command flakes")
+command -v gh && gh="gh" || gh=(nix run nixpkgs\#gh "${expfeats[@]}" --)
+command -v git && git="git" || git=(nix run nixpkgs\#gitMinimal "${expfeats[@]}" --)
 
-# Permission fixes
+# Config directory setup
+cd /etc/nixos
 sudo chgrp -R wheel "$PWD"
 sudo chmod -R g+s "$PWD"
 sudo chmod -R u=rwX,g=rwX,o=rX "$PWD"
-sudo setfacl -dRm g::rw "$PWD"
+sudo setfacl -R --default --modify g::rw "$PWD"
 
 # Temp github ssh-key setup
 if [ ! -f "$HOME"/.ssh/git-key ]; then
   ssh-keygen -t ed25519 -C "$USER@$HOSTNAME" -N "" -f "$HOME"/.ssh/git-key
 fi
-nix run nixpkgs#gh -- auth login -h github.com -p ssh --skip-ssh-key --scopes "admin:public_key,admin:ssh_signing_key"
-#types=("authentication" "signing")
-#for index in "${types[@]}"; do
-#  nix run nixpkgs\#gh -- ssh-key add --type "$index" --title "$USER@$HOSTNAME" "$HOME"/.ssh/git-key.pub
-#done
-nix run nixpkgs#gh -- ssh-key add --title "$USER@$HOSTNAME" "$HOME"/.ssh/git-key.pub
+"${gh[@]}" auth login --hostname github.com --protocol ssh --skip-ssh-key --scopes "admin:public_key,admin:ssh_signing_key"
+"${gh[@]}" ssh-key add --title="$USER@$HOSTNAME" "$HOME"/.ssh/git-key.pub
 
 # Git config setup
-nix run nixpkgs#gitMinimal -- config --global --add core.sshCommand "ssh -i $HOME/.ssh/git-key"
-nix run nixpkgs#gitMinimal -- config --global --add safe.directory "$PWD"
+"${git[@]}" config --global --add core.sshCommand "ssh -i $HOME/.ssh/git-key"
+"${git[@]}" config --global --add safe.directory "$PWD"
 
-# Cloning nix-dotfiles repo
-#if nix run nixpkgs\#gitMinimal -- ls-remote --heads git@github.com:cameronaw13/nix-dotfiles.git | grep "$HOSTNAME"; then
-#  cloneFlags=(--branch "$HOSTNAME")
-#fi
-nix run nixpkgs#gitMinimal -- clone --recurse-submodules --remote-submodules --jobs=8 git@github.com:cameronaw13/nix-dotfiles.git "$PWD"
-nix run nixpkgs#gitMinimal -- checkout -B "$HOSTNAME"
-nix run nixpkgs\#gitMinimal -- pull origin "$HOSTNAME" || echo "New host branch '$HOSTNAME', no need to pull"
-nix run nixpkgs#gitMinimal -- submodule foreach --recursive "git checkout master || true"
+# Clone full nix-dotfiles repo
+"${git[@]}" clone --recurse-submodules --remote-submodules --jobs=8 git@github.com:cameronaw13/nix-dotfiles.git "$PWD"
+"${git[@]}" checkout -B "$HOSTNAME"
+"${git[@]}" pull origin "$HOSTNAME" || echo "New host branch '$HOSTNAME', no need to pull"
+"${git[@]}" submodule foreach --recursive "git checkout master || true"
 
 # If existing host, copy hardware-configuration.nix as well as "disko.devices.disk" and "networking.hostId" from configuration.nix to the new configuration
   # Else, copy all files under /nixos-anywhere/* to /etc/nixos/hosts/$hostname
   # Could also change nix min/max free based on root disk size
-if [ -d "$hostdir" ]; then
-  mv "$hostdir"/hardware-configuration.nix "$hostdir"/hardware-configuration.nix~
-  cp /nixos-anywhere/hardware-configuration.nix "$hostdir"
+
+# Copy necessary config to nix-dotfiles
+host_dir=/etc/nixos/hosts/"$HOSTNAME"
+if [ -d "$host_dir" ]; then
+  # TODO: Use nix-editor to add disko.devices.disk, networking.hostId, etc
+  cp --backup=numbered /nixos-anywhere/hardware-configuration.nix "$host_dir"
 else
-  mkdir -p "$hostdir" 
-  cp /nixos-anywhere/* "$hostdir"
+  # TODO: Replace configuration.nix with bootstrap configuration.nix template using nix-editor to add important configurations from anywhere configuration.nix template (disko.devices.disk, networking.hostId, etc)
+  # also add extra-hardware-configuration.nix template and microvm templates (if necessary)
+  mkdir -p "$host_dir" 
+  templates=($(find /nixos-anywhere/* ! -name "*~*" ! -name "flake.*"))
+  cp --backup=numbered -t "$host_dir" "${templates[@]}"
+fi
 
+# TODO: change networking interface and other extra-hardware-config options using dialogs and nix-editor
 
-# Allow user verification for new configuration (setup static networking, extra-hardware-config, etc)
+# TODO: Allow user verification for new configuration
 
-# Generate host age key based on host ssh keys
+# TODO: Generate host age key based on host ssh keys
   # If no age key is given to decrypt secrets, generate new secrets file
 
-# Generate age keys for each declared user(?)
-  # Could create a separate script that searches for each declared user with secrets support and both generates and enrolls an age key if needed 
-  # NOTE: should separate bash scripts from nix code to ease debugging, may need to rethink how to declare bash scripts
+# TODO: Generate age keys for each declared user
+  # utilize system.activationScripts to generate each user's sops key within their home dir (user directories will be created despite sops keys missing) and regenerate the secrets repo with each user's sops keys
+  # TODO: will need to move bash scripts outside of nix files for readability, can use substitutions to insert nix options into script if needed (https://nixos.org/manual/nixpkgs/stable/#ssec-stdenv-functions)
+  # In case home dir's aren't created before setup or if key setup is required before the rebuild process, use this command below:
+    # nix-instantiate --strict --eval --expr 'with import <nixpkgs> { }; lib.strings.concatStringsSep " " (lib.attrsets.mapAttrsToList (name: value: name) (import ./configuration.nix { lib = "_"; pkgs = "_"; inputs = "_"; }).local.users)'
 
-# Rebuild and finish
+# TODO: Rebuild and finish
+  # Will need to nixos-rebuild ___ w/out sudo first for nixos to find user-level ssh keys to access github
+  # After it inevitably errors, then perform sudo nixos-rebuild ___

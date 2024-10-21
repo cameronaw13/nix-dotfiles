@@ -2,6 +2,12 @@
 { config, pkgs, ... }:
 {
   system.activationScripts = {
+    # TODO: Iterate through each user in /home, check if ~/.config/sops/age/keys.txt exists, if not, gen key and add to key list, afterwards insert all gen'd keys into .sops.yaml and regen secrets.yaml with added keys
+    genSecrets = {
+      text = ''
+        echo "TODO"
+      '';
+    };
     diff = {
       supportsDryActivation = true;
       text = let
