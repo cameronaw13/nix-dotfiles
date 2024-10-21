@@ -77,6 +77,8 @@ while :; do
 done
 
 # Variable setup
+# TODO: Check if necessary programs are installed, nix run otherwise (a la nixos-bootstrap.sh)
+expfeats=(--experimental-features "nix-command flakes")
 template_dir="$dir_choice"/templates/nixos-anywhere
 mkdir -p "$template_dir"
 mkdir -p "$HOME"/.ssh
@@ -90,8 +92,10 @@ wget -P "$dir_choice" -O "$dir_choice"/nix-dotfiles.zip https://github.com/camer
 unzip -Bj "$dir_choice"/nix-dotfiles.zip "nix-dotfiles-installation/templates/nixos-anywhere/*" -d "$template_dir"
 
 # Add ssh key to configuration.nix template
-ssh_curr=$(( $(grep -n "openssh.authorizedKeys.keys" "$template_dir"/configuration.nix | cut -d: -f1) + 2 ))
-sed -i "${ssh_curr}i \      \"$(cat "$dir_choice"/client-key.pub)\"" "$template_dir"/configuration.nix
+#ssh_curr=$(( $(grep -n "openssh.authorizedKeys.keys" "$template_dir"/configuration.nix | cut -d: -f1) + 2 ))
+#sed -i "${ssh_curr}i \      \"$(cat "$dir_choice"/client-key.pub)\"" "$template_dir"/configuration.nix
+nix run github:snowfallorg/nix-editor "${expfeats[@]}" -- "$template_dir"/configuration.nix users.users.bootstrap.openssh.authorizedKeys.keys --arr "  \"$(cat "$dir_choice"/client-key.pub)\"" --inplace
+
 
 # Check if client requires sudo password
 if ! ssh -i "$dir_choice"/client-key "$addr_choice" -t "sudo -n true"; then
@@ -104,7 +108,22 @@ if ! ssh -i "$dir_choice"/client-key "$addr_choice" -t "sudo -n true"; then
   user_continue "exit" && echo || exit 0
 fi
 
+# Print client filesystem
+echo "| Client filesystem will be printed in the next step. Take note of this info, block device paths"
+echo "| need to be manually declared during the installation!"
+echo "|"
+read -rn 1 -p "(Press any key to continue) "
+echo
+printf "%.s=" $(seq 1 $(tput cols))
+ssh -i "$dir_choice"/client-key "$addr_choice" -t "lsblk -o NAME,SIZE,TYPE,MOUNTPOINT,PARTTYPENAME,FSTYPE,PATH,MODEL"
+printf "%.s=" $(seq 1 $(tput cols))
+echo
+echo "| Successfully fetched filesystem info!"
+echo "|"
+read -rn 1 -p "(Press any key to continue) "
+
 # Pull disk-config.nix if hostname exists
+# TODO: Cleanup, shouldn't be this many for loops
 hostname_dir="nix-dotfiles-installation/hosts/$hostname_choice"
 if unzip -l "$dir_choice"/nix-dotfiles.zip | grep -q "$hostname_dir"; then
   unzip -Bj "$dir_choice"/nix-dotfiles.zip "$hostname_dir"/disk-config.nix -d "$template_dir"
@@ -114,11 +133,24 @@ if unzip -l "$dir_choice"/nix-dotfiles.zip | grep -q "$hostname_dir"; then
   lib.strings.concatStringsSep " " (lib.attrsets.mapAttrsToList (name: value: name) (
     import '"$template_dir"'/disk-config.nix { }
   ).disko.devices.disk)' | tr -d '"')"
+
+  # Create input dialog for block device paths
+  for i in "${!disk_list[@]}"; do
+    dialog_items+=("${disk_list["$i"]}:" $(( "$i"+3 )) 1 "" $(( "$i"+3 )) 20 20 0)
+  done
+  disk_paths=$(dialog --colors --erase-on-exit --title "Declare Installation Disks" --form "\\ZbInsert the block device path of each disk" $(( "${#dialog_items[@]}"+9 )) 60 0 "Example:" 1 1 "/dev/sda" -20 20 0 "${dialog_items[@]}" 2>&1 >/dev/tty)
+  
+  # TODO: Substitute basic block device names with full ids to prevent reodering issues
+  # for disks with multiple ids, a radiolist will pop up for each disk; user chooses the desired id to insert into the config
+  # eg: udevadm info --no-pager --root --query symlink /dev/sda | grep -Po "/dev/disk/by-id/[A-Za-z0-9\-\_]+"
+
+  # TODO: Add user verification before adding disks to config
   
   # Add disks to configuration.nix template
-  disk_curr=$(( $(grep -n "disko.devices.disk" "$template_dir"/configuration.nix | cut -d: -f1) + 2 ))
-  for disk in "${disk_list[@]}"; do
-    sed -i "${disk_curr}i \    $disk.device = \"XXXXX\";" "$template_dir"/configuration.nix
+  #disk_curr=$(( $(grep -n "disko.devices.disk" "$template_dir"/configuration.nix | cut -d: -f1) + 2 ))
+  for i in "${!disk_list[@]}"; do
+    #sed -i "${disk_curr}i \    $disk.device = \"XXXXX\";" "$template_dir"/configuration.nix
+    nix run github:snowfallorg/nix-editor "${expfeats[@]}" -- "$template_dir"/configuration.nix disko.devices.disk."${disk_list["$i"]}".device --val "\"XXXXX\"" --inplace
     ((disk_curr++))
   done
 fi
@@ -127,35 +159,15 @@ echo
 # Add hostname & hostId to configuration.nix template
 hostname_curr=$(grep -n "services.openssh.enable" "$template_dir"/configuration.nix | cut -d: -f1)
 hostId=$(head -c4 /dev/urandom | od -A none -t x4 | tr -d " ")
-sed -i "${hostname_curr}i\\
-  networking.hostName = \"$hostname_choice\";\\
-  networking.hostId = \"$hostId\";
-" "$template_dir"/configuration.nix
+#sed -i "${hostname_curr}i\\
+#  networking.hostName = \"$hostname_choice\";\\
+#  networking.hostId = \"$hostId\";
+#" "$template_dir"/configuration.nix
+nix run github:snowfallorg/nix-editor "${expfeats[@]}" -- "$template_dir"/configuration.nix networking.hostName --val "\"$hostname_choice\"" --inplace
+nix run github:snowfallorg/nix-editor "${expfeats[@]}" -- "$template_dir"/configuration.nix networking.hostId --val "\"$hostId\"" --inplace
 
 # Add hostname to flake.nix template
 sed -i "s/HOSTNAME/$hostname_choice/g" "$template_dir"/flake.nix
-
-# Print client block devices
-while :; do
-  echo "| It's recommended to know the client's block device information since device locations need to"
-  echo "| be manually set in the config."
-  echo "|"
-  read -rp "Do you want to print the client's block device info? [Y/n]: " block_choice
-  echo
-  case "$block_choice" in
-    y|Y|"")
-      ssh -i "$dir_choice"/client-key "$addr_choice" -t "sudo fdisk -l"
-      echo
-      echo "| Successfully fetched block device info!"
-      echo "|"
-      user_continue "exit" && echo || exit 0
-      break
-      ;;
-    n|N)
-      break
-      ;;
-  esac
-done
 
 # Final user verification
 while :; do
@@ -176,8 +188,7 @@ while :; do
 done
 
 # Nixos-Anywhere
-nix run --experimental-features "nix-command flakes" \
-  github:nix-community/nixos-anywhere -- \
+nix run github:nix-community/nixos-anywhere "${expfeats[@]}" -- \
   --generate-hardware-config nixos-generate-config "$template_dir"/hardware-configuration.nix \
   --flake "$template_dir"#"$hostname_choice" \
   --extra-files "$dir_choice"/templates \

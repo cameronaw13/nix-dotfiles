@@ -1,4 +1,4 @@
-{ lib, inputs, ... }:
+{ lib, inputs, pkgs, ... }:
 {
   imports = [
     inputs.disko.nixosModules.disko
@@ -18,8 +18,11 @@
     # eg: root-disk.device = "/dev/sda";
   };
 
-  # eg: networking.hostName = "nixos";
-  # eg: networking.hostId = "12345678";
+  networking = {
+    # eg: networking.hostName = "nixos";
+    #     networking.hostId = "01234567";
+  };
+
   services.openssh.enable = true;
 
   users.users.bootstrap = {
@@ -39,6 +42,13 @@
       options = [ "NOPASSWD" "SETENV" ];
     } ];
   } ];
+
+  environment.systemPackages = builtins.attrValues {
+    inherit (pkgs)
+    git
+    gh
+    ;
+  };
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   system.stateVersion = "24.05";
