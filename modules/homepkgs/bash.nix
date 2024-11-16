@@ -14,10 +14,14 @@ in
         type = lib.types.path;
         default = "/etc/nixos";
       };
-      sudo = {
+      editor = {
         enable = lib.mkOption {
           type = lib.types.bool;
           default = false;
+        };
+        type = lib.mkOption {
+          type = lib.types.str;
+          default = "";
         };
       };
       rebuild = {
@@ -40,7 +44,7 @@ in
       enable = lib.mkDefault true;
       bashrcExtra = lib.strings.concatStringsSep "\n" (
         lib.lists.optional scripts.sudo.enable ''
-          alias sudo="sudo "
+          alias sudo="sudo VISUAL='${scripts.sudo.type}'"
         '' ++
         lib.lists.optional scripts.rebuild.enable ''
           alias rebuild="bash ~/Scripts/rebuild.sh"

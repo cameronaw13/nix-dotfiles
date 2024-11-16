@@ -11,7 +11,7 @@
       trash-cli
     ];
     shellAliases = {
-      rm = "echo \"Consider using 'trash' or use the full command: $(which rm)\"";
+      rm = "echo Consider using 'trash' or use the full command: \''\$(type -P rm)'\'";
       mv = "mv -i";
       cp = "cp -i";
     };

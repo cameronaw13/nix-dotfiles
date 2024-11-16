@@ -65,6 +65,7 @@
         imports = [
           ./homepkgs/default.nix
         ];
+        
         local.homepkgs = lib.mkMerge [
           users.${username}.homePackages
           { inherit hostname; }
