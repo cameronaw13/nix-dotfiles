@@ -9,7 +9,7 @@
 
   outputs = { nixpkgs, disko, ... } @inputs: {
     nixosConfigurations = {
-      HOSTNAME = nixpkgs.lib.nixosSystem {
+      NEW_HOSTNAME = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = { inherit inputs; };
         modules = [

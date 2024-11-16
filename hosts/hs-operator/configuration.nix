@@ -32,7 +32,10 @@
       };
       homePackages = {
         bash.scripts = {
-          sudo.enable = true;
+          editor = {
+            enable = true;
+            type = "vim";
+          };
           rebuild.enable = true;
           createpr.enable = true;
         };
