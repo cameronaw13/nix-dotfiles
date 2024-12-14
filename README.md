@@ -17,15 +17,15 @@ After installation is complete, 'nixos-boostrap.sh' is ran on the client to set 
     - [Ventoy](https://www.ventoy.net/en/index.html) is recommended to set up a bootable medium
 2. Set up networking on the client
     - Take note of the given ip address for installation
-3. Add a password for any user with passwordless sudo on the client
-    - The NixOS installer includes both root login and passwordless users by default
-    - If using root, make sure that root login is enabled with `PermitRootLogin=yes` in the '/etc/ssh/sshd_config' file
-    - If using a normal user, add `username ALL=(ALL) NOPASSWD: ALL` to the '/etc/sudoers' file
+3. Add a password to a user with ssh login and passwordless sudo capabilities on the client
+    - With a regular user, add `username ALL=(ALL) NOPASSWD: ALL` to the '/etc/sudoers' file for passwordless sudo
+    - With root, make sure root login is enabled with `PermitRootLogin=yes` in the '/etc/ssh/sshd_config' file
+    - Note: The NixOS installer includes both of the above by default, once a password is set you're good to go
 4. On the host machine, run the 'nixos-anywhere.sh' script:
     - To ensure system security, you can run the script within Distrobox or any other containerization/virtualization service
 5. Follow the process to install nixos and bootstrap the dotfiles on the client machine
 
-### Script Command (Setup Step 4)
+### Script Command (Step 4 Setup)
 ```bash
 bash <(curl -sSL https://raw.githubusercontent.com/cameronaw13/nix-dotfiles/refs/heads/installation/nixos-anywhere.sh)
 ```
