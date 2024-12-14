@@ -1,4 +1,4 @@
-{ ... }:
+_:
 # A Hybrid setup, more examples shown below: 
 # https://github.com/nix-community/disko/blob/master/example
 # https://github.com/nix-community/disko-templates

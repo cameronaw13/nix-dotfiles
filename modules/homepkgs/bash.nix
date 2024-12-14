@@ -43,8 +43,8 @@ in
     programs.bash = {
       enable = lib.mkDefault true;
       bashrcExtra = lib.strings.concatStringsSep "\n" (
-        lib.lists.optional scripts.sudo.enable ''
-          alias sudo="sudo VISUAL='${scripts.sudo.type}'"
+        lib.lists.optional scripts.editor.enable ''
+          alias sudo="sudo VISUAL='${scripts.editor.type}'"
         '' ++
         lib.lists.optional scripts.rebuild.enable ''
           alias rebuild="bash ~/Scripts/rebuild.sh"
@@ -116,7 +116,7 @@ in
         base="master"
         head="${homepkgs.hostname}"
         read -rp "PR Title: " title
-        body="$(git log origin/master..HEAD --reverse --format=%s$'\n```\n'%b$'```')"
+        body="$(git log origin/master..HEAD --reverse --format=%s$'\n```\n'%b$'\n```')"
         fmtbody="$(sed "s/^/\t/g" <<< "$body")"
 
         printf "\nBase: %s" "$base"

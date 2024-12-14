@@ -7,7 +7,7 @@
     };
   };
 
-  outputs = { nixpkgs, disko, ... } @inputs: {
+  outputs = { nixpkgs, ... } @inputs: {
     nixosConfigurations = {
       NEW_HOSTNAME = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
