@@ -9,6 +9,7 @@
   boot = {
     supportedFilesystems = [ "zfs" ];
     zfs.forceImportRoot = false;
+    kernel.sysctl."kernel.sysrq" = 1;
     loader.grub = {
       efiSupport = true;
       efiInstallAsRemovable = true;
@@ -45,11 +46,11 @@
 
   environment.systemPackages = builtins.attrValues {
     inherit (pkgs)
-    git
+    gitMinimal
     gh
     ;
   };
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  system.stateVersion = "24.05";
+  system.stateVersion = "24.11";
 }

@@ -43,4 +43,5 @@
   /* Other */
   security.sudo.execWheelOnly = lib.mkDefault true;
   systemd.services.nix-daemon.serviceConfig.OOMScoreAdjust = lib.mkDefault 250; # kill nix builds before user services
+  boot.kernel.sysctl."kernel.sysrq" = 1;
 }
