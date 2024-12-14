@@ -87,7 +87,7 @@ dlg_greetmsg=$(
   echo "| Welcome to the nixos-anywhere script!"
   echo "| You'll need to perform a few manual steps before running this script."
   echo "| These are documented under:"
-  echo "- https://github.com/cameronaw13/nix-dotfiles/tree/installation?tab=readme-ov-file#setup"
+  echo "- https://github.com/cameronaw13/nix-dotfiles/tree/master?tab=readme-ov-file#setup"
   echo "| Please go through each step before running the script!"
   echo "|"
   echo "| Make sure you've audited the installation scripts and their dependencies before running"
@@ -175,7 +175,7 @@ done
 tmp_repo=$(mktemp -d)
 
 # Setup temp git dir
-"${git[@]}" clone -q --branch installation --no-checkout --depth 1 \
+"${git[@]}" clone -q --no-checkout --depth 1 \
   https://github.com/cameronaw13/nix-dotfiles.git "$tmp_repo"
 rm -v "$dir_choice" 2>/dev/null || true
 mkdir -p "$dir_choice"
@@ -213,7 +213,7 @@ while :; do
     echo "| It seems that '$addr_choice' requests a password when using sudo."
     echo "| Passwordless sudo is required to perform the installation."
     echo "| Follow Step 3 under 'Setup' in the README to fix this issue:"
-    echo "- https://github.com/cameronaw13/nix-dotfiles/tree/installation?tab=readme-ov-file#setup"
+    echo "- https://github.com/cameronaw13/nix-dotfiles/tree/master?tab=readme-ov-file#setup"
     echo "|"
     echo "| Note: Press (Ctrl+Z) and use the 'fg' command to suspend and resume the script."
   )
@@ -431,7 +431,7 @@ dlg_donemsg=$(
 # Run 'nixos-bootstrap.sh' on the client
 #ssh -ti "$dir_choice"/client-key bootstrap@"$ip_choice" \
 #  -o ConnectionAttempts=20 -o ConnectTimeout=30 \
-#  bash <(curl -sSL https://raw.githubusercontent.com/cameronaw13/nix-dotfiles/refs/heads/installation/nixos-bootstrap.sh)
+#  bash <(curl -sSL https://raw.githubusercontent.com/cameronaw13/nix-dotfiles/refs/heads/master/nixos-bootstrap.sh)
 
 dlg_exitmsg=$(
   echo "| The installation and bootstrap are done!"

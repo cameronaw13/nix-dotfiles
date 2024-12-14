@@ -22,7 +22,7 @@ After installation is complete, 'nixos-boostrap.sh' is ran on the client to set 
     - With root, make sure root login is enabled with `PermitRootLogin=yes` in the '/etc/ssh/sshd_config' file
     - Note: The NixOS installer includes both of the above by default, once a password is set you're good to go
 4. On the host machine, run the 'nixos-anywhere.sh' script:
-    - To ensure system security, you can run the script within Distrobox or any other containerization/virtualization service
+    - You can use Distrobox or any other containerization/virtualization service to isolate the nix installation if needed
 5. Follow the process to install nixos and bootstrap the dotfiles on the client machine
 
 ### Script Command (Step 4 Setup)
