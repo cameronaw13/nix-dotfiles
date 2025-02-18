@@ -9,7 +9,15 @@
     ./gh.nix
   ];
 
-  options.local.homepkgs.hostname = lib.mkOption {
-    type = lib.types.str;
+  options.local.homepkgs = {
+    hostName = lib.mkOption {
+      type = lib.types.singleLineStr;
+    };
+    sopsDir = lib.mkOption {
+      type = lib.types.singleLineStr;
+    };
+    sopsNix = lib.mkOption {
+      type = lib.types.bool;
+    };
   };
 }

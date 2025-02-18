@@ -2,12 +2,10 @@
 {
   imports = [ 
     ./hardware-configuration.nix
-    ./extra-hardware-config.nix
-    ../../modules/common/default.nix
-    ../../modules/users.nix
-    ../../modules/services/default.nix
+    ./extra-hardware-conf.nix
+    ../../modules/default.nix
     inputs.sops-nix.nixosModules.sops
-    inputs.microvm.nixosModules.host
+    #inputs.microvm.nixosModules.host
   ];
 
   /* System Packages */
@@ -23,6 +21,7 @@
       uid = 1000;
       extraGroups = [ "wheel" ];
       linger = true;
+      sopsNix = true;
       userPackages = builtins.attrValues {
         inherit (pkgs)
         sops
@@ -31,10 +30,12 @@
         ;
       };
       homePackages = {
-        bash.scripts = {
-          sudo.enable = true;
-          rebuild.enable = true;
-          createpr.enable = true;
+        bash = {
+          editor = "vim";
+          scripts = {
+            rebuild.enable = true;
+            createpr.enable = true;
+          };
         };
         vim.enable = true;
         git = {
@@ -49,7 +50,7 @@
       };
     };
     ## Filesystem ##
-    users.filesystem = {
+    /*users.filesystem = {
       uid = 1001;
       extraGroups = [ "wheel" ];
       userPackages = builtins.attrValues {
@@ -68,7 +69,7 @@
         };
         htop.enable = true;
       };
-    };
+    };*/
     ## Services ##
     services = {
       postfix = {
@@ -110,7 +111,7 @@
   };
 
   /* MicroVMs */
-  microvm.autostart = [ "hs-caddy" ];
+  # microvm.autostart = [ "dl-caddy" ];
 
   /* Secrets */
   sops = {
@@ -126,17 +127,13 @@
   /* Virtual Console */
   console = {
     earlySetup = true;
-    #font = "";
+    #font = "ter-v28b";
     keyMap = "us";
   };
 
   /* Systemd */
   systemd = {
     enableEmergencyMode = false; # try to allow remote access during emergencies
-    watchdog = {
-      runtimeTime = "30s"; # time system hangs before reboot # watchdog sends signal every runtimeTime/2
-      rebootTime = "30s"; # time reboot hangs before force reboot
-    };
     sleep.extraConfig = ''
       AllowSuspend=no
       AllowHibernation=no
@@ -144,10 +141,15 @@
   };
 
   /* Cleanup */
-  nix.settings.min-free = 7000 * 1024 * 1024; # 7000 MiB, Start when free space < min-free
-  nix.settings.max-free = 7000 * 1024 * 1024; # 7000 MiB, Stop when used space < max-free
-  boot.tmp.cleanOnBoot = lib.mkDefault true;
-
-  /* Statever */
-  system.stateVersion = "24.05";
+  nix.settings = {
+    min-free = 7000 * 1024 * 1024; # 7000 MiB, Start when free space < min-free
+    max-free = 7000 * 1024 * 1024; # 7000 MiB, Stop when used space < max-free
+  };
+  boot = {
+    tmp.cleanOnBoot = true;
+    loader = {
+      grub.configurationLimit = 10;
+      systemd-boot.configurationLimit = 10;
+    };
+  };
 }

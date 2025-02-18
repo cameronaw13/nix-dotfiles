@@ -44,14 +44,14 @@ in
 
       interfaces = [ {
         type = "tap";
-        id = "hs-caddy";
+        id = "dl-caddy";
         inherit (microvms.caddy) mac;
       } ];
     };
 
     /* Networking */
     networking = {
-      hostName = "hs-caddy";
+      hostName = "dl-caddy";
       useDHCP = false;
     };
     systemd.network = {
@@ -85,8 +85,5 @@ in
         generateKey = true;
       };
     };
-    
-    /* Statever */
-    system.stateVersion = "24.05";
   };
 }

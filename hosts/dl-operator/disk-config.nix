@@ -1,9 +1,8 @@
-{ device ? throw "Define a disk device (eg: /dev/sda)", ... }:
+_:
 {
   disko.devices = {
     disk = {
-      root-disk = {
-        inherit device;
+      root-disk1 = {
         type = "disk";
         content = {
           type = "gpt";
@@ -14,7 +13,7 @@
               priority = 1;
             };
             swap = {
-              size = "2G";
+              size = "8G";
               content = {
                 type = "swap";
                 discardPolicy = "both";
@@ -31,10 +30,29 @@
           };
         };
       };
+      root-disk2 = {
+        type = "disk";
+        content = {
+          type = "gpt";
+          partitions = {
+            root = {
+              size = "100%";
+              content = {
+                type = "zfs";
+                pool = "zroot";
+              };
+            };
+          };
+        };
+      };
     };
     zpool = {
       zroot = {
         type = "zpool";
+        mode = "mirror";
+        options = {
+          autotrim = "on";
+        };
         rootFsOptions = {
           mountpoint = "none";
           canmount = "off";
@@ -62,7 +80,7 @@
             type = "zfs_fs";
             mountpoint = "/nix";
             options = {
-              mountpoint = "legacy";
+              mountpoint = "legacy"; # TODO: Is this needed?
               canmount = "noauto";
             };
           };
