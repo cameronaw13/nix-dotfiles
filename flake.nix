@@ -8,7 +8,7 @@
     };
     sops-nix = {
       url = "github:Mic92/sops-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     nix-secrets = {
       url = "git+ssh://git@github.com/cameronaw13/nix-secrets?ref=master&shallow=1";
@@ -28,18 +28,25 @@
     system = "x86_64-linux";
   in {
     nixosConfigurations = {
-      hs-operator = nixpkgs.lib.nixosSystem {
+      dl-operator = nixpkgs.lib.nixosSystem {
         inherit system;
         specialArgs = { inherit inputs; };
         modules = [
-          ./hosts/hs-operator/configuration.nix
+          ./hosts/dl-operator/configuration.nix
         ];
       };
-      hs-caddy = nixpkgs.lib.nixosSystem {
+      /*dl-caddy = nixpkgs.lib.nixosSystem {
         inherit system;
         specialArgs = { inherit inputs; };
         modules = [
-          ./hosts/hs-operator/vms/caddy.nix
+          ./hosts/dl-operator/vms/caddy.nix
+        ];
+      };*/
+      templates = nixpkgs.lib.nixosSystem {
+        inherit system;
+        specialArgs = { inherit inputs; };
+        modules = [
+          ./hosts/templates/configuration.nix
         ];
       };
     };

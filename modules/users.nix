@@ -13,6 +13,7 @@
         };
         uid = lib.mkOption {
           type = lib.types.nullOr lib.types.int;
+          default = null;
         };
         extraGroups = lib.mkOption {
           type = lib.types.listOf lib.types.str;
@@ -21,6 +22,18 @@
         linger = lib.mkOption {
           type = lib.types.bool;
           default = false;
+        };
+        sopsNix = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+        };
+        sudoBypass = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+        };
+        authorizedKeys = lib.mkOption {
+          type = lib.types.listOf lib.types.singleLineStr;
+          default = [ ];
         };
         userPackages = lib.mkOption {
           type = lib.types.listOf lib.types.package;
@@ -36,30 +49,33 @@
   };
 
   config = let
-    inherit (config.local) users;
-    hostname = config.networking.hostName;
-    userList = lib.attrsets.mapAttrsToList (name: _: name) users;
-  in {
-    sops.secrets = lib.mkMerge (map (username: {
-      "${hostname}/${username}/password".neededForUsers = true;
-    }) userList);
-    
-    users.users = lib.mkMerge (map (username: {
-      ${username} = {
+    inherit (config.networking) hostName;
+    userList = lib.attrsets.mapAttrsToList (name: _: name) config.local.users;
+  in lib.getAttrs [ "users" "home-manager" "sops" "security" ] (
+    lib.mapAttrs (_: list: lib.mkMerge list) (lib.foldAttrs (name: accu: [ name ] ++ accu) [ ] (
+    map (username: let
+      currUser = config.local.users.${username};
+      sopsDir = "${hostName}/${username}";
+    in {
+      users.users.${username} = {
         isNormalUser = true;
         description = username;
-        hashedPasswordFile = config.sops.secrets."${hostname}/${username}/password".path;
-        inherit (users.${username}) uid extraGroups linger;
+        inherit (currUser) uid extraGroups linger;
+        hashedPasswordFile = lib.mkIf (
+          builtins.hasAttr "${sopsDir}/hashedPassword" config.sops.secrets
+          ) config.sops.secrets."${sopsDir}/hashedPassword".path;
+        openssh.authorizedKeys.keys = currUser.authorizedKeys ++ lib.optionals (
+          builtins.hasAttr "${sopsDir}/authorizedKeys" config.sops.secrets) (
+          lib.splitString "\n" (builtins.readFile config.sops.secrets."${sopsDir}/authorizedKeys".path)
+        );
       };
-    }) userList);
 
-    home-manager.users = lib.mkMerge (map (username: {
-      ${username} = {
-        home = {
+      home-manager.users.${username} = {
+         home = {
           inherit (username);
           homeDirectory = "/home/${username}";
           stateVersion = "24.05";
-          packages = users.${username}.userPackages;
+          packages = currUser.userPackages;
         };
         
         imports = [
@@ -67,15 +83,30 @@
         ];
         
         local.homepkgs = lib.mkMerge [
-          users.${username}.homePackages
-          { inherit hostname; }
+          currUser.homePackages
+          { 
+            inherit hostName sopsDir;
+            inherit (currUser) sopsNix;
+          }
         ];
         
-        sops = {
+        sops = lib.mkIf currUser.sopsNix {
           age.keyFile = "/home/${username}/.config/sops/age/keys.txt";
           defaultSopsFile = "${inputs.nix-secrets}/secrets.yaml";
         };
       };
-    }) userList);
-  };
+      
+      sops.secrets = lib.mkIf currUser.sopsNix {
+        "${sopsDir}/hashedPassword".neededForUsers = true;
+      };
+
+      security.sudo.extraRules = lib.mkIf currUser.sudoBypass [ {
+        users = [ username ];
+        commands = [ {
+          command = "ALL";
+          options = [ "NOPASSWD" "SETENV" ];
+        } ];
+      } ];
+    }) userList))
+  );
 }

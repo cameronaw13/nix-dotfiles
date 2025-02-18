@@ -1,0 +1,67 @@
+{ lib, inputs, pkgs, ... }:
+{
+  imports = [
+    inputs.disko.nixosModules.disko
+    ./hardware-configuration.nix
+    ./disk-config.nix
+  ];
+
+  # TODO: Could potentially use nixos-facter to simplify "hardware automation" process (at the cost of giving trust in an abstracted third-party tool)
+    # At the same time this doesn't solve every issue with hardware and its more important that users are able to override automation rather than having automation predict everything
+  
+  
+  # TODO: Add to extra-hardware-config
+  boot = {
+    supportedFilesystems = [ "zfs" ];
+    zfs.forceImportRoot = false;
+    kernel.sysctl."kernel.sysrq" = 1;
+    loader.grub = {
+      efiSupport = true;
+      efiInstallAsRemovable = true;
+    };
+  };
+  disko.devices.disk = {
+    # eg: root-disk.device = "/dev/sda";
+  };
+
+  # TODO: Add to extra-hardware-config
+  networking = {
+    # eg: networking.hostName = "nixos";
+    #     networking.hostId = "01234567";
+  };
+
+  # DONE
+  services.openssh.enable = true;
+
+  # DONE
+  users.users.bootstrap = {
+    isNormalUser = true;
+    description = "bootstrap"; 
+    extraGroups = [ "wheel" ];
+    openssh.authorizedKeys.keys = [
+      # eg: "ssh-ed25519 AAAA... nixos@dotfiles"
+    ];
+  };
+
+  # DONE
+  # Allow sudo without password (Only for bootstrap, do not keep!)
+  security.sudo.extraRules = lib.mkAfter [ {
+    users = [ "bootstrap" ];
+    commands = [ {
+      command = "ALL";
+      options = [ "NOPASSWD" "SETENV" ];
+    } ];
+  } ];
+
+  # DONE
+  environment.systemPackages = builtins.attrValues {
+    inherit (pkgs)
+    gitMinimal
+    gh
+    ;
+  };
+
+  # Within common packages
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  system.stateVersion = "24.11";
+}

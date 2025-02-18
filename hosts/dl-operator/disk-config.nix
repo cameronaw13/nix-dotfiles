@@ -2,7 +2,7 @@ _:
 {
   disko.devices = {
     disk = {
-      root-disk = {
+      root-disk1 = {
         type = "disk";
         content = {
           type = "gpt";
@@ -23,7 +23,7 @@ _:
               };
             };
             swap = {
-              size = "2G";
+              size = "8G";
               content = {
                 type = "swap";
                 discardPolicy = "both";
@@ -40,10 +40,26 @@ _:
           };
         };
       };
+      root-disk2 = {
+        type = "disk";
+        content = {
+          type = "gpt";
+          partitions = {
+            root = {
+              size = "100%";
+              content = {
+                type = "zfs";
+                pool = "zroot";
+              };
+            };
+          };
+        };
+      };
     };
     zpool = {
       zroot = {
         type = "zpool";
+        mode = "mirror";
         options = {
           autotrim = "on";
         };
@@ -73,7 +89,7 @@ _:
             type = "zfs_fs";
             mountpoint = "/nix";
             options = {
-              mountpoint = "legacy";
+              mountpoint = "legacy"; # TODO: Is this needed?
               canmount = "noauto";
             };
           };

@@ -2,13 +2,13 @@
 let
   inherit (config.local) services;
   inherit (services.postfix) sender;
-  hostname = config.networking.hostName;
+  inherit (config.networking) hostName;
   aliases = lib.strings.concatStringsSep ", " services.postfix.rootAliases;
 in
 {
   options.local.services.postfix = {
     enable = lib.mkOption {
-      type = lib.types.bool;
+      type = lib.types.addCheck lib.types.bool (x: !x || builtins.hasAttr "sops" config);
       default = false;
     };
     sender = lib.mkOption {
@@ -30,19 +30,19 @@ in
         smtp_tls_security_level = "may";
         smtp_sasl_auth_enable = "yes";
         smtp_sasl_security_options = "";
-        smtp_sasl_password_maps = "texthash:${config.sops.secrets."postfix/sasl-passwd".path}";
+        smtp_sasl_password_maps = "texthash:${config.sops.secrets."${hostName}/sasl-passwd".path}";
         # optional: Forward mails to root (e.g. from cron jobs, smartd) to me privately:
         virtual_alias_maps = "inline:{ {root=${aliases}} }";
         smtp_header_checks = "pcre:/etc/postfix/header_checks";
       };
       enableHeaderChecks = lib.mkDefault true;
       headerChecks = [ { 
-          action = "REPLACE From: ${hostname} <${sender}>";
+          action = "REPLACE From: ${hostName} <${sender}>";
           pattern = "/^From:.*/";
       } ];
     };
 
-    sops.secrets."postfix/sasl-passwd" = {
+    sops.secrets."${hostName}/sasl-passwd" = {
       owner = config.services.postfix.user;
     };
   };

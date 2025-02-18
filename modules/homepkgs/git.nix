@@ -42,14 +42,20 @@ in
       ];
     };
 
-    sops.secrets = {
-      "${homepkgs.hostname}/${username}/id_ed25519" = {
-        path = "/home/${username}/.ssh/id_ed25519";
+    sops = lib.mkIf homepkgs.sopsNix {
+      secrets = {
+        "${homepkgs.sopsDir}/id_ed25519" = {
+          path = "/home/${username}/.ssh/id_ed25519";
+        };
+        "${homepkgs.sopsDir}/id_ed25519.pub" = {
+          path = "/home/${username}/.ssh/id_ed25519.pub";
+        };
+        /*"${homepkgs.sopsDir}/allowed_signers" = {
+          path = "/home/${username}/.ssh/allowed_signers";
+        };*/
       };
-      "${homepkgs.hostname}/${username}/id_ed25519.pub" = {
-        path = "/home/${username}/.ssh/id_ed25519.pub";
-      };
-      "${homepkgs.hostname}/${username}/allowed_signers" = {
+      templates."allowed_signers" = {
+        content = "* ${config.sops.placeholder."${homepkgs.sopsDir}/id_ed25519.pub"}";
         path = "/home/${username}/.ssh/allowed_signers";
       };
     };

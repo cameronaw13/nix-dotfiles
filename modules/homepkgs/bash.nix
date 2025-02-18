@@ -1,7 +1,7 @@
 { lib, config, ... }:
 let
   inherit (config.local) homepkgs;
-  inherit (homepkgs.bash) scripts;
+  inherit (homepkgs.bash) editor scripts;
 in
 {
   options.local.homepkgs.bash = {
@@ -9,12 +9,16 @@ in
       type = lib.types.bool;
       default = true;
     };
+    editor = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+    };
     scripts = {
       path = lib.mkOption {
         type = lib.types.path;
         default = "/etc/nixos";
       };
-      editor = {
+      /*editor = {
         enable = lib.mkOption {
           type = lib.types.bool;
           default = false;
@@ -23,7 +27,7 @@ in
           type = lib.types.str;
           default = "";
         };
-      };
+      };*/
       rebuild = {
         enable = lib.mkOption {
           type = lib.types.addCheck lib.types.bool (x: !x || homepkgs.git.enable);
@@ -43,8 +47,8 @@ in
     programs.bash = {
       enable = lib.mkDefault true;
       bashrcExtra = lib.strings.concatStringsSep "\n" (
-        lib.lists.optional scripts.editor.enable ''
-          alias sudo="sudo VISUAL='${scripts.editor.type}'"
+        lib.lists.optional (editor != null) ''
+          alias sudo="sudo VISUAL='${editor}'"
         '' ++
         lib.lists.optional scripts.rebuild.enable ''
           alias rebuild="bash ~/Scripts/rebuild.sh"
@@ -83,7 +87,7 @@ in
           echo "Rebase conflicts found. Manual intervention needed."
           exit 1
         fi
-        git push --force-with-lease origin ${homepkgs.hostname}
+        git push --force-with-lease origin ${homepkgs.hostName}
 
         echo "-- Rebuild --"
         git add -Av
@@ -99,7 +103,7 @@ in
           exit 0
         fi
         git commit -m "nixos-rebuild: $1" -m "added   deleted"$'\n'"$message"
-        git push origin ${homepkgs.hostname}
+        git push origin ${homepkgs.hostName}
       '';
     };
     home.file.createpr = lib.mkIf scripts.createpr.enable {
@@ -114,7 +118,7 @@ in
           exit 1
         fi
         base="master"
-        head="${homepkgs.hostname}"
+        head="${homepkgs.hostName}"
         read -rp "PR Title: " title
         body="$(git log origin/master..HEAD --reverse --format=%s$'\n```\n'%b$'\n```')"
         fmtbody="$(sed "s/^/\t/g" <<< "$body")"
