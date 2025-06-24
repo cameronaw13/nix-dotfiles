@@ -152,5 +152,5 @@
   boot.tmp.cleanOnBoot = lib.mkDefault true;
 
   /* Statever */
-  system.stateVersion = "24.05";
+  system.stateVersion = "25.05";
 }
