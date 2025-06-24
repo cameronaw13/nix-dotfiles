@@ -54,7 +54,7 @@
     ## Filesystem ##
     users.filesystem = {
       uid = 1001;
-      extraGroups = [ "wheel" ];
+      #extraGroups = [ "wheel" ];
       userPackages = builtins.attrValues {
         inherit (pkgs)
         tree
