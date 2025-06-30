@@ -103,7 +103,7 @@ dlg_greetmsg=$(
 while :; do
   dlg_optstitle="| Enter the required options to start the installation"
   dlg_optsout=$("${dialog[@]}" --ok-label "Continue" --cancel-label "Exit" --form "$dlg_optstitle" 0 0 0 \
-    "| Set a directory to store nixos-anywhere templates:" 1 1 "${dlg_optslist[0]}" 1 55 30 0 \
+    "| Set a directory to create the nixos-install files in:" 1 1 "${dlg_optslist[0]}" 1 55 30 0 \
     "| Enter the user@ip_addr of the client machine:" 2 1 "${dlg_optslist[1]}" 2 55 30 0 \
     "| Enter the desired hostname for the client machine:" 3 1 "${dlg_optslist[2]}" 3 55 30 0 \
   2>&1 >/dev/tty) || exit 0
@@ -122,7 +122,7 @@ while :; do
 
   # Directory/file exist checks
   unset dlg_dirmsg
-  dir_choice=$(realpath -m "$(echo "${dlg_optslist[0]}" | sed -r "s@^~@$HOME@g")")
+  dir_choice="$(realpath -m "$(echo "${dlg_optslist[0]}" | sed -r "s@^~@$HOME@g")")/nixos-install"
   if [ -f "$dir_choice" ]; then
     dlg_dirmsg=$(
       echo "| '$dir_choice' is an existing file!"
@@ -171,28 +171,60 @@ while :; do
     && break
 done
 
-# Make temp repo directory
-tmp_repo=$(mktemp -d)
-
-# Setup temp git dir
-"${git[@]}" clone -q --no-checkout --depth 1 \
-  https://github.com/cameronaw13/nix-dotfiles.git "$tmp_repo"
+# Setup git dir
 rm -v "$dir_choice" 2>/dev/null || true
 mkdir -p "$dir_choice"
+"${git[@]}" clone -q https://github.com/cameronaw13/nix-dotfiles.git "$dir_choice"/nix-dotfiles
+host_dir="$dir_choice"/nix-dotfiles/hosts/"$host_choice"
 
-# Copy git files to dir choice
-templates="$dir_choice"/templates/nixos-anywhere
-origPWD="$PWD"
-dir_sublist=(templates hosts)
-for dir in "${dir_sublist[@]}"; do
-  cd "$tmp_repo" || exit 1
-  "${git[@]}" restore --worktree --staged "$dir"
-  cd "$origPWD" || exit 1
-  cp -rf --backup=numbered "$tmp_repo"/"$dir" "$dir_choice"
+# Gen SSH key
+mkdir -p "$HOME"/.ssh
+if [ ! -f "$dir_choice"/client-key ]; then
+  ssh-keygen -t ed25519 -C "$USER@$HOSTNAME" -N "" -f "$dir_choice"/client-key
+fi
+ssh-copy-id -i "$dir_choice"/client-key -o StrictHostKeyChecking=accept-new "$addr_choice"
+
+# Check if client requires sudo pwd
+while :; do
+  ssh -Ti "$dir_choice"/client-key "$addr_choice" sudo -n true \
+    && break
+  dlg_pwdmsg=$(
+    echo "| It seems that '$addr_choice' requests a password when using sudo."
+    echo "| Passwordless sudo is required to perform the installation."
+    echo "| Follow Step 3 under 'Setup' in the README to fix this issue:"
+    echo "- https://github.com/cameronaw13/nix-dotfiles/tree/master?tab=readme-ov-file#setup"
+    echo "|"
+    echo "| Note: Press (Ctrl+Z) and use the 'fg' command to suspend and resume the script."
+  )
+  "${dialog[@]}" --aspect 10 --yes-label "Continue" --no-label "Exit" --yesno "$dlg_pwdmsg" 0 0 \
+    || exit 0
 done
 
-# Temp cleanup
-rm -rf "$tmp_repo"
+# Setup host config
+cp -Tr --backup=numbered "$host_dir" "$dir_choice"/nix-dotfiles/hosts/"$host_choice".old 2>/dev/null \
+  || true
+dlg_clonemsg=$(
+  echo "| It seems that the host '$host_choice' already exists!"
+  echo "| Would you like to keep the host config or create a new one?"
+  echo "| (Note: Original host config will be saved)"
+)
+if [ -d "$host_dir" ] && "${dialog[@]}" --aspect 12 --yes-label "Keep" --no-label "Create New" \
+--yesno "$dlg_clonemsg" 0 0; then
+  # rm "$host_dir"/hardware-configuration.nix
+else
+  rm -r "$host_dir"
+  cp -Tr "$dir_choice"/nix-dotfiles/hosts/templates "$host_dir"
+fi
+
+
+
+
+
+####################
+
+
+# Copy git files to dir choice
+# newhost="$dir_choice"/nix-dotfiles/hosts/new-host
 
 # Gen SSH key
 mkdir -p "$HOME"/.ssh
@@ -202,8 +234,8 @@ fi
 ssh-copy-id -i "$dir_choice"/client-key -o StrictHostKeyChecking=accept-new "$addr_choice"
 
 # Add ssh key to configuration.nix
-"${nix_editor[@]}" "$templates"/configuration.nix users.users.bootstrap.openssh.authorizedKeys.keys \
-  --arr "  \"$(cat "$dir_choice"/client-key.pub)\"" --inplace
+# "${nix_editor[@]}" "$newhost"/configuration.nix users.users.bootstrap.openssh.authorizedKeys.keys \
+#   --arr "  \"$(cat "$dir_choice"/client-key.pub)\"" --inplace
 
 # Check if client requires sudo password
 while :; do
@@ -221,15 +253,15 @@ while :; do
     || exit 0
 done
 
-# Add hostname & hostId to configuration.nix template
+# Add hostname & hostId to extra-hardware-config.nix template
 hostId=$(head -c4 /dev/urandom | od -A none -t x4 | tr -d " ")
-"${nix_editor[@]}" "$templates"/configuration.nix networking.hostName \
+"${nix_editor[@]}" "$newhost"/extra-hardware-config.nix networking.hostName \
   --val "\"$host_choice\"" --inplace
-"${nix_editor[@]}" "$templates"/configuration.nix networking.hostId \
+"${nix_editor[@]}" "$newhost"/extra-hardware-config.nix networking.hostId \
   --val "\"$hostId\"" --inplace
 
 # Add hostname to flake.nix template
-sed -i "s/NEW_HOSTNAME/$host_choice/g" "$templates"/flake.nix
+sed -i "s/NEW_HOSTNAME/$host_choice/g" "$newhot"/flake.nix
 
 # Obtain client lsblk
 client_lsblk=$(ssh -Ti "$dir_choice"/client-key "$addr_choice" \
@@ -237,14 +269,14 @@ client_lsblk=$(ssh -Ti "$dir_choice"/client-key "$addr_choice" \
   | sed -r "s/null/---/g")
 
 # Ask if using host's disk-config for client
-if [ -d "$dir_choice"/hosts/"$host_choice" ]; then
+if [ -d "$dir_choice"/nix-dotfiles/hosts/"$host_choice" ]; then
   dlg_clonemsg=$(
     echo "| It seems that the '$host_choice' host is already defined in nix-dotfiles."
     echo "| Do you want to copy $host_choice's disk-config?"
   )
   if "${dialog[@]}" --aspect 20 --yesno "$dlg_clonemsg" 0 0; then
     # Copy host's disk-config
-    cp -f --backup=numbered "$dir_choice/hosts/$host_choice/disk-config.nix" "$templates" 
+    cp -f --backup=numbered "$dir_choice/nix-dotfiles/hosts/$host_choice/disk-config.nix" "$" 
     use_diskconf=true
 
     # Get list of defined disks from disk-config

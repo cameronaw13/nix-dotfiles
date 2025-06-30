@@ -15,13 +15,10 @@
   };
   disko.devices.disk = {
     # eg: root-disk.device = "/dev/sda";
-    root-disk.device = "/dev/sda";
   };
 
   networking = {
     # eg: hostName = "nixos";
     #     hostId = "01234567";
-    hostName = "nixos";
-    hostId = "01234567";
   };
 }

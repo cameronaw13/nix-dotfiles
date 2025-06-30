@@ -21,7 +21,6 @@
       };
       authorizedKeys = [
         # eg: "ssh-ed25519 AAAA... nixos@dotfiles"
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO6EWLlF8TyhMyWdFoJdFK9mtZBGsT//BA+RHqcjZsHG cameron@fedora-thinkpad.nix-env"
       ];
     };
     services.openssh.enable = true;

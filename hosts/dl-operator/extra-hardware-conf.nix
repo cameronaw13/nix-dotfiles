@@ -27,27 +27,27 @@
   /* Networking */
   networking = {
     hostName = "dl-operator";
-    hostId = "abbae956";
+    hostId = "bceeaabf";
     useDHCP = false;
   };
   # MACVTAP
-  /*systemd.network = {
+  systemd.network = {
     enable = true;
-    networks."50-ens18" = {
-      matchConfig.Name = "ens18";
+    networks."50-enp4s0" = {
+      matchConfig.Name = "enp4s0";
       networkConfig = {
-        Address = "192.168.4.200/24";
+        Address = "192.168.4.254/24";
         Gateway = "192.168.4.1";
         DNS = "9.9.9.9";
       };
     };
-    links."50-ens18" = {
-      matchConfig.OriginalName = "ens18";
+    links."50-enp4s0" = {
+      matchConfig.OriginalName = "enp4s0";
       linkConfig.WakeOnLan = "magic";
     };
-  };*/
+  };
   # TAP
-  systemd.network = {
+  /*systemd.network = {
     enable = true;
     networks = {
       "20-lan" = {
@@ -72,5 +72,5 @@
         Kind = "bridge";
       };
     };
-  };
+  };*/
 }

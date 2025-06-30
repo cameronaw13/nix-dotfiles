@@ -80,5 +80,5 @@
   systemd.services.nix-daemon.serviceConfig.OOMScoreAdjust = lib.mkDefault 250; # kill nix builds before user services
 
   /* Statever */
-  system.stateVersion = "24.11";
+  system.stateVersion = "25.05";
 }

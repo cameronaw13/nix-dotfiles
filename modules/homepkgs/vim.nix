@@ -20,6 +20,7 @@ in
         set linebreak
         set display+=lastline
         set laststatus=0
+        set nu rnu
 
         " indentation "
         set autoindent

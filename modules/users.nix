@@ -27,10 +27,10 @@
           type = lib.types.bool;
           default = false;
         };
-        sudoBypass = lib.mkOption {
+        /*sudoBypass = lib.mkOption {
           type = lib.types.bool;
           default = false;
-        };
+        };*/
         authorizedKeys = lib.mkOption {
           type = lib.types.listOf lib.types.singleLineStr;
           default = [ ];
@@ -51,7 +51,7 @@
   config = let
     inherit (config.networking) hostName;
     userList = lib.attrsets.mapAttrsToList (name: _: name) config.local.users;
-  in lib.getAttrs [ "users" "home-manager" "sops" "security" ] (
+  in lib.getAttrs [ "users" "home-manager" "sops" ] (
     lib.mapAttrs (_: list: lib.mkMerge list) (lib.foldAttrs (name: accu: [ name ] ++ accu) [ ] (
     map (username: let
       currUser = config.local.users.${username};
@@ -74,7 +74,7 @@
          home = {
           inherit (username);
           homeDirectory = "/home/${username}";
-          stateVersion = "24.05";
+          stateVersion = "25.05";
           packages = currUser.userPackages;
         };
         
@@ -100,13 +100,13 @@
         "${sopsDir}/hashedPassword".neededForUsers = true;
       };
 
-      security.sudo.extraRules = lib.mkIf currUser.sudoBypass [ {
+      /*security.sudo.extraRules = lib.mkIf currUser.sudoBypass [ {
         users = [ username ];
         commands = [ {
           command = "ALL";
           options = [ "NOPASSWD" "SETENV" ];
         } ];
-      } ];
+      } ];*/
     }) userList))
   );
 }

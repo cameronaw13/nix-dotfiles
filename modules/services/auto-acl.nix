@@ -25,6 +25,7 @@ in
         chgrp -R wheel /etc/nixos
         chmod -R g+s /etc/nixos
         chmod -R u=rwX,g=rwX,o=rX /etc/nixos
+	chmod -R o= /etc/nixos/secrets
         ${setfacl} -dRm g::rw /etc/nixos
       '';
 

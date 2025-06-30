@@ -22,11 +22,15 @@
       extraGroups = [ "wheel" ];
       linger = true;
       sopsNix = true;
+      authorizedKeys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG+F0TjRt4MED8xhkzDL0VZo5XGspRlGkQgTTNcwacRR cameron@ye-olde-workhorse"
+      ];
       userPackages = builtins.attrValues {
         inherit (pkgs)
         sops
         age
         tree
+        btop
         ;
       };
       homePackages = {
@@ -46,30 +50,23 @@
           gh.enable = true;
         };
         ssh.enable = true;
-        htop.enable = true;
       };
     };
     ## Filesystem ##
-    /*users.filesystem = {
+    users.filesystem = {
       uid = 1001;
-      extraGroups = [ "wheel" ];
+      sopsNix = true;
+      #extraGroups = [ "wheel" ];
       userPackages = builtins.attrValues {
         inherit (pkgs)
         tree
+        btop
         ;
       };
       homePackages = {
         vim.enable = true;
-        git = {
-          enable = true;
-          username = "cameronaw13";
-          email = "cameronawichman@gmail.com";
-          signing = true;
-          gh.enable = true;
-        };
-        htop.enable = true;
       };
-    };*/
+    };
     ## Services ##
     services = {
       postfix = {
@@ -80,22 +77,22 @@
       maintenance = {
         dates = "Fri *-*-* 04:15:00";
         wakeOnLan = {
-          enable = true;
+          enable = false;
           macList = [ "0c:9d:92:1a:49:94" ];
         };
         upgrade = {
-          enable = true;
+          enable = false;
           pull = {
-            enable = true;
+            enable = false;
             user = "cameron";
           };
         };
         collectGarbage = {
-          enable = true;
+          enable = false;
           options = "--delete-older-than 14d";
         };
         poweroff = {
-          enable = true;
+          enable = false;
           timeframe = 120; # 2 min
         };
         mail = {
@@ -127,8 +124,13 @@
   /* Virtual Console */
   console = {
     earlySetup = true;
-    #font = "ter-v28b";
+    font = "ter-v32b";
     keyMap = "us";
+    packages = builtins.attrValues {
+      inherit (pkgs)
+      terminus_font
+      ;
+    };
   };
 
   /* Systemd */
