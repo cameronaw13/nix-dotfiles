@@ -27,10 +27,6 @@
           type = lib.types.bool;
           default = false;
         };
-        /*sudoBypass = lib.mkOption {
-          type = lib.types.bool;
-          default = false;
-        };*/
         authorizedKeys = lib.mkOption {
           type = lib.types.listOf lib.types.singleLineStr;
           default = [ ];
@@ -87,6 +83,7 @@
           { 
             inherit hostName sopsDir;
             inherit (currUser) sopsNix;
+            isWheel = builtins.elem "wheel" currUser.extraGroups;
           }
         ];
         

@@ -11,6 +11,9 @@
   /* System Packages */
   environment.systemPackages = builtins.attrValues {
     inherit (pkgs)
+    tree
+    btop
+    fzf
     ;
   };
 
@@ -29,19 +32,15 @@
         inherit (pkgs)
         sops
         age
-        tree
-        btop
+        shellcheck
         ;
       };
       homePackages = {
-        bash = {
-          editor = "vim";
-          scripts = {
-            rebuild.enable = true;
-            createpr.enable = true;
-          };
+        bash.scripts = {
+          fullrebuild.enable = true;
+          createpr.enable = true;
         };
-        vim.enable = true;
+        neovim.enable = true;
         git = {
           enable = true;
           username = "cameronaw13";
@@ -49,22 +48,14 @@
           signing = true;
           gh.enable = true;
         };
-        ssh.enable = true;
       };
     };
     ## Filesystem ##
     users.filesystem = {
       uid = 1001;
       sopsNix = true;
-      #extraGroups = [ "wheel" ];
-      userPackages = builtins.attrValues {
-        inherit (pkgs)
-        tree
-        btop
-        ;
-      };
       homePackages = {
-        vim.enable = true;
+        neovim.enable = true;
       };
     };
     ## Services ##
@@ -123,7 +114,7 @@
 
   /* Virtual Console */
   console = {
-    earlySetup = true;
+    #earlySetup = true;
     font = "ter-v32b";
     keyMap = "us";
     packages = builtins.attrValues {
@@ -150,8 +141,8 @@
   boot = {
     tmp.cleanOnBoot = true;
     loader = {
-      grub.configurationLimit = 10;
-      systemd-boot.configurationLimit = 10;
+      grub.configurationLimit = 64;
+      systemd-boot.configurationLimit = 64;
     };
   };
 }

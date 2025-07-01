@@ -1,20 +1,10 @@
-# MIT Jörg Thalheim - https://github.com/Mic92/dotfiles/blob/c6cad4e57016945c4816c8ec6f0a94daaa0c3203/nixos/modules/upgrade-diff.nix
-# TODO 2: For each user defined in local.users, perform switch against the sopsNix boolean
-  # If sopsNix == false && /home/"$user"/.config/sops/age/keys.txt exists:
-    # Delete the keys.txt file
-    # Remove "$HOSTNAME"_"$user" from .sops.yaml
-    # Regenerate secrets.yaml
-  # If sopsNix == true && /home/"$user"/.config/sops/age/keys.txt doesn't exist:
-    # Generate new age key as the keys.txt file
-    # Add "$HOSTNAME"_"$user" to .sops.yaml
-    # Regenerate secrets.yaml
-
 { lib, config, pkgs, ... }:
 {
   system.activationScripts = let
     inherit (config.networking) hostName;
     userList = lib.strings.concatStringsSep " " (lib.attrsets.mapAttrsToList (name: value: "[${name}]='${lib.trivial.boolToString value.sopsNix}'") config.local.users);
   in {
+    /* Automatic User Agekey Generation */
     genUserkeys = {
       text = let
         yq = "${pkgs.yq-go}/bin/yq";
@@ -48,6 +38,8 @@
         env SOPS_AGE_KEY="$hostKey" ${sops} --config "$secretsDir/.sops.yaml" updatekeys --yes "$secretsDir/secrets.yaml"
       '';
     };
+    /* Rebuild Diffs */
+    # MIT Jörg Thalheim - https://github.com/Mic92/dotfiles/blob/c6cad4e57016945c4816c8ec6f0a94daaa0c3203/nixos/modules/upgrade-diff.nix
     diff = {
       supportsDryActivation = true;
       text = let

@@ -32,21 +32,21 @@ in
         mountPoint = "/run/secrets-for-users";
       }*/ ];
 
-      /*interfaces = [ {
+      interfaces = [ {
         type = "macvtap";
-        id = "hs-caddy";
+        id = "dl-caddy";
        inherit (microvms.caddy) mac;
         macvtap = {
           inherit (microvms) link;
           mode = "bridge";
         };
-      } ];*/
+      } ];
 
-      interfaces = [ {
+      /*interfaces = [ {
         type = "tap";
         id = "dl-caddy";
         inherit (microvms.caddy) mac;
-      } ];
+      } ];*/
     };
 
     /* Networking */
@@ -64,9 +64,6 @@ in
         };
       };
     };
-
-    /* Root */
-    #users.users.root.password = "test";
 
     /* Local Config */
     local = {

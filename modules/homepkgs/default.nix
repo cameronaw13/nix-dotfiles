@@ -1,12 +1,9 @@
 { lib, ... }:
 {
   imports = [
-    ./vim.nix
-    ./htop.nix
     ./git.nix
-    ./ssh.nix
     ./bash.nix
-    ./gh.nix
+    ./neovim.nix
   ];
 
   options.local.homepkgs = {
@@ -17,6 +14,9 @@
       type = lib.types.singleLineStr;
     };
     sopsNix = lib.mkOption {
+      type = lib.types.bool;
+    };
+    isWheel = lib.mkOption {
       type = lib.types.bool;
     };
   };
