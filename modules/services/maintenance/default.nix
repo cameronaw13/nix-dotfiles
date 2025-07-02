@@ -15,7 +15,6 @@
     ./upgrade.nix
     ./optimise.nix
     ./garbage.nix
-    #./snapshot.nix
     ./poweroff.nix
     ./mail.nix
   ];

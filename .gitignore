@@ -2,3 +2,5 @@
 /result
 # temporary files
 *.swp
+# temp
+/olds

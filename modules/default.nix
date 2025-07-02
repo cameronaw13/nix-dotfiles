@@ -21,13 +21,6 @@
     };
   };
 
-  /* Programs */
-  programs = {
-    ssh.knownHosts = {
-      "github.com".publicKey = "ssh-ed25519                                                                 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
-    };
-  };
-
   /* Locale */
   time.timeZone = lib.mkDefault "America/Los_Angeles";
   i18n.defaultLocale = lib.mkDefault "en_US.UTF-8";
@@ -71,6 +64,11 @@
   home-manager.sharedModules = [
     inputs.sops-nix.homeManagerModules.sops
   ];
+
+  /* Known Hosts */
+  programs.ssh.knownHosts = {
+    "github.com".publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
+  };
 
   /* "Debloat" */
   fonts.fontconfig.enable = lib.mkDefault false;

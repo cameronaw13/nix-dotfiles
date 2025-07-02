@@ -7,8 +7,8 @@
     ./maintenance/default.nix
   ];
 
-  networking.firewall = lib.mkDefault {
-    allowedTCPPorts = [ 22 ];
+  /*networking.firewall = lib.mkDefault {
+    allowedTCPPorts = [ ];
     allowedUDPPorts = [ ];
-  };
+  };*/
 }

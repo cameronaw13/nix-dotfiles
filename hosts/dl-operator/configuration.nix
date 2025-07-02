@@ -5,7 +5,6 @@
     ./extra-hardware-conf.nix
     ../../modules/default.nix
     inputs.sops-nix.nixosModules.sops
-    #inputs.microvm.nixosModules.host
   ];
 
   /* System Packages */

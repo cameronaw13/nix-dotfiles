@@ -61,8 +61,8 @@
           builtins.hasAttr "${sopsDir}/hashedPassword" config.sops.secrets
           ) config.sops.secrets."${sopsDir}/hashedPassword".path;
         openssh.authorizedKeys.keys = currUser.authorizedKeys ++ lib.optionals (
-          builtins.hasAttr "${sopsDir}/authorizedKeys" config.sops.secrets) (
-          lib.splitString "\n" (builtins.readFile config.sops.secrets."${sopsDir}/authorizedKeys".path)
+          builtins.hasAttr "${sopsDir}/authorizedKeys" config.sops.secrets
+          ) (lib.splitString "\n" (builtins.readFile config.sops.secrets."${sopsDir}/authorizedKeys".path)
         );
       };
 
@@ -79,12 +79,12 @@
         ];
         
         local.homepkgs = lib.mkMerge [
-          currUser.homePackages
           { 
             inherit hostName sopsDir;
             inherit (currUser) sopsNix;
             isWheel = builtins.elem "wheel" currUser.extraGroups;
           }
+          currUser.homePackages
         ];
         
         sops = lib.mkIf currUser.sopsNix {
@@ -96,14 +96,6 @@
       sops.secrets = lib.mkIf currUser.sopsNix {
         "${sopsDir}/hashedPassword".neededForUsers = true;
       };
-
-      /*security.sudo.extraRules = lib.mkIf currUser.sudoBypass [ {
-        users = [ username ];
-        commands = [ {
-          command = "ALL";
-          options = [ "NOPASSWD" "SETENV" ];
-        } ];
-      } ];*/
     }) userList))
   );
 }
