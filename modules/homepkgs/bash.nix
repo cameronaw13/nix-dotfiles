@@ -10,10 +10,6 @@ in
       default = true;
     };
     scripts = {
-      path = lib.mkOption {
-        type = lib.types.path;
-        default = "/etc/nixos";
-      };
       fullrebuild.enable = lib.mkOption {
         type = lib.types.bool;
         default = false;
@@ -25,11 +21,11 @@ in
     };
   };
 
-  config = lib.mkIf homepkgs.bash.enable {
+  config = {
     programs.bash = {
-      enable = true;
-      shellAliases = {
-        sudo = "sudo --preserve-env=VISUAL ";
+      enable = homepkgs.bash.enable;
+      shellAliases = lib.mkDefault {
+        sudo = "sudo --preserve-env=EDITOR ";
       };
     };
     
@@ -41,7 +37,7 @@ in
           pkgs.gitMinimal
         ];
         runtimeEnv = {
-          SCRIPT_PATH = scripts.path;
+          SCRIPT_PATH = homepkgs.repopath;
         };
         text = (builtins.readFile ../scripts/fullrebuild.sh);
       };
@@ -53,7 +49,7 @@ in
           pkgs.gh
         ];
         runtimeEnv = {
-          SCRIPT_PATH = scripts.path;
+          SCRIPT_PATH = homepkgs.repopath;
         };
         excludeShellChecks = [ "SC2001" ];
         text = (builtins.readFile ../scripts/createpr.sh);

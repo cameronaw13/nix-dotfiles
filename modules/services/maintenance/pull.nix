@@ -1,4 +1,4 @@
-{ lib, config, pkgs, ... }:
+{ lib, config, pkgs, repopath, ... }:
 let
   inherit (config.local.services) maintenance;
 in
@@ -13,10 +13,6 @@ in
         x: config.users.users.${x}.linger && config.home-manager.users.${x}.local.homepkgs.git.enable
       );
     };
-    path = lib.mkOption {
-      type = lib.types.path;
-      default = "/etc/nixos";
-    };
   };
 
   config = lib.mkIf maintenance.upgrade.pull.enable {
@@ -25,7 +21,7 @@ in
       serviceConfig = {
         Type = "oneshot";
         User = maintenance.upgrade.pull.user;
-        WorkingDirectory = maintenance.upgrade.pull.path; 
+        WorkingDirectory = repopath;
       };
       startAt = maintenance.dates;
 
@@ -38,7 +34,6 @@ in
         hostname = config.networking.hostName;
         inherit (maintenance.upgrade.pull.user);
       in ''
-        #${git} config --global --add safe.directory /etc/nixos
         ${git} fetch -v
         ${git} stash -u
         ${git} rebase origin/master

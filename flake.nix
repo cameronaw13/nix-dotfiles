@@ -1,6 +1,6 @@
 {
   inputs = {
-    self.submodules = true;
+    #self.submodules = true;
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     home-manager = {
@@ -25,13 +25,15 @@
     };
   };
 
-  outputs = { nixpkgs, ... } @inputs: let
+  outputs = { nixpkgs, nixpkgs-unstable, ... } @inputs: let
     system = "x86_64-linux";
+    repopath = "/etc/nixos";
+    pkgsUnstable = nixpkgs-unstable.legacyPackages.${system};
   in {
     nixosConfigurations = {
       dl-operator = nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs = { inherit inputs; };
+        specialArgs = { inherit repopath pkgsUnstable inputs; };
         modules = [
           ./hosts/dl-operator/configuration.nix
         ];

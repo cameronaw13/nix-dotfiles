@@ -84,18 +84,14 @@
     "nix-secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1751245720,
-        "narHash": "sha256-dGFr5ae5Kw0wpVT9Go2E58F5ds7YLXcPXCcPvcz7ypE=",
-        "ref": "refs/heads/master",
-        "rev": "e20ebc1927ac1e73e20446cee1da555e72ac0a81",
-        "revCount": 25,
-        "type": "git",
-        "url": "file:///etc/nixos/secrets"
+        "path": "git+file://./secrets",
+        "type": "path"
       },
       "original": {
-        "type": "git",
-        "url": "file:///etc/nixos/secrets"
-      }
+        "path": "git+file://./secrets",
+        "type": "path"
+      },
+      "parent": []
     },
     "nixpkgs": {
       "locked": {

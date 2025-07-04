@@ -1,4 +1,4 @@
-{ lib, pkgs, inputs, ... }:
+{ lib, pkgs, pkgsUnstable, inputs, ... }:
 {
   imports = [ 
     ./hardware-configuration.nix
@@ -32,6 +32,9 @@
         sops
         age
         shellcheck
+        ;
+      } ++ builtins.attrValues {
+        inherit (pkgsUnstable)
         glab
         ;
       };
@@ -40,7 +43,10 @@
           fullrebuild.enable = true;
           createpr.enable = true;
         };
-        neovim.enable = true;
+        neovim = {
+          enable = true;
+          defaultEditor = true;
+        };
         vcs = {
           enable = true;
           username = "cameronaw13";

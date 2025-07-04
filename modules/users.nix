@@ -1,4 +1,4 @@
-{ lib, config, inputs, ... }:
+{ lib, config, repopath, inputs, ... }:
 {
   imports = [
     inputs.home-manager.nixosModules.home-manager
@@ -80,7 +80,7 @@
         
         local.homepkgs = lib.mkMerge [
           { 
-            inherit hostName sopsDir;
+            inherit repopath hostName sopsDir ;
             inherit (currUser) sopsNix;
             isWheel = builtins.elem "wheel" currUser.extraGroups;
           }

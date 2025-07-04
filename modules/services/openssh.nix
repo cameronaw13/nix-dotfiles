@@ -8,18 +8,11 @@ in
       type = lib.types.bool;
       default = true;
     };
-    /*permitRoot = lib.mkOption {
-      type = lib.types.str;
-      default = "no";
-    };*/
   };
 
   config = lib.mkIf services.openssh.enable {
     services.openssh = {
       enable = true;
-      /*settings = {
-        PermitRootLogin = services.openssh.permitRoot;
-      };*/
     };
     networking.firewall.allowedTCPPorts = lib.mkDefault [ 22 ];
   };

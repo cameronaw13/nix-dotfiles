@@ -1,4 +1,4 @@
-{ lib, config, pkgs, ... }:
+{ lib, config, pkgs, repopath, ... }:
 let
   inherit (config.local) services;
 in
@@ -7,10 +7,6 @@ in
     enable = lib.mkOption {
       type = lib.types.bool;
       default = true;
-    };
-    path = lib.mkOption {
-      type = lib.types.path;
-      default = "/etc/nixos";
     };
   };
 
@@ -22,11 +18,11 @@ in
       script = let
         setfacl = "${pkgs.acl}/bin/setfacl";
       in ''
-        chgrp -R wheel /etc/nixos
-        chmod -R g+s /etc/nixos
-        chmod -R u=rwX,g=rwX,o=rX /etc/nixos
-	chmod -R o= /etc/nixos/secrets
-        ${setfacl} -dRm g::rw /etc/nixos
+        chgrp -R wheel "${repopath}"
+        chmod -R g+s "${repopath}"
+        chmod -R u=rwX,g=rwX,o=rX "${repopath}"
+	chmod -R o= "${repopath}/secrets"
+        ${setfacl} -dRm g::rw "${repopath}"
       '';
 
       wantedBy = [ "default.target" ];

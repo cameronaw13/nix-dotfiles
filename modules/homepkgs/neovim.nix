@@ -14,21 +14,24 @@ in
     };
   };
 
-  config = lib.mkIf homepkgs.neovim.enable {
+  config = {
     programs.neovim = {
-      enable = true;
+      enable = homepkgs.neovim.enable;
       inherit (homepkgs.neovim) defaultEditor;
-      vimAlias = true;
-      plugins = with pkgs.vimPlugins; [
+      vimAlias = lib.mkDefault true;
+      plugins = (builtins.attrValues {
+        inherit (pkgs.vimPlugins)
         fzf-lua
+        ;
+      }) ++ [
         (lib.mkIf homepkgs.isWheel {
-          plugin = vim-suda;
+          plugin = pkgs.vimPlugins.vim-suda;
           config = ''
             let g:suda_smart_edit = 1
           '';
         })
       ];
-      extraConfig = ''
+      extraConfig = lib.mkDefault ''
         " visual "
         set nu rnu
 

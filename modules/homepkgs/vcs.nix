@@ -37,15 +37,15 @@ in
 
   config = lib.mkIf homepkgs.vcs.enable {
     programs = {
-      git = lib.mkIf homepkgs.vcs.git.enable {
-        enable = true;
-        package = pkgs.gitMinimal;
+      git = {
+        enable = homepkgs.vcs.git.enable;
+        package = lib.mkDefault pkgs.git;
         userName = homepkgs.vcs.username;
         userEmail = homepkgs.vcs.email;
         extraConfig = lib.mkMerge [
           { 
             init.defaultBranch = "master";
-            safe.directory = [ "/etc/nixos" "/etc/nixos/secrets" ];
+            safe.directory = [ homepkgs.repopath "${homepkgs.repopath}/secrets" ];
           }
           (lib.mkIf (homepkgs.vcs.signing && homepkgs.sopsNix) {
             commit.gpgsign = true;
@@ -55,8 +55,8 @@ in
           })
         ];
       };
-      jujutsu = lib.mkIf homepkgs.vcs.jj.enable {
-        enable = true;
+      jujutsu = {
+        enable = homepkgs.vcs.jj.enable;
         settings = lib.mkMerge [
           {
             user = {
@@ -78,19 +78,28 @@ in
           })
         ];
       };
-      ssh = lib.mkIf homepkgs.sopsNix {
-        enable = true;
-        matchBlocks."github-key" = {
-          host = "github.com";
-          identitiesOnly = true;
-          identityFile = [
-            "~/.ssh/id_ed25519_key"
-          ];
+      ssh = {
+        enable = homepkgs.sopsNix;
+        matchBlocks = lib.mkDefault {
+          "github-host" = {
+            host = "github.com";
+            identitiesOnly = true;
+            identityFile = [
+              "~/.ssh/id_ed25519_key"
+            ];
+          };
+          "gitlab-host" = {
+            host = "gitlab.com";
+            identitiesOnly = true;
+            identityFile = [
+              "~/.ssh/id_ed25519_key"
+            ];
+          };
         };
       };
-      gh = lib.mkIf homepkgs.vcs.gh.enable {
-        enable = true;
-        settings.git_protocol = "ssh";
+      gh = {
+        enable = homepkgs.vcs.gh.enable;
+        settings.git_protocol = lib.mkDefault "ssh";
       };
     };
 

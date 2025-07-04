@@ -1,4 +1,4 @@
-{ lib, config, pkgs, ... }:
+{ lib, config, pkgs, repopath, ... }:
 {
   system.activationScripts = let
     inherit (config.networking) hostName;
@@ -13,7 +13,7 @@
         sops = "${pkgs.sops}/bin/sops";
         sudo = "${pkgs.sudo}/bin/sudo";
       in ''
-        secretsDir="/etc/nixos/secrets"
+        secretsDir="${repopath}/secrets"
         declare -A userList=(${userList})
         for name in "''${!userList[@]}"; do
           keyFile="/home/$name/.config/sops/age/keys.txt"
