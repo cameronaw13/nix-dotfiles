@@ -1,7 +1,7 @@
 { lib, ... }:
 {
   imports = [
-    ./git.nix
+    ./vcs.nix
     ./bash.nix
     ./neovim.nix
   ];

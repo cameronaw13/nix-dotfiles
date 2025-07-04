@@ -15,11 +15,11 @@ in
         default = "/etc/nixos";
       };
       fullrebuild.enable = lib.mkOption {
-        type = lib.types.addCheck lib.types.bool (x: !x || homepkgs.git.enable);
+        type = lib.types.bool;
         default = false;
       };
       createpr.enable = lib.mkOption {
-        type = lib.types.addCheck lib.types.bool (x: !x || homepkgs.git.enable);
+        type = lib.types.bool;
         default = false;
       };
     };

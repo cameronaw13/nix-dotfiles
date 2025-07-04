@@ -32,6 +32,7 @@
         sops
         age
         shellcheck
+        glab
         ;
       };
       homePackages = {
@@ -40,12 +41,11 @@
           createpr.enable = true;
         };
         neovim.enable = true;
-        git = {
+        vcs = {
           enable = true;
           username = "cameronaw13";
           email = "cameronawichman@gmail.com";
           signing = true;
-          gh.enable = true;
         };
       };
     };
