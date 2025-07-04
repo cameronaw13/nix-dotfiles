@@ -4,42 +4,50 @@ let
   inherit (config.home) username;
 in
 {
-  options.local.homepkgs.git = {
+  options.local.homepkgs.vcs = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = false;
     };
-    username = lib.mkOption {
-      type = lib.types.nullOr lib.types.singleLineStr;
-      default = null;
-    };
-    email = lib.mkOption {
-      type = lib.types.nullOr lib.types.singleLineStr;
-      default = null;
-    };
-    signing = lib.mkOption {
+    git.enable = lib.mkOption {
       type = lib.types.bool;
-      default = false;
+      default = true;
+    };
+    jj.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
     };
     gh.enable = lib.mkOption {
       type = lib.types.bool;
       default = true;
     };
+    username = lib.mkOption {
+      type = lib.types.singleLineStr;
+      default = "";
+    };
+    email = lib.mkOption {
+      type = lib.types.singleLineStr;
+      default = "";
+    };
+    signing = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+    };
   };
 
-  config = lib.mkIf homepkgs.git.enable {
+  config = lib.mkIf homepkgs.vcs.enable {
     programs = {
-      git = {
+      git = lib.mkIf homepkgs.vcs.git.enable {
         enable = true;
         package = pkgs.gitMinimal;
-        userName = homepkgs.git.username;
-        userEmail = homepkgs.git.email;
+        userName = homepkgs.vcs.username;
+        userEmail = homepkgs.vcs.email;
         extraConfig = lib.mkMerge [
           { 
             init.defaultBranch = "master";
             safe.directory = [ "/etc/nixos" "/etc/nixos/secrets" ];
           }
-          (lib.mkIf (homepkgs.git.signing && homepkgs.sopsNix) {
+          (lib.mkIf (homepkgs.vcs.signing && homepkgs.sopsNix) {
             commit.gpgsign = true;
             gpg.format = "ssh";
             gpg.ssh.allowedSignersFile = "~/.ssh/allowed_signers";
@@ -47,8 +55,31 @@ in
           })
         ];
       };
-      ssh = {
-        enable = lib.mkDefault true;
+      jujutsu = lib.mkIf homepkgs.vcs.jj.enable {
+        enable = true;
+        settings = lib.mkMerge [
+          {
+            user = {
+              name = homepkgs.vcs.username;
+              email = homepkgs.vcs.email;
+            };
+          }
+          (lib.mkIf (homepkgs.vcs.signing && homepkgs.sopsNix) {
+            signing = {
+              behavior = "own";
+              backend = "ssh";
+              backends = {
+                ssh.allowed-signers = "~/.ssh/allowed_signers";
+              };
+              key = "~/.ssh/id_ed25519_key.pub";
+            };
+            git.sign-on-push = false;
+            ui.show-cryptographic-signatures = true;
+          })
+        ];
+      };
+      ssh = lib.mkIf homepkgs.sopsNix {
+        enable = true;
         matchBlocks."github-key" = {
           host = "github.com";
           identitiesOnly = true;
@@ -57,7 +88,7 @@ in
           ];
         };
       };
-      gh = lib.mkIf homepkgs.git.gh.enable {
+      gh = lib.mkIf homepkgs.vcs.gh.enable {
         enable = true;
         settings.git_protocol = "ssh";
       };
