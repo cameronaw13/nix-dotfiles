@@ -1,4 +1,4 @@
-{ lib, config, pkgs, repopath, ... }:
+{ lib, config, pkgs, repoPath, ... }:
 {
   system.activationScripts = let
     inherit (config.networking) hostName;
@@ -11,9 +11,8 @@
         age = "${pkgs.age}/bin/age-keygen";
         ssh-to-age = "${pkgs.ssh-to-age}/bin/ssh-to-age";
         sops = "${pkgs.sops}/bin/sops";
-        sudo = "${pkgs.sudo}/bin/sudo";
       in ''
-        secretsDir="${repopath}/secrets"
+        secretsDir="${repoPath}/secrets"
         declare -A userList=(${userList})
         for name in "''${!userList[@]}"; do
           keyFile="/home/$name/.config/sops/age/keys.txt"
@@ -26,8 +25,8 @@
               ;;
             true)
               if [ ! -f "$keyFile" ]; then
-                ${sudo} -u "$name" mkdir -p /home/$name/.config/sops/age
-                ${sudo} -u "$name" ${age} -o "$keyFile" 2>/dev/null
+                sudo -u "$name" mkdir -p /home/$name/.config/sops/age
+                sudo -u "$name" ${age} -o "$keyFile" 2>/dev/null
                 currKey="$(${age} -y "$keyFile")"
                 ${yq} -i '.keys += ("'$currKey'" | . anchor = "'$HOSTNAME'_'$name'") | .creation_rules[0].key_groups[0].age += ((.keys[-1] | anchor) | . alias |= .)' "$secretsDir/.sops.yaml"
               fi

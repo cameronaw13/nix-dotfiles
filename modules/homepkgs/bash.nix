@@ -37,7 +37,7 @@ in
           pkgs.gitMinimal
         ];
         runtimeEnv = {
-          SCRIPT_PATH = homepkgs.repopath;
+          SCRIPT_PATH = homepkgs.repoPath;
         };
         text = (builtins.readFile ../scripts/fullrebuild.sh);
       };
@@ -49,7 +49,7 @@ in
           pkgs.gh
         ];
         runtimeEnv = {
-          SCRIPT_PATH = homepkgs.repopath;
+          SCRIPT_PATH = homepkgs.repoPath;
         };
         excludeShellChecks = [ "SC2001" ];
         text = (builtins.readFile ../scripts/createpr.sh);

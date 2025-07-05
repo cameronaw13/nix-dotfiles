@@ -1,4 +1,4 @@
-{ lib, config, pkgs, repopath, ... }:
+{ lib, config, pkgs, repoPath, ... }:
 let
   inherit (config.local.services) maintenance;
 in
@@ -21,7 +21,7 @@ in
       serviceConfig = {
         Type = "oneshot";
         User = maintenance.upgrade.pull.user;
-        WorkingDirectory = repopath;
+        WorkingDirectory = repoPath;
       };
       startAt = maintenance.dates;
 

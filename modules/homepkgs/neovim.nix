@@ -12,16 +12,20 @@ in
       type = lib.types.bool;
       default = false;
     };
+    vimAlias = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+    };
   };
 
   config = {
     programs.neovim = {
       enable = homepkgs.neovim.enable;
-      inherit (homepkgs.neovim) defaultEditor;
-      vimAlias = lib.mkDefault true;
-      plugins = (builtins.attrValues {
+      inherit (homepkgs.neovim) defaultEditor vimAlias;
+      plugins = lib.mkDefault ((builtins.attrValues {
         inherit (pkgs.vimPlugins)
         fzf-lua
+        undotree
         ;
       }) ++ [
         (lib.mkIf homepkgs.isWheel {
@@ -30,7 +34,7 @@ in
             let g:suda_smart_edit = 1
           '';
         })
-      ];
+      ]);
       extraConfig = lib.mkDefault ''
         " visual "
         set nu rnu

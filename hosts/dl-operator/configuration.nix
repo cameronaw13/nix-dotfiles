@@ -46,6 +46,7 @@
         neovim = {
           enable = true;
           defaultEditor = true;
+          vimAlias = true;
         };
         vcs = {
           enable = true;

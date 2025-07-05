@@ -1,4 +1,4 @@
-{ lib, config, repopath, inputs, ... }:
+{ lib, config, repoPath, stateVersion, inputs, ... }:
 {
   imports = [
     inputs.home-manager.nixosModules.home-manager
@@ -54,9 +54,9 @@
       sopsDir = "${hostName}/${username}";
     in {
       users.users.${username} = {
-        isNormalUser = true;
-        description = username;
         inherit (currUser) uid extraGroups linger;
+        isNormalUser = true;
+        description = lib.mkDefault username;
         hashedPasswordFile = lib.mkIf (
           builtins.hasAttr "${sopsDir}/hashedPassword" config.sops.secrets
           ) config.sops.secrets."${sopsDir}/hashedPassword".path;
@@ -68,9 +68,8 @@
 
       home-manager.users.${username} = {
          home = {
-          inherit (username);
+          inherit username stateVersion;
           homeDirectory = "/home/${username}";
-          stateVersion = "25.05";
           packages = currUser.userPackages;
         };
         
@@ -80,7 +79,7 @@
         
         local.homepkgs = lib.mkMerge [
           { 
-            inherit repopath hostName sopsDir ;
+            inherit repoPath hostName sopsDir ;
             inherit (currUser) sopsNix;
             isWheel = builtins.elem "wheel" currUser.extraGroups;
           }

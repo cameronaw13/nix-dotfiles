@@ -7,7 +7,7 @@
   ];
 
   options.local.homepkgs = {
-    repopath = lib.mkOption {
+    repoPath = lib.mkOption {
       type = lib.types.singleLineStr;
     };
     hostName = lib.mkOption {

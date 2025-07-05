@@ -27,13 +27,14 @@
 
   outputs = { nixpkgs, nixpkgs-unstable, ... } @inputs: let
     system = "x86_64-linux";
-    repopath = "/etc/nixos";
+    repoPath = "/etc/nixos";
     pkgsUnstable = nixpkgs-unstable.legacyPackages.${system};
+    stateVersion = "25.05";
   in {
     nixosConfigurations = {
       dl-operator = nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs = { inherit repopath pkgsUnstable inputs; };
+        specialArgs = { inherit repoPath pkgsUnstable stateVersion inputs; };
         modules = [
           ./hosts/dl-operator/configuration.nix
         ];

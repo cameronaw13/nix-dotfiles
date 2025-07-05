@@ -44,8 +44,8 @@ in
         userEmail = homepkgs.vcs.email;
         extraConfig = lib.mkMerge [
           { 
-            init.defaultBranch = "master";
-            safe.directory = [ homepkgs.repopath "${homepkgs.repopath}/secrets" ];
+            init.defaultBranch = lib.mkDefault "master";
+            safe.directory = [ homepkgs.repoPath "${homepkgs.repoPath}/secrets" ];
           }
           (lib.mkIf (homepkgs.vcs.signing && homepkgs.sopsNix) {
             commit.gpgsign = true;
@@ -63,6 +63,7 @@ in
               name = homepkgs.vcs.username;
               email = homepkgs.vcs.email;
             };
+            ui.pager = lib.mkDefault "less -FRX";
           }
           (lib.mkIf (homepkgs.vcs.signing && homepkgs.sopsNix) {
             signing = {
@@ -73,14 +74,14 @@ in
               };
               key = "~/.ssh/id_ed25519_key.pub";
             };
-            git.sign-on-push = false;
-            ui.show-cryptographic-signatures = true;
+            git.sign-on-push = lib.mkDefault false;
+            ui.show-cryptographic-signatures = lib.mkDefault true;
           })
         ];
       };
       ssh = {
         enable = homepkgs.sopsNix;
-        matchBlocks = lib.mkDefault {
+        matchBlocks = {
           "github-host" = {
             host = "github.com";
             identitiesOnly = true;
@@ -99,7 +100,7 @@ in
       };
       gh = {
         enable = homepkgs.vcs.gh.enable;
-        settings.git_protocol = lib.mkDefault "ssh";
+        settings.git_protocol = "ssh";
       };
     };
 

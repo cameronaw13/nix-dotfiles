@@ -1,4 +1,4 @@
-{ lib, config, pkgs, repopath, ... }:
+{ lib, config, pkgs, repoPath, ... }:
 let
   inherit (config.local) services;
 in
@@ -18,11 +18,12 @@ in
       script = let
         setfacl = "${pkgs.acl}/bin/setfacl";
       in ''
-        chgrp -R wheel "${repopath}"
-        chmod -R g+s "${repopath}"
-        chmod -R u=rwX,g=rwX,o=rX "${repopath}"
-	chmod -R o= "${repopath}/secrets"
-        ${setfacl} -dRm g::rw "${repopath}"
+        set -x
+        chgrp -R wheel "${repoPath}"
+        chmod -R g+s "${repoPath}"
+        chmod -R u=rwX,g=rwX,o=rX "${repoPath}"
+	chmod -R o= "${repoPath}/secrets"
+        ${setfacl} -dRm g::rw "${repoPath}"
       '';
 
       wantedBy = [ "default.target" ];
