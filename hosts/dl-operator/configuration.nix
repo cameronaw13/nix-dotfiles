@@ -1,4 +1,4 @@
-{ lib, pkgs, pkgsUnstable, inputs, ... }:
+{ pkgs, pkgsUnstable, inputs, ... }:
 {
   imports = [ 
     ./hardware-configuration.nix
@@ -50,7 +50,7 @@
         };
         vcs = {
           enable = true;
-          username = "cameronaw13";
+          name = "cameronaw13";
           email = "cameronawichman@gmail.com";
           signing = true;
         };

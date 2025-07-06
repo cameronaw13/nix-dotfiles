@@ -20,8 +20,7 @@ in
 
   config = {
     programs.neovim = {
-      enable = homepkgs.neovim.enable;
-      inherit (homepkgs.neovim) defaultEditor vimAlias;
+      inherit (homepkgs.neovim) enable defaultEditor vimAlias;
       plugins = lib.mkDefault ((builtins.attrValues {
         inherit (pkgs.vimPlugins)
         fzf-lua

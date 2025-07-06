@@ -67,7 +67,7 @@
       };
 
       home-manager.users.${username} = {
-         home = {
+        home = {
           inherit username stateVersion;
           homeDirectory = "/home/${username}";
           packages = currUser.userPackages;
@@ -79,7 +79,7 @@
         
         local.homepkgs = lib.mkMerge [
           { 
-            inherit repoPath hostName sopsDir ;
+            inherit repoPath hostName sopsDir;
             inherit (currUser) sopsNix;
             isWheel = builtins.elem "wheel" currUser.extraGroups;
           }

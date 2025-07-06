@@ -12,15 +12,18 @@
   local = {
     users.bootstrap = {
       extraGroups = [ "wheel" ];
-      sudoBypass = true;
       userPackages = builtins.attrValues {
         inherit (pkgs)
         gitMinimal
+        jj
         gh
+        glab
         ;
       };
       authorizedKeys = [
-        # eg: "ssh-ed25519 AAAA... nixos@dotfiles"
+        #<<<<<<< EXAMPLE <<<<<<<
+        "ssh-ed25519 AAAA... nixos@dotfiles"
+        #>>>>> DO NOT KEEP >>>>>
       ];
     };
     services.openssh.enable = true;

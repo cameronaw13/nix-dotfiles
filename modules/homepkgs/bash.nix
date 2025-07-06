@@ -23,7 +23,7 @@ in
 
   config = {
     programs.bash = {
-      enable = homepkgs.bash.enable;
+      inherit (homepkgs.bash) enable;
       shellAliases = lib.mkDefault {
         sudo = "sudo --preserve-env=EDITOR ";
       };
@@ -39,7 +39,7 @@ in
         runtimeEnv = {
           SCRIPT_PATH = homepkgs.repoPath;
         };
-        text = (builtins.readFile ../scripts/fullrebuild.sh);
+        text = builtins.readFile ../scripts/fullrebuild.sh;
       };
       createpr = pkgs.writeShellApplication {
         name = "home-createpr";
@@ -52,11 +52,10 @@ in
           SCRIPT_PATH = homepkgs.repoPath;
         };
         excludeShellChecks = [ "SC2001" ];
-        text = (builtins.readFile ../scripts/createpr.sh);
+        text = builtins.readFile ../scripts/createpr.sh;
       };
-    in (
-      lib.lists.optional scripts.fullrebuild.enable (fullrebuild)
-      ++ lib.lists.optional scripts.createpr.enable (createpr)
-    );
+    in
+      lib.lists.optional scripts.fullrebuild.enable fullrebuild
+      ++ lib.lists.optional scripts.createpr.enable createpr;
   };
 }

@@ -21,7 +21,7 @@ in
       type = lib.types.bool;
       default = true;
     };
-    username = lib.mkOption {
+    name = lib.mkOption {
       type = lib.types.singleLineStr;
       default = "";
     };
@@ -38,9 +38,9 @@ in
   config = lib.mkIf homepkgs.vcs.enable {
     programs = {
       git = {
-        enable = homepkgs.vcs.git.enable;
-        package = lib.mkDefault pkgs.git;
-        userName = homepkgs.vcs.username;
+        inherit (homepkgs.vcs.git) enable;
+        package = lib.mkDefault pkgs.gitMinimal;
+        userName = homepkgs.vcs.name;
         userEmail = homepkgs.vcs.email;
         extraConfig = lib.mkMerge [
           { 
@@ -56,12 +56,11 @@ in
         ];
       };
       jujutsu = {
-        enable = homepkgs.vcs.jj.enable;
+        inherit (homepkgs.vcs.jj) enable;
         settings = lib.mkMerge [
           {
             user = {
-              name = homepkgs.vcs.username;
-              email = homepkgs.vcs.email;
+              inherit (homepkgs.vcs) name email;
             };
             ui.pager = lib.mkDefault "less -FRX";
           }
@@ -99,7 +98,7 @@ in
         };
       };
       gh = {
-        enable = homepkgs.vcs.gh.enable;
+        inherit (homepkgs.vcs.gh) enable;
         settings.git_protocol = "ssh";
       };
     };
