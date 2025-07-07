@@ -45,7 +45,7 @@ in
         extraConfig = lib.mkMerge [
           { 
             init.defaultBranch = lib.mkDefault "master";
-            safe.directory = [ homepkgs.repoPath "${homepkgs.repoPath}/secrets" ];
+            safe.directory = [ homepkgs.repoPath homepkgs.scrtPath ];
           }
           (lib.mkIf (homepkgs.vcs.signing && homepkgs.sopsNix) {
             commit.gpgsign = true;
@@ -111,10 +111,15 @@ in
         "${homepkgs.sopsDir}/id_ed25519_key.pub" = {
           path = "/home/${username}/.ssh/id_ed25519_key.pub";
         };
+        "${homepkgs.sopsDir}/gh-hosts.yml" = lib.mkIf homepkgs.vcs.gh.enable {
+          path = "/home/${username}/.config/gh/hosts.yml";
+        };
       };
-      templates."allowed_signers" = {
-        content = "* ${config.sops.placeholder."${homepkgs.sopsDir}/id_ed25519_key.pub"}";
-        path = "/home/${username}/.ssh/allowed_signers";
+      templates = {
+        "allowed_signers" = {
+          content = "* ${config.sops.placeholder."${homepkgs.sopsDir}/id_ed25519_key.pub"}";
+          path = "/home/${username}/.ssh/allowed_signers";
+        };
       };
     };
   };

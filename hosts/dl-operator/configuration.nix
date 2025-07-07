@@ -31,7 +31,7 @@
         inherit (pkgs)
         sops
         age
-        shellcheck
+        act
         ;
       } ++ builtins.attrValues {
         inherit (pkgsUnstable)

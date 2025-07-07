@@ -4,4 +4,4 @@
 *.swp
 # temp
 /olds
-/*secrets*
+/*secret*

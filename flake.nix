@@ -27,13 +27,14 @@
   outputs = { nixpkgs, nixpkgs-unstable, ... } @inputs: let
     system = "x86_64-linux";
     repoPath = "/etc/nixos";
+    scrtPath = "${repoPath}/secrets";
     stateVersion = "25.05";
     pkgsUnstable = nixpkgs-unstable.legacyPackages.${system};
   in {
     nixosConfigurations = {
       dl-operator = nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs = { inherit repoPath stateVersion pkgsUnstable inputs; };
+        specialArgs = { inherit repoPath scrtPath stateVersion pkgsUnstable inputs; };
         modules = [
           ./hosts/dl-operator/configuration.nix
         ];
@@ -47,7 +48,7 @@
       };*/
       templates = nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs = { inherit repoPath stateVersion inputs; };
+        specialArgs = { inherit repoPath scrtPath stateVersion inputs; };
         modules = [
           ./hosts/templates/configuration.nix
         ];

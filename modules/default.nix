@@ -1,4 +1,4 @@
-{ lib, pkgs, stateVersion, inputs, ... }:
+{ lib, pkgs, repoPath, stateVersion, inputs, ... }:
 {
   imports = [
     ./activate.nix
@@ -14,6 +14,9 @@
       nh
       trash-cli
       ;
+    };
+    variables = {
+      NH_FLAKE = repoPath;
     };
     shellAliases = {
       rm = "echo Consider using 'trash' or use the full command: \''\$(type -P rm)'\'";

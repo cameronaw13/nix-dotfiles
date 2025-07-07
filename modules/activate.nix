@@ -1,4 +1,4 @@
-{ lib, config, pkgs, repoPath, ... }:
+{ lib, config, pkgs, scrtPath, ... }:
 {
   system.activationScripts = let
     userList = lib.strings.concatStringsSep " " (lib.attrsets.mapAttrsToList (name: value: "[${name}]='${lib.trivial.boolToString value.sopsNix}'") config.local.users);
@@ -11,7 +11,7 @@
         ssh-to-age = "${pkgs.ssh-to-age}/bin/ssh-to-age";
         sops = "${pkgs.sops}/bin/sops";
       in ''
-        secretsDir="${repoPath}/secrets"
+        secretsDir="${scrtPath}"
         declare -A userList=(${userList})
         for name in "''${!userList[@]}"; do
           keyFile="/home/$name/.config/sops/age/keys.txt"
