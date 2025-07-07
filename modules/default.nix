@@ -11,6 +11,7 @@
     # Multi-host system packages
     systemPackages = builtins.attrValues {
       inherit (pkgs)
+      nh
       trash-cli
       ;
     };
