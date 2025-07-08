@@ -6,7 +6,7 @@ permissions:
   actions: write
 
 env:
-  GITHUB_TOKEN: ${{ secrets.github_token }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   REPO_PATH: /etc/nixos
   SECRET_PATH: /etc/nixos/secrets
   SECRET_NAME: cameronaw13/nix-secrets
