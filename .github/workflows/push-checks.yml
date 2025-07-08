@@ -31,9 +31,9 @@ jobs:
         with:
           nix-permission-edict: true
 
-      - name: Attempt to fix permissions
+      - name: Grant user ownership to TMPDIR
         run: |
-          sudo chmod o=+x /nix/_temp
+          sudo chown "${id --user}":"${id --group}" "$TMPDIR"
           ls -lha /nix
           ls -lha /nix/_temp
 
