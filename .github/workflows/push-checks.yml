@@ -3,6 +3,7 @@ name: Push Checks
 on: push
 
 env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   REPO_PATH: /etc/nixos
   SECRET_PATH: /etc/nixos/secrets
   SECRET_NAME: cameronaw13/nix-secrets
@@ -134,7 +135,7 @@ jobs:
           sudo cp -r "$GITHUB_WORKSPACE/dotfiles/." ${{ env.REPO_PATH }}
           sudo mkdir -p ${{ env.SECRET_PATH }}
           sudo cp -r "$GITHUB_WORKSPACE/secrets/." ${{ env.SECRET_PATH }}
-          nix run github:juspay/omnix --accept-flake-config -- ci run ${{ env.REPO_PATH }}
+          nix run nixpkgs#omnix -- ci run ${{ env.REPO_PATH }}
 
       - name: Save/purge/gc nix cache
         if: always() && steps.restore-nix-cache.outputs.hit-primary-key == 'false'
