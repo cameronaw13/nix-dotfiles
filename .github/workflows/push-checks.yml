@@ -3,8 +3,9 @@ name: Push Checks
 on: push
 
 env:
-  SECRET_REPO: cameronaw13/nix-secrets
-  SECRET_PATH: secrets
+  REPO_PATH: nixos
+  SECRET_PATH: nixos/secrets
+  SECRET_NAME: cameronaw13/nix-secrets
   NIX_CONF: |
     keep-env-derivations = true
     keep-outputs = true
@@ -101,11 +102,13 @@ jobs:
     steps:
       # Checkout pushed repo
       - uses: actions/checkout@v4.2.2
+        with:
+          path: ${{ env.REPO_PATH }}
 
       # Checkout secrets repo
       - uses: actions/checkout@v4.2.2
         with:
-          repository: ${{ env.SECRET_REPO }}
+          repository: ${{ env.SECRET_NAME }}
           path: ${{ env.SECRET_PATH }}
           token: ${{ secrets.NIX_SECRETS_PAT }}
 
@@ -128,7 +131,9 @@ jobs:
           restore-prefixes-first-match: nix-statix-
       
       # Run omnix ci
-      - run: nix run github:juspay/omnix --accept-flake-config -- ci
+      - run: |
+          sudo cp -r $GITHUB_WORKSPACE/${{ env.REPO_PATH }} /etc/nixos
+          nix run github:juspay/omnix --accept-flake-config -- ci run /etc/nixos
 
       # Save/purge/clean nix cache
       - id: save-nix-cache
