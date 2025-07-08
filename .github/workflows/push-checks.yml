@@ -2,7 +2,11 @@ name: Push Checks
 
 on: push
 
+permissions:
+  actions: write
+
 env:
+  GITHUB_TOKEN: ${{ secrets.github_token }}
   REPO_PATH: /etc/nixos
   SECRET_PATH: /etc/nixos/secrets
   SECRET_NAME: cameronaw13/nix-secrets
@@ -13,8 +17,6 @@ env:
 jobs:
   statix-lint:
     runs-on: ubuntu-latest
-    permissions:
-      actions: write
     concurrency:
       group: statix-lint
       cancel-in-progress: true
@@ -60,8 +62,6 @@ jobs:
 
   deadnix-lint:
     runs-on: ubuntu-latest
-    permissions:
-      actions: write
     concurrency:
       group: deadnix-lint
       cancel-in-progress: true
@@ -107,8 +107,6 @@ jobs:
           
   omnix-ci:
     runs-on: ubuntu-latest
-    permissions:
-      actions: write
     concurrency:
       group: omnix-ci
       cancel-in-progress: true
