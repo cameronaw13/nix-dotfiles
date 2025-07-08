@@ -130,10 +130,10 @@ jobs:
       
       - name: Run omnix ci
         run: |
-          mkdir -p ${{ env.REPO_PATH }}
-          cp -r "$GITHUB_WORKSPACE/dotfiles/." ${{ env.REPO_PATH }}
-          mkdir -p ${{ env.SECRET_PATH }}
-          cp -r "$GITHUB_WORKSPACE/secrets/." ${{ env.SECRET_PATH }}
+          sudo mkdir -p ${{ env.REPO_PATH }}
+          sudo cp -r "$GITHUB_WORKSPACE/dotfiles/." ${{ env.REPO_PATH }}
+          sudo mkdir -p ${{ env.SECRET_PATH }}
+          sudo cp -r "$GITHUB_WORKSPACE/secrets/." ${{ env.SECRET_PATH }}
           nix run github:juspay/omnix --accept-flake-config -- ci run ${{ env.REPO_PATH }}
 
       - name: Save/purge/gc nix cache
