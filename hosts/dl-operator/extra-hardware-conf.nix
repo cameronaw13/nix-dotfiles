@@ -9,10 +9,11 @@
   boot = {
     supportedFilesystems = [ "zfs" ];
     zfs.forceImportRoot = false;
-    loader.grub = {
+    /*loader.grub = {
       efiSupport = true;
       efiInstallAsRemovable = true;
-    };
+    };*/
+    loader.systemd-boot.enable = true;
     /*initrd.postDeviceCommands = lib.mkAfter ''
       zfs rollback -r zroot/root@blank
     '';*/

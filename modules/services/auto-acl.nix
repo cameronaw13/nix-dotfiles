@@ -1,4 +1,4 @@
-{ lib, config, pkgs, repoPath, scrtPath, ... }:
+{ lib, config, pkgs, repoPath, ... }:
 let
   inherit (config.local) services;
 in
@@ -22,7 +22,7 @@ in
         chgrp -R wheel "${repoPath}"
         chmod -R g+s "${repoPath}"
         chmod -R u=rwX,g=rwX,o=rX "${repoPath}"
-	chmod -R o= "${scrtPath}"
+	chmod -R o= "${repoPath}/secrets"
         ${setfacl} -dRm g::rw "${repoPath}"
       '';
 

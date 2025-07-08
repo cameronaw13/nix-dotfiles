@@ -84,16 +84,17 @@
     "nix-secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1751921826,
-        "narHash": "sha256-XB7nu06pxxE6dPEn25mE9U5nTBOiQdYRj9DXVrclR/Q=",
-        "rev": "3d26afaed17d6eaf8b9edbdf94573f9fe653e865",
-        "revCount": 28,
+        "lastModified": 1752018211,
+        "narHash": "sha256-A4g5sfkWxP/A5jOddJZBvFge9WRDr3F2SMRdyY6eYEk=",
+        "ref": "refs/heads/master",
+        "rev": "91a074b93ac2f18f192ac8d7e4cdd48260524ac3",
+        "revCount": 29,
         "type": "git",
-        "url": "file:///etc/nixos/secrets"
+        "url": "file:./secrets"
       },
       "original": {
         "type": "git",
-        "url": "file:///etc/nixos/secrets"
+        "url": "file:./secrets"
       }
     },
     "nixpkgs": {

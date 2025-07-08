@@ -1,4 +1,4 @@
-{ pkgs, pkgsUnstable, inputs, ... }:
+{ pkgs, inputs, ... }:
 {
   imports = [ 
     ./hardware-configuration.nix
@@ -31,11 +31,6 @@
         inherit (pkgs)
         sops
         age
-        act
-        ;
-      } ++ builtins.attrValues {
-        inherit (pkgsUnstable)
-        glab
         ;
       };
       homePackages = {
@@ -146,9 +141,9 @@
   };
   boot = {
     tmp.cleanOnBoot = true;
-    loader = {
-      grub.configurationLimit = 64;
-      systemd-boot.configurationLimit = 64;
-    };
+    /*loader = {
+      grub.configurationLimit = 100;
+      systemd-boot.configurationLimit = 100;
+    };*/
   };
 }

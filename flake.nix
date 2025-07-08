@@ -1,6 +1,6 @@
 {
   inputs = {
-    #self.submodules = true;
+    self.submodules = true;
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     home-manager = {
@@ -12,7 +12,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-secrets = {
-      url = "git+file:///etc/nixos/secrets";
+      url = "git+file:./secrets";
       flake = false;
     };
     microvm = {
@@ -28,14 +28,13 @@
   outputs = { nixpkgs, nixpkgs-unstable, ... } @inputs: let
     system = "x86_64-linux";
     repoPath = "/etc/nixos";
-    scrtPath = "${repoPath}/secrets";
     stateVersion = "25.05";
     pkgsUnstable = nixpkgs-unstable.legacyPackages.${system};
   in {
     nixosConfigurations = {
       dl-operator = nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs = { inherit repoPath scrtPath stateVersion pkgsUnstable inputs; };
+        specialArgs = { inherit repoPath stateVersion pkgsUnstable inputs; };
         modules = [
           ./hosts/dl-operator/configuration.nix
         ];
@@ -49,7 +48,7 @@
       };*/
       templates = nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs = { inherit repoPath scrtPath stateVersion inputs; };
+        specialArgs = { inherit repoPath stateVersion inputs; };
         modules = [
           ./hosts/templates/configuration.nix
         ];

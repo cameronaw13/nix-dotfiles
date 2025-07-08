@@ -10,9 +10,6 @@
     repoPath = lib.mkOption {
       type = lib.types.path;
     };
-    scrtPath = lib.mkOption {
-      type = lib.types.path;
-    };
     hostName = lib.mkOption {
       type = lib.types.singleLineStr;
     };

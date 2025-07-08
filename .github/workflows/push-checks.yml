@@ -1,17 +1,14 @@
 name: Push Checks
 
 on:
-  push:
   pull_request:
     types: opened
+  push:
   
 permissions:
   actions: write
 
 env:
-  REPO_PATH: /etc/nixos
-  SECRET_PATH: /etc/nixos/secrets
-  SECRET_NAME: cameronaw13/nix-secrets
   NIX_CONF: |
     keep-env-derivations = true
     keep-outputs = true
@@ -127,20 +124,13 @@ jobs:
         uses: actions/checkout@v4.2.2
         with:
           path: dotfiles
-
-      - name: Checkout secrets repo
-        uses: actions/checkout@v4.2.2
-        with:
-          repository: ${{ env.SECRET_NAME }}
-          path: secrets
+          submodules: recursive
           token: ${{ secrets.NIX_SECRETS_PAT }}
-      
-      - name: Copy repositories to ${{ env.REPO_PATH }}
-        run: |
-          sudo mkdir -p ${{ env.REPO_PATH }}
-          sudo cp -r "$GITHUB_WORKSPACE/dotfiles/." ${{ env.REPO_PATH }}
-          sudo mkdir -p ${{ env.SECRET_PATH }}
-          sudo cp -r "$GITHUB_WORKSPACE/secrets/." ${{ env.SECRET_PATH }}
+
+      #- name: Copy repositories to ${{ env.REPO_PATH }}
+      #  run: |
+      #    sudo mkdir -p ${{ env.REPO_PATH }}
+      #    sudo cp -r "$GITHUB_WORKSPACE/dotfiles/." ${{ env.REPO_PATH }}
 
       - name: Cleanup workflow runner
         uses: wimpysworld/nothing-but-nix@v6
@@ -167,7 +157,7 @@ jobs:
       
       - name: Run omnix ci
         run: |
-          nix run nixpkgs#omnix -- ci run ${{ env.REPO_PATH }}
+          nix run nixpkgs#omnix -- ci run -d
 
       - name: Save/purge/gc nix cache
         if: always() && steps.restore-nix-cache.outputs.hit-primary-key == 'false'

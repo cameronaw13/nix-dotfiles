@@ -15,7 +15,7 @@ in
     };
     jj.enable = lib.mkOption {
       type = lib.types.bool;
-      default = true;
+      default = false;
     };
     gh.enable = lib.mkOption {
       type = lib.types.bool;
@@ -39,13 +39,13 @@ in
     programs = {
       git = {
         inherit (homepkgs.vcs.git) enable;
-        package = lib.mkDefault pkgs.gitMinimal;
+        package = lib.mkDefault pkgs.git;
         userName = homepkgs.vcs.name;
         userEmail = homepkgs.vcs.email;
         extraConfig = lib.mkMerge [
           { 
             init.defaultBranch = lib.mkDefault "master";
-            safe.directory = [ homepkgs.repoPath homepkgs.scrtPath ];
+            safe.directory = [ homepkgs.repoPath "${homepkgs.repoPath}/secrets" ];
           }
           (lib.mkIf (homepkgs.vcs.signing && homepkgs.sopsNix) {
             commit.gpgsign = true;
