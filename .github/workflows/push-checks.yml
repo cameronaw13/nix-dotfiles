@@ -31,11 +31,10 @@ jobs:
         with:
           nix-permission-edict: true
 
-      - name: Grant user ownership to TMPDIR
+      - name: Grant user ownership of $TMPDIR
         run: |
-          sudo chown "${id --user}":"${id --group}" "$TMPDIR"
-          ls -lha /nix
-          ls -lha /nix/_temp
+          sudo chown "$(id --user)":"$(id --group)" "$TMPDIR"
+          ls -lha "$TMPDIR"
 
       - name: Install nix
         uses: nixbuild/nix-quick-install-action@v32
