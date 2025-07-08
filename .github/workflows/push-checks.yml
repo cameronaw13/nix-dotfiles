@@ -3,7 +3,6 @@ name: Push Checks
 on: push
 
 env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   REPO_PATH: /etc/nixos
   SECRET_PATH: /etc/nixos/secrets
   SECRET_NAME: cameronaw13/nix-secrets
@@ -76,7 +75,7 @@ jobs:
         with:
           primary-key: nix-deadnix-${{ hashFiles('**/flake.lock') }}
           # If cache wasnt found, restore most similar cache
-          restore-prefixes-first-match: nix-statix-
+          restore-prefixes-first-match: nix-deadnix-
 
       - name: Run deadnix
         run: nix run nixpkgs#deadnix -- --fail --exclude hosts/*/hardware-configuration.nix /etc/nixos 
@@ -127,7 +126,7 @@ jobs:
         with:
           primary-key: nix-omnix-${{ hashFiles('**/flake.lock') }}
           # If cache wasnt found, restore most similar cache
-          restore-prefixes-first-match: nix-statix-
+          restore-prefixes-first-match: nix-omnix-
       
       - name: Run omnix ci
         run: |
