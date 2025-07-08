@@ -130,7 +130,7 @@ jobs:
       
       - name: Run omnix ci
         run: |
-          cp -Tr $GITHUB_WORKSPACE/${{ env.REPO_PATH }} ${{ env.REPO_PATH }}
+          cp -r $GITHUB_WORKSPACE/${{ env.REPO_PATH }}/* ${{ env.REPO_PATH }}
           nix run github:juspay/omnix --accept-flake-config -- ci run ${{ env.REPO_PATH }}
 
       - name: Save/purge/gc nix cache
