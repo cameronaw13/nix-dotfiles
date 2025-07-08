@@ -33,8 +33,9 @@ jobs:
 
       - name: Attempt to fix permissions
         run: |
-          sudo chmod -R u=+rwX /nix
+          sudo chmod o=+x /nix/_temp
           ls -lha /nix
+          ls -lha /nix/_temp
 
       - name: Install nix
         uses: nixbuild/nix-quick-install-action@v32
