@@ -29,8 +29,11 @@ jobs:
       - name: Cleanup workflow runner
         uses: wimpysworld/nothing-but-nix@v6
         with:
-          hatchet-protocol: carve
           nix-permission-edict: true
+
+      - name: Attempt to fix permissions
+        run: |
+          sudo chmod -R u=+X /nix
 
       - name: Install nix
         uses: nixbuild/nix-quick-install-action@v32
@@ -125,6 +128,13 @@ jobs:
           repository: ${{ env.SECRET_NAME }}
           path: secrets
           token: ${{ secrets.NIX_SECRETS_PAT }}
+      
+      - name: Copy repositories to ${{ env.REPO_PATH }}
+        run: |
+          sudo mkdir -p ${{ env.REPO_PATH }}
+          sudo cp -r "$GITHUB_WORKSPACE/dotfiles/." ${{ env.REPO_PATH }}
+          sudo mkdir -p ${{ env.SECRET_PATH }}
+          sudo cp -r "$GITHUB_WORKSPACE/secrets/." ${{ env.SECRET_PATH }}
 
       #- name: Cleanup workflow runner
       #  uses: wimpysworld/nothing-but-nix@v6
@@ -146,10 +156,6 @@ jobs:
       
       - name: Run omnix ci
         run: |
-          sudo mkdir -p ${{ env.REPO_PATH }}
-          sudo cp -r "$GITHUB_WORKSPACE/dotfiles/." ${{ env.REPO_PATH }}
-          sudo mkdir -p ${{ env.SECRET_PATH }}
-          sudo cp -r "$GITHUB_WORKSPACE/secrets/." ${{ env.SECRET_PATH }}
           nix run nixpkgs#omnix -- ci run ${{ env.REPO_PATH }}
 
       - name: Save/purge/gc nix cache
