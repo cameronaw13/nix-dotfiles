@@ -24,10 +24,10 @@ jobs:
       - name: Checkout pushed repo
         uses: actions/checkout@v4.2.2
 
-      - name: Cleanup workflow runner
-        uses: wimpysworld/nothing-but-nix@v6
-        with:
-          nix-permission-edict: true
+      #- name: Cleanup workflow runner
+      #  uses: wimpysworld/nothing-but-nix@v6
+      #  with:
+      #    nix-permission-edict: true
 
       - name: Install nix
         uses: nixbuild/nix-quick-install-action@v32
@@ -69,10 +69,10 @@ jobs:
       - name: Checkout pushed repo
         uses: actions/checkout@v4.2.2
       
-      - name: Cleanup workflow runner
-        uses: wimpysworld/nothing-but-nix@v6
-        with:
-          nix-permission-edict: true
+      #- name: Cleanup workflow runner
+      #  uses: wimpysworld/nothing-but-nix@v6
+      #  with:
+      #    nix-permission-edict: true
       
       - name: Install nix
         uses: nixbuild/nix-quick-install-action@v32
@@ -123,10 +123,10 @@ jobs:
           path: secrets
           token: ${{ secrets.NIX_SECRETS_PAT }}
 
-      - name: Cleanup workflow runner
-        uses: wimpysworld/nothing-but-nix@v6
-        with:
-          nix-permission-edict: true
+      #- name: Cleanup workflow runner
+      #  uses: wimpysworld/nothing-but-nix@v6
+      #  with:
+      #    nix-permission-edict: true
 
       - name: Install nix
         uses: nixbuild/nix-quick-install-action@v32
