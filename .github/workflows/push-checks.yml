@@ -31,10 +31,10 @@ jobs:
         with:
           nix-permission-edict: true
 
+      # TODO: Remove on nothing-but-nix@v7
       - name: Grant user ownership of $TMPDIR
         run: |
           sudo chown "$(id --user)":"$(id --group)" "$TMPDIR"
-          ls -lha "$TMPDIR"
 
       - name: Install nix
         uses: nixbuild/nix-quick-install-action@v32
@@ -76,10 +76,15 @@ jobs:
       - name: Checkout pushed repo
         uses: actions/checkout@v4.2.2
       
-      #- name: Cleanup workflow runner
-      #  uses: wimpysworld/nothing-but-nix@v6
-      #  with:
-      #    nix-permission-edict: true
+      - name: Cleanup workflow runner
+        uses: wimpysworld/nothing-but-nix@v6
+        with:
+          nix-permission-edict: true
+      
+      # TODO: Remove on nothing-but-nix@v7
+      - name: Grant user ownership of $TMPDIR
+        run: |
+          sudo chown "$(id --user)":"$(id --group)" "$TMPDIR"
       
       - name: Install nix
         uses: nixbuild/nix-quick-install-action@v32
@@ -137,10 +142,15 @@ jobs:
           sudo mkdir -p ${{ env.SECRET_PATH }}
           sudo cp -r "$GITHUB_WORKSPACE/secrets/." ${{ env.SECRET_PATH }}
 
-      #- name: Cleanup workflow runner
-      #  uses: wimpysworld/nothing-but-nix@v6
-      #  with:
-      #    nix-permission-edict: true
+      - name: Cleanup workflow runner
+        uses: wimpysworld/nothing-but-nix@v6
+        with:
+          nix-permission-edict: true
+
+      # TODO: Remove on nothing-but-nix@v7
+      - name: Grant user ownership of $TMPDIR 
+        run: |
+          sudo chown "$(id --user)":"$(id --group)" "$TMPDIR"
 
       - name: Install nix
         uses: nixbuild/nix-quick-install-action@v32
