@@ -13,6 +13,11 @@ env:
 jobs:
   statix-lint:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    concurrency:
+      group: statix-lint
+      cancel-in-progress: true
     steps:
       - name: Checkout pushed repo
         uses: actions/checkout@v4.2.2
@@ -55,6 +60,11 @@ jobs:
 
   deadnix-lint:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    concurrency:
+      group: deadnix-lint
+      cancel-in-progress: true
     steps:
       - name: Checkout pushed repo
         uses: actions/checkout@v4.2.2
@@ -97,6 +107,11 @@ jobs:
           
   omnix-ci:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    concurrency:
+      group: omnix-ci
+      cancel-in-progress: true
     steps:
       - name: Checkout pushed repo
         uses: actions/checkout@v4.2.2
