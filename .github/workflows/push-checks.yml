@@ -1,0 +1,141 @@
+name: Push Checks
+
+on: push
+
+env:
+  SECRET_REPO: cameronaw13/nix-secrets
+  SECRET_PATH: secrets
+  NIX_CONF: |
+    keep-env-derivations = true
+    keep-outputs = true
+
+jobs:
+  statix-lint:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout pushed repo
+      - uses: actions/checkout@v4.2.2
+
+      # Cleanup workflow runner
+      - uses: wimpysworld/nothing-but-nix@v6
+
+      # Install nix
+      - uses: nixbuild/nix-quick-install-action@v32
+        with:
+          nix_conf: ${{ env.NIX_CONF }}
+
+      # Restore nix cache
+      - id: restore-nix-cache
+        uses: nix-community/cache-nix-action/restore@6.1.3
+        with:
+          primary-key: nix-statix-${{ hashFiles('**/flake.lock') }}
+          # If cache wasnt found, restore most similar cache
+          restore-prefixes-first-match: nix-statix-
+
+      # Run statix check
+      - run: nix run nixpkgs#statix -- check --ignore hardware-configuration.nix
+
+      # Save/purge/clean nix cache
+      - id: save-nix-cache
+        if: always() && steps.restore-nix-cache.outputs.hit-primary-key == 'false'
+        uses: nix-community/cache-nix-action/save@6.1.3
+        with:
+          primary-key: ${{ steps.restore-nix-cache.outputs.primary-key }}
+          purge: true
+          # Purge all cache versions
+          purge-prefixes: nix-statix-
+          # Purge cache created since now
+          purge-created: 0
+          # Except if cache has current key
+          purge-primary-key: never
+          # Clean all unused cache
+          gc-max-store-size: 0
+
+  deadnix-lint:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout pushed repo
+      - uses: actions/checkout@v4.2.2
+      
+      # Cleanup workflow runner
+      - uses: wimpysworld/nothing-but-nix@v6
+      
+      # Install nix
+      - uses: nixbuild/nix-quick-install-action@v32
+        with:
+          nix_conf: ${{ env.NIX_CONF }}
+
+      # Restore nix cache
+      - id: restore-nix-cache
+        uses: nix-community/cache-nix-action/restore@6.1.3
+        with:
+          primary-key: nix-deadnix-${{ hashFiles('**/flake.lock') }}
+          # If cache wasnt found, restore most similar cache
+          restore-prefixes-first-match: nix-statix-
+
+      # Run deadnix
+      - run: nix run nixpkgs#deadnix -- --fail --exclude hosts/*/hardware-configuration.nix /etc/nixos 
+
+      # Save/purge/clean nix cache
+      - id: save-nix-cache
+        if: always() && steps.restore-nix-cache.outputs.hit-primary-key == 'false'
+        uses: nix-community/cache-nix-action/save@6.1.3
+        with:
+          primary-key: ${{ steps.restore-nix-cache.outputs.primary-key }}
+          purge: true
+          # Purge all cache versions
+          purge-prefixes: nix-deadnix-
+          # Purge cache created since now
+          purge-created: 0
+          # Except if cache has current key
+          purge-primary-key: never
+          # Clean all unused cache
+          gc-max-store-size: 0
+          
+  omnix-ci:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout pushed repo
+      - uses: actions/checkout@v4.2.2
+
+      # Checkout secrets repo
+      - uses: actions/checkout$v4.2.2
+        with:
+          repository: ${{ env.SECRET_REPO }}
+          path: ${{ env.SECRET_PATH }}
+          token: ${{ secrets.GH_PAT }}
+
+      # Cleanup workflow runner
+      - uses: wimpysworld/nothing-but-nix@v6
+
+      # Install nix
+      - uses: nixbuild/nix-quick-install-action@v32
+        with:
+          nix_conf: ${{ env.NIX_CONF }}
+
+      # Restore nix cache
+      - id: restore-nix-cache
+        uses: nix-community/cache-nix-action/restore@6.1.3
+        with:
+          primary-key: nix-omnix-${{ hashFiles('**/flake.lock') }}
+          # If cache wasnt found, restore most similar cache
+          restore-prefixes-first-match: nix-statix-
+      
+      # Run omnix ci
+      - run: nix run github:juspay/omnix --accept-flake-config -- ci
+
+      # Save/purge/clean nix cache
+      - id: save-nix-cache
+        if: always() && steps.restore-nix-cache.outputs.hit-primary-key == 'false'
+        uses: nix-community/cache-nix-action/save@6.1.3
+        with:
+          primary-key: ${{ steps.restore-nix-cache.outputs.primary-key }}
+          purge: true
+          # Purge all cache versions
+          purge-prefixes: nix-omnix-
+          # Purge cache created since now
+          purge-created: 0
+          # Except if cache has current key
+          purge-primary-key: never
+          # Clean all unused cache
+          gc-max-store-size: 0
