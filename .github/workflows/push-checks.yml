@@ -1,12 +1,11 @@
 name: Push Checks
 
-on: push
+on: [push | pull_request]
 
 permissions:
   actions: write
 
 env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   REPO_PATH: /etc/nixos
   SECRET_PATH: /etc/nixos/secrets
   SECRET_NAME: cameronaw13/nix-secrets
@@ -24,10 +23,11 @@ jobs:
       - name: Checkout pushed repo
         uses: actions/checkout@v4.2.2
 
-      #- name: Cleanup workflow runner
-      #  uses: wimpysworld/nothing-but-nix@v6
-      #  with:
-      #    nix-permission-edict: true
+      - name: Cleanup workflow runner
+        uses: wimpysworld/nothing-but-nix@v6
+        with:
+          hatchet-protocol: carve
+          nix-permission-edict: true
 
       - name: Install nix
         uses: nixbuild/nix-quick-install-action@v32
@@ -46,7 +46,7 @@ jobs:
         run: nix run nixpkgs#statix -- check --ignore hardware-configuration.nix
 
       - name: Save/purge/gc nix cache
-        if: always() && steps.restore-nix-cache.outputs.hit-primary-key == 'false'
+        if: always() && steps.restore-nix-cache.outputs.hit-primary-key == false
         uses: nix-community/cache-nix-action/save@v6.1.3
         with:
           primary-key: ${{ steps.restore-nix-cache.outputs.primary-key }}
