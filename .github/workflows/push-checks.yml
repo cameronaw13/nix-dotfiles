@@ -14,32 +14,31 @@ jobs:
   statix-lint:
     runs-on: ubuntu-latest
     steps:
-      # Checkout pushed repo
-      - uses: actions/checkout@v4.2.2
+      - name: Checkout pushed repo
+        uses: actions/checkout@v4.2.2
 
-      # Cleanup workflow runner
-      - uses: wimpysworld/nothing-but-nix@v6
+      - name: Cleanup workflow runner
+        uses: wimpysworld/nothing-but-nix@v6
         with:
           nix-permission-edict: true
 
-      # Install nix
-      - uses: nixbuild/nix-quick-install-action@v32
+      - name: Install nix
+        uses: nixbuild/nix-quick-install-action@v32
         with:
           nix_conf: ${{ env.NIX_CONF }}
 
-      # Restore nix cache
-      - id: restore-nix-cache
+      - name: Restore nix cache
+        id: restore-nix-cache
         uses: nix-community/cache-nix-action/restore@v6.1.3
         with:
           primary-key: nix-statix-${{ hashFiles('**/flake.lock') }}
           # If cache wasnt found, restore most similar cache
           restore-prefixes-first-match: nix-statix-
 
-      # Run statix check
-      - run: nix run nixpkgs#statix -- check --ignore hardware-configuration.nix
+      - name: Run statix check
+        run: nix run nixpkgs#statix -- check --ignore hardware-configuration.nix
 
-      # Save/purge/clean nix cache
-      - id: save-nix-cache
+      - name: Save/purge/gc nix cache
         if: always() && steps.restore-nix-cache.outputs.hit-primary-key == 'false'
         uses: nix-community/cache-nix-action/save@v6.1.3
         with:
@@ -57,32 +56,31 @@ jobs:
   deadnix-lint:
     runs-on: ubuntu-latest
     steps:
-      # Checkout pushed repo
-      - uses: actions/checkout@v4.2.2
+      - name: Checkout pushed repo
+        uses: actions/checkout@v4.2.2
       
-      # Cleanup workflow runner
-      - uses: wimpysworld/nothing-but-nix@v6
+      - name: Cleanup workflow runner
+        uses: wimpysworld/nothing-but-nix@v6
         with:
           nix-permission-edict: true
       
-      # Install nix
-      - uses: nixbuild/nix-quick-install-action@v32
+      - name: Install nix
+        uses: nixbuild/nix-quick-install-action@v32
         with:
           nix_conf: ${{ env.NIX_CONF }}
 
-      # Restore nix cache
-      - id: restore-nix-cache
+      - name: Restore nix cache
+        id: restore-nix-cache
         uses: nix-community/cache-nix-action/restore@v6.1.3
         with:
           primary-key: nix-deadnix-${{ hashFiles('**/flake.lock') }}
           # If cache wasnt found, restore most similar cache
           restore-prefixes-first-match: nix-statix-
 
-      # Run deadnix
-      - run: nix run nixpkgs#deadnix -- --fail --exclude hosts/*/hardware-configuration.nix /etc/nixos 
+      - name: Run deadnix
+        run: nix run nixpkgs#deadnix -- --fail --exclude hosts/*/hardware-configuration.nix /etc/nixos 
 
-      # Save/purge/clean nix cache
-      - id: save-nix-cache
+      - name: Save/purge/gc nix cache
         if: always() && steps.restore-nix-cache.outputs.hit-primary-key == 'false'
         uses: nix-community/cache-nix-action/save@v6.1.3
         with:
@@ -100,43 +98,42 @@ jobs:
   omnix-ci:
     runs-on: ubuntu-latest
     steps:
-      # Checkout pushed repo
-      - uses: actions/checkout@v4.2.2
+      - name: Checkout pushed repo
+        uses: actions/checkout@v4.2.2
         with:
           path: ${{ env.REPO_PATH }}
 
-      # Checkout secrets repo
-      - uses: actions/checkout@v4.2.2
+      - name: Checkout secrets repo
+        uses: actions/checkout@v4.2.2
         with:
           repository: ${{ env.SECRET_NAME }}
           path: ${{ env.SECRET_PATH }}
           token: ${{ secrets.NIX_SECRETS_PAT }}
 
-      # Cleanup workflow runner
-      - uses: wimpysworld/nothing-but-nix@v6
+      - name: Cleanup workflow runner
+        uses: wimpysworld/nothing-but-nix@v6
         with:
           nix-permission-edict: true
 
-      # Install nix
-      - uses: nixbuild/nix-quick-install-action@v32
+      - name: Install nix
+        uses: nixbuild/nix-quick-install-action@v32
         with:
           nix_conf: ${{ env.NIX_CONF }}
 
-      # Restore nix cache
-      - id: restore-nix-cache
+      - name: Restore nix cache
+        id: restore-nix-cache
         uses: nix-community/cache-nix-action/restore@v6.1.3
         with:
           primary-key: nix-omnix-${{ hashFiles('**/flake.lock') }}
           # If cache wasnt found, restore most similar cache
           restore-prefixes-first-match: nix-statix-
       
-      # Run omnix ci
-      - run: |
-          sudo cp -r $GITHUB_WORKSPACE/${{ env.REPO_PATH }} /etc/nixos
-          nix run github:juspay/omnix --accept-flake-config -- ci run /etc/nixos
+      - name: Run omnix ci
+        run: |
+          cp -Tr $GITHUB_WORKSPACE/${{ env.REPO_PATH }} ${{ env.REPO_PATH }}
+          nix run github:juspay/omnix --accept-flake-config -- ci run ${{ env.REPO_PATH }}
 
-      # Save/purge/clean nix cache
-      - id: save-nix-cache
+      - name: Save/purge/gc nix cache
         if: always() && steps.restore-nix-cache.outputs.hit-primary-key == 'false'
         uses: nix-community/cache-nix-action/save@v6.1.3
         with:
