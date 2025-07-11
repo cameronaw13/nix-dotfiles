@@ -10,8 +10,9 @@ in
     };
   };
 
-  config = lib.mkIf services.auto-acl.enable {
+  config = {
     systemd.services.auto-acl = {
+      inherit (services.auto-acl) enable;
       description = "NixOS declarative acl service";
       serviceConfig.Type = "oneshot";
 
@@ -22,7 +23,7 @@ in
         chgrp -R wheel "${repoPath}"
         chmod -R g+s "${repoPath}"
         chmod -R u=rwX,g=rwX,o=rX "${repoPath}"
-	chmod -R o= "${repoPath}/secrets"
+        chmod -R o= "${repoPath}/secrets"
         ${setfacl} -dRm g::rw "${repoPath}"
       '';
 

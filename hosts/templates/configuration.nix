@@ -2,10 +2,10 @@
 {
   imports = [
     #./hardware-configuration.nix
-    ./extra-hardware-conf.nix
+    ./extra-hardware.nix
     ../../modules/default.nix
     inputs.sops-nix.nixosModules.sops
-    # inputs.microvm.nixosModules.host
+    #inputs.microvm.nixosModules.host
   ];
 
   /* Local Config */
@@ -15,9 +15,7 @@
       userPackages = builtins.attrValues {
         inherit (pkgs)
         gitMinimal
-        jj
         gh
-        glab
         ;
       };
       authorizedKeys = [

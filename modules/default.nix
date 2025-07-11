@@ -3,7 +3,7 @@
   imports = [
     ./activate.nix
     ./users.nix
-    ./services/default.nix
+    ./services
   ];
 
   /* Environment */
@@ -67,6 +67,7 @@
   users.mutableUsers = lib.mkDefault false;
   home-manager.sharedModules = [
     inputs.sops-nix.homeManagerModules.sops
+    inputs.nixCats.homeModule
   ];
 
   /* Known Hosts */

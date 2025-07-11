@@ -23,6 +23,7 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixCats.url = "github:BirdeeHub/nixCats-nvim";
   };
 
   outputs = { nixpkgs, nixpkgs-unstable, ... } @inputs: let

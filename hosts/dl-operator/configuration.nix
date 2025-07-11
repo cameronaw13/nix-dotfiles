@@ -2,8 +2,8 @@
 {
   imports = [ 
     ./hardware-configuration.nix
-    ./extra-hardware-conf.nix
-    ../../modules/default.nix
+    ./extra-hardware.nix
+    ../../modules
     inputs.sops-nix.nixosModules.sops
   ];
 
@@ -23,14 +23,13 @@
       uid = 1000;
       extraGroups = [ "wheel" ];
       linger = true;
-      sopsNix = true;
+      sops = true;
       authorizedKeys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG+F0TjRt4MED8xhkzDL0VZo5XGspRlGkQgTTNcwacRR cameron@ye-olde-workhorse"
       ];
       userPackages = builtins.attrValues {
         inherit (pkgs)
         sops
-        age
         ;
       };
       homePackages = {
@@ -38,26 +37,31 @@
           fullrebuild.enable = true;
           createpr.enable = true;
         };
-        neovim = {
-          enable = true;
-          defaultEditor = true;
-          vimAlias = true;
-        };
         vcs = {
           enable = true;
+          git.delta.enable = false;
           name = "cameronaw13";
           email = "cameronawichman@gmail.com";
           signing = true;
         };
+        neovim = {
+          enable = true;
+          aliases = [ "nvim" "vim" "vi" ];
+        };
+        zellij.enable = true;
       };
     };
     ## Filesystem ##
     users.filesystem = {
       uid = 1001;
-      sopsNix = true;
-      homePackages = {
-        neovim.enable = true;
+      sops = true;
+      userPackages = builtins.attrValues {
+        inherit (pkgs)
+        ;
       };
+      /*homePackages = {
+        neovim.enable = true;
+      };*/
     };
     ## Services ##
     services = {

@@ -1,7 +1,7 @@
 { lib, config, pkgs, repoPath, ... }:
 {
   system.activationScripts = let
-    userList = lib.strings.concatStringsSep " " (lib.attrsets.mapAttrsToList (name: value: "[${name}]='${lib.trivial.boolToString value.sopsNix}'") config.local.users);
+    userList = lib.strings.concatStringsSep " " (lib.attrsets.mapAttrsToList (name: value: "[${name}]='${lib.trivial.boolToString value.sops}'") config.local.users);
   in {
     /* Automatic User Agekey Generation */
     genUserkeys = {

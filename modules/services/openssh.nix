@@ -8,12 +8,17 @@ in
       type = lib.types.bool;
       default = true;
     };
+    ports = lib.mkOption {
+      type = lib.types.listOf lib.types.port;
+      default = [ 22 ];
+    };
+    openFirewall = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+    };
   };
 
-  config = lib.mkIf services.openssh.enable {
-    services.openssh = {
-      enable = true;
-    };
-    networking.firewall.allowedTCPPorts = lib.mkDefault [ 22 ];
+  config.services.openssh = {
+    inherit (services.openssh) enable ports openFirewall;
   };
 }

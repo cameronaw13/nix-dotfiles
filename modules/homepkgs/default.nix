@@ -2,22 +2,19 @@
 {
   imports = [
     ./vcs.nix
-    ./bash.nix
-    ./neovim.nix
+    ./bash
+    ./neovim
+    ./zellij
   ];
 
   options.local.homepkgs = {
-    repoPath = lib.mkOption {
-      type = lib.types.path;
-    };
-    hostName = lib.mkOption {
-      type = lib.types.singleLineStr;
-    };
-    sopsDir = lib.mkOption {
-      type = lib.types.singleLineStr;
-    };
-    sopsNix = lib.mkOption {
-      type = lib.types.bool;
+    sops = { 
+      enable = lib.mkOption {
+        type = lib.types.bool;
+      };
+      path = lib.mkOption {
+        type = lib.types.singleLineStr;
+      };
     };
     isWheel = lib.mkOption {
       type = lib.types.bool;

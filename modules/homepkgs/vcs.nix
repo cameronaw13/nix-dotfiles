@@ -1,4 +1,4 @@
-{ lib, config, pkgs, ... }:
+{ lib, config, pkgs, repoPath, ... }:
 let
   inherit (config.local) homepkgs;
   inherit (config.home) username;
@@ -9,15 +9,29 @@ in
       type = lib.types.bool;
       default = false;
     };
-    git.enable = lib.mkOption {
-      type = lib.types.bool;
-      default = true;
+    git = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+      };
+      delta.enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+      };
     };
     jj.enable = lib.mkOption {
       type = lib.types.bool;
       default = false;
     };
     gh.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+    };
+    lazygit.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+    };
+    delta.enable = lib.mkOption {
       type = lib.types.bool;
       default = true;
     };
@@ -45,15 +59,18 @@ in
         extraConfig = lib.mkMerge [
           { 
             init.defaultBranch = lib.mkDefault "master";
-            safe.directory = [ homepkgs.repoPath "${homepkgs.repoPath}/secrets" ];
+            safe.directory = [ repoPath "${repoPath}/secrets" ];
           }
-          (lib.mkIf (homepkgs.vcs.signing && homepkgs.sopsNix) {
+          (lib.mkIf (homepkgs.vcs.signing && homepkgs.sops.enable) {
             commit.gpgsign = true;
             gpg.format = "ssh";
             gpg.ssh.allowedSignersFile = "~/.ssh/allowed_signers";
             user.signingkey = "~/.ssh/id_ed25519_key.pub";
           })
         ];
+        delta = {
+          inherit (homepkgs.vcs.git.delta) enable;
+        };
       };
       jujutsu = {
         inherit (homepkgs.vcs.jj) enable;
@@ -64,7 +81,7 @@ in
             };
             ui.pager = lib.mkDefault "less -FRX";
           }
-          (lib.mkIf (homepkgs.vcs.signing && homepkgs.sopsNix) {
+          (lib.mkIf (homepkgs.vcs.signing && homepkgs.sops.enable) {
             signing = {
               behavior = "own";
               backend = "ssh";
@@ -79,7 +96,7 @@ in
         ];
       };
       ssh = {
-        enable = homepkgs.sopsNix;
+        inherit (homepkgs.sops) enable;
         matchBlocks = {
           "github-host" = {
             host = "github.com";
@@ -101,23 +118,34 @@ in
         inherit (homepkgs.vcs.gh) enable;
         settings.git_protocol = "ssh";
       };
+      lazygit = {
+        inherit (homepkgs.vcs.lazygit) enable;
+        settings = lib.mkMerge [
+          (lib.mkIf homepkgs.vcs.delta.enable {
+            git.paging = {
+              colorArg = "always";
+              /*pager = "delta --dark --paging=never";*/
+            };
+          })
+        ];
+      };
     };
 
-    sops = lib.mkIf homepkgs.sopsNix {
+    sops = lib.mkIf homepkgs.sops.enable {
       secrets = {
-        "${homepkgs.sopsDir}/id_ed25519_key" = {
+        "${homepkgs.sops.path}/id_ed25519_key" = {
           path = "/home/${username}/.ssh/id_ed25519_key";
         };
-        "${homepkgs.sopsDir}/id_ed25519_key.pub" = {
+        "${homepkgs.sops.path}/id_ed25519_key.pub" = {
           path = "/home/${username}/.ssh/id_ed25519_key.pub";
         };
-        "${homepkgs.sopsDir}/gh-hosts.yml" = lib.mkIf homepkgs.vcs.gh.enable {
+        "${homepkgs.sops.path}/gh-hosts.yml" = lib.mkIf homepkgs.vcs.gh.enable {
           path = "/home/${username}/.config/gh/hosts.yml";
         };
       };
       templates = {
         "allowed_signers" = {
-          content = "* ${config.sops.placeholder."${homepkgs.sopsDir}/id_ed25519_key.pub"}";
+          content = "* ${config.sops.placeholder."${homepkgs.sops.path}/id_ed25519_key.pub"}";
           path = "/home/${username}/.ssh/allowed_signers";
         };
       };

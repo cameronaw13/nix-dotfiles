@@ -1,0 +1,92 @@
+{ lib, config, pkgs, ... }: 
+let
+  inherit (config.local) homepkgs;
+in
+{
+  options.local.homepkgs.neovim = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+    };
+    defaultEditor = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+    };
+    vimAlias = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+    };
+  };
+
+  config = {
+    programs.neovim = {
+      inherit (homepkgs.neovim) enable defaultEditor vimAlias;
+      plugins = let
+        luaPlugin = { plugin, config }: {
+          inherit plugin config;
+          type = "lua";
+        };
+      in [
+        (lib.mkIf homepkgs.isWheel (luaPlugin {
+          plugin = pkgs.vimPlugins.vim-suda;
+          config = ''
+            vim.g.suda_smart_edit = 1
+          '';
+        }))
+        (luaPlugin {
+          plugin = pkgs.vimPlugins.fzf-lua;
+          config = ''
+            require('fzf-lua').setup({'border-fused'})
+          '';
+        })
+        (luaPlugin {
+          plugin = pkgs.vimPlugins.undotree;
+          config = ''
+            vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggle)
+          '';
+        })
+        (luaPlugin {
+          plugin = pkgs.vimPlugins.indent-blankline-nvim;
+          config = ''
+            require('ibl').setup {
+              indent = {
+                char = '▏',
+                smart_indent_cap = false
+              }
+            }
+          '';
+        })
+        (luaPlugin {
+          plugin = pkgs.vimPlugins.nvim-treesitter;
+          config = ''
+            require('nvim-treesitter.configs').setup {
+              ensure_installed = { }
+            }
+          '';
+        })
+      ] ++ (builtins.attrValues {
+        inherit (pkgs.vimPlugins.nvim-treesitter-parsers)
+        nix
+        ;
+      });
+      extraLuaConfig = lib.mkDefault ''
+        -- keymaps --
+        vim.keymap.set("", '<Space>', '<Nop>')
+        vim.g.mapleader = ' '
+
+        -- vimrc --
+        vim.cmd([[
+          " visual "
+          set nu rnu
+          set termguicolors
+
+          " indentation "
+          set softtabstop=2
+          set shiftwidth=2
+          set expandtab
+          set cpoptions+="I"
+        ]])
+      '';
+    };
+  };
+}
