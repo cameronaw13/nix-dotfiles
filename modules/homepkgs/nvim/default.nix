@@ -62,7 +62,7 @@ in
       };
       
       packageDefinitions.replace = {
-        home-nvim = { _ }: {
+        home-nvim = _: {
           settings = {
             inherit (homepkgs.nvim) aliases wrapRc;
             unwrappedCfgPath = lib.mkIf (!homepkgs.nvim.wrapRc) "${repoPath}/modules/homepkgs/nvim";
