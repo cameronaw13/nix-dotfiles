@@ -39,7 +39,7 @@
         };
         vcs = {
           enable = true;
-          git.delta.enable = false;
+          # git.delta.enable = false;
           name = "cameronaw13";
           email = "cameronawichman@gmail.com";
           signing = true;
@@ -108,7 +108,7 @@
   # microvm.autostart = [ "dl-caddy" ];
 
   /* Secrets */
-  sops = {
+  /* sops = {
     defaultSopsFile = "${inputs.nix-secrets}/secrets.yaml";
     age = {
       # Generate private age key per host
@@ -116,7 +116,7 @@
       keyFile = "/var/lib/sops-nix/keys.txt";
       generateKey = true;
     };
-  };
+  }; */
 
   /* Virtual Console */
   console = {

@@ -44,7 +44,7 @@ in
       ];
     };
 
-    sops.secrets."${hostName}/sasl-passwd" = {
+    sops.secrets."${hostName}/sasl-passwd" = lib.mkIf services.postfix.enable {
       owner = config.services.postfix.user;
     };
   };

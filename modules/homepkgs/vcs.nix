@@ -124,7 +124,7 @@ in
           (lib.mkIf homepkgs.vcs.delta.enable {
             git.paging = {
               colorArg = "always";
-              /*pager = "delta --dark --paging=never";*/
+              pager = "delta --dark --paging=never";
             };
           })
         ];

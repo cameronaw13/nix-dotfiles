@@ -165,7 +165,14 @@ keybinds clear-defaults=true {
     }
     shared_except "locked" "renametab" "renamepane" {
         bind "Ctrl g" { SwitchToMode "locked"; }
-        bind "Ctrl q" { Quit; }
+        bind "q" {
+            LaunchOrFocusPlugin "zj-quit" { floating true; } 
+            SwitchToMode "locked";
+        } // Modified
+        bind "?" {
+            LaunchOrFocusPlugin "zellij-forgot";
+            SwitchToMode "locked";
+        } // Custom
     }
     shared_except "locked" "entersearch" {
         bind "enter" { SwitchToMode "locked"; }
@@ -242,13 +249,19 @@ plugins {
     welcome-screen location="zellij:session-manager" {
         welcome_screen true
     }
+    zj-quit location="https://github.com/cristiand391/zj-quit/releases/download/0.3.1/zj-quit.wasm" {
+      confirm_key "q"
+      cancel_key "Esc"
+    }
+    zellij-forgot location="https://github.com/karimould/zellij-forgot/releases/download/0.4.2/zellij_forgot.wasm"
 }
 
 // Plugins to load in the background when a new session starts
 // eg. "file:/path/to/my-plugin.wasm"
 // eg. "https://example.com/my-plugin.wasm"
 load_plugins {
-    https://github.com/karimould/zellij-forgot/releases/download/0.4.2/zellij_forgot.wasm
+    "https://github.com/cristiand391/zj-quit/releases/download/0.3.1/zj-quit.wasm"
+    "https://github.com/karimould/zellij-forgot/releases/download/0.4.2/zellij_forgot.wasm"
 }
  
 // Use a simplified UI without special fonts (arrow glyphs)

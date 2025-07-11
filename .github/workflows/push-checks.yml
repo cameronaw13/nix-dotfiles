@@ -151,8 +151,8 @@ jobs:
       
       - name: Run omnix ci
         run: |
-          nix run nixpkgs#omnix -- ci run -d --extra-access-tokens "${{ secrets.NIX_SECRETS_PAT }}"
-
+          nix run nixpkgs#omnix -- ci run -d
+      
       - name: Save/purge/gc nix cache
         if: always() && steps.restore-nix-cache.outputs.hit-primary-key == 'false'
         uses: nix-community/cache-nix-action/save@v6.1.3
