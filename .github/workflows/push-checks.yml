@@ -123,14 +123,8 @@ jobs:
       - name: Checkout pushed repo
         uses: actions/checkout@v4.2.2
         with:
-          path: dotfiles
           submodules: recursive
           token: ${{ secrets.NIX_SECRETS_PAT }}
-
-      #- name: Copy repositories to ${{ env.REPO_PATH }}
-      #  run: |
-      #    sudo mkdir -p ${{ env.REPO_PATH }}
-      #    sudo cp -r "$GITHUB_WORKSPACE/dotfiles/." ${{ env.REPO_PATH }}
 
       - name: Cleanup workflow runner
         uses: wimpysworld/nothing-but-nix@v6

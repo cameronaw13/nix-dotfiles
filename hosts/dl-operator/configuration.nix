@@ -47,6 +47,7 @@
         nvim = {
           enable = true;
           aliases = [ "nvim" "vim" "vi" ];
+          defaultEditor = true;
         };
         zellij.enable = true;
       };
@@ -59,9 +60,9 @@
         inherit (pkgs)
         ;
       };
-      /*homePackages = {
-        neovim.enable = true;
-      };*/
+      homePackages = {
+        nvim.enable = true;
+      };
     };
     ## Services ##
     services = {
