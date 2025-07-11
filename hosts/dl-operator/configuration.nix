@@ -44,7 +44,7 @@
           email = "cameronawichman@gmail.com";
           signing = true;
         };
-        neovim = {
+        nvim = {
           enable = true;
           aliases = [ "nvim" "vim" "vi" ];
         };

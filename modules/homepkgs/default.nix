@@ -3,7 +3,7 @@
   imports = [
     ./vcs.nix
     ./bash
-    ./neovim
+    ./nvim
     ./zellij
   ];
 

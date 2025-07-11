@@ -12,7 +12,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-secrets = {
-      url = "git+file:./secrets";
+      url = "./secrets";
       flake = false;
     };
     microvm = {
@@ -25,7 +25,7 @@
     };
     nixCats.url = "github:BirdeeHub/nixCats-nvim";
   };
-
+  
   outputs = { nixpkgs, nixpkgs-unstable, ... } @inputs: let
     system = "x86_64-linux";
     repoPath = "/etc/nixos";
