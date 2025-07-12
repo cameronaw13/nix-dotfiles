@@ -9,6 +9,7 @@ permissions:
   actions: write
 
 env:
+  SSH_AUTH_SOCK: /tmp/ssh_agent.sock
   NIX_CONF: |
     keep-env-derivations = true
     keep-outputs = true
@@ -120,12 +121,17 @@ jobs:
       group: omnix-ci
       cancel-in-progress: true
     steps:
+      - name: Add deploy key to ssh-agent
+        run: |
+          ssh-agent -a "$SSH_AUTH_SOCK" >/dev/null
+          ssh-add - <<< "${{ secrets.NIX_SECRETS_DEPLOY_KEY }}"
+        
       - name: Checkout pushed repo
         uses: actions/checkout@v4.2.2
         with:
           submodules: recursive
-          token: ${{ secrets.NIX_SECRETS_PAT }}
-
+          # token: ${{ secrets.NIX_SECRETS_DEPLOY_KEY }}
+      
       - name: Cleanup workflow runner
         uses: wimpysworld/nothing-but-nix@v6
         with:

@@ -1,0 +1,20 @@
+List of commands to create github deploy key for push-checks:
+
+REMOTE="origin"
+REPO_DIR="/etc/nixos"
+
+keyDir = "$(mktemp -d)"
+currDir="$PWD"
+
+cd "$REPO_DIR"
+repoName="$(git remote get-url "$REMOTE" | sed -r "s/.*\/(.*).git/\1/g")"
+ssh-keygen -t ed25519 -N "" -C "$repoName" -f "$keyDir/deploy_key"
+
+cd "$REPO_DIR/secrets"
+gh repo deploy-key add "$keyDir/deploy_key.pub"
+
+cd "$REPO_DIR"
+gh secret set NIX_SECRETS_DEPLOY_KEY < "$keyDir/deploy_key"
+
+cd "$currDir"
+exit 0

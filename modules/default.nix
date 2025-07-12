@@ -19,6 +19,8 @@
       NH_FLAKE = repoPath;
     };
     shellAliases = {
+      l = "ls -a --color=tty";
+      ll = "ls -lha --color=tty";
       rm = "echo \"Use the safer 'trash' or use '\\$(type -P rm)'\"";
       mv = "mv -i";
       cp = "cp -i";
