@@ -120,6 +120,7 @@ jobs:
       group: omnix-ci
       cancel-in-progress: true
     env:
+      REPO_PATH: /etc/nixos
       SSH_AUTH_SOCK: /tmp/ssh_agent.sock
     steps:
       - name: Add deploy key to ssh-agent
@@ -155,10 +156,15 @@ jobs:
           primary-key: nix-omnix-${{ hashFiles('**/flake.lock') }}
           # If cache wasnt found, restore most similar cache
           restore-prefixes-first-match: nix-omnix-
+
+      - name: Copy repository to ${{ env.REPO_PATH }}
+        run: |
+          sudo mkdir -p ${{ env.REPO_PATH }}
+          sudo cp -r "$GITHUB_WORKSPACE/." ${{ env.REPO_PATH }}
       
       - name: Run omnix ci
         run: |
-          nix run nixpkgs#omnix -- ci run -d
+          nix run nixpkgs#omnix -- ci run -d ${{ env.REPO_PATH}}
       
       - name: Save/purge/gc nix cache
         if: always() && steps.restore-nix-cache.outputs.hit-primary-key == 'false'

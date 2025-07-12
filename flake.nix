@@ -12,7 +12,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-secrets = {
-      url = "./secrets";
+      url = "git+file:///etc/nixos/secrets";
       flake = false;
     };
     microvm = {

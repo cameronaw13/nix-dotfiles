@@ -68,11 +68,11 @@
         "spectrum": "spectrum"
       },
       "locked": {
-        "lastModified": 1752095991,
-        "narHash": "sha256-+paXzPg6SN3O+YKtQKiU+kQE1EkfsrI1XEYTxI4DSFk=",
+        "lastModified": 1752278584,
+        "narHash": "sha256-QaT8PpCR1IaUMa12ou2MlvNCzYVWgTQfVWJGXyFvY5c=",
         "owner": "astro",
         "repo": "microvm.nix",
-        "rev": "f30b1412b73df264dc9cac154d340645add350ff",
+        "rev": "f30ae9b9e740116d044935c9c0c68bd1c2ce8432",
         "type": "github"
       },
       "original": {
@@ -84,14 +84,18 @@
     "nix-secrets": {
       "flake": false,
       "locked": {
-        "path": "./secrets",
-        "type": "path"
+        "lastModified": 1752018211,
+        "narHash": "sha256-A4g5sfkWxP/A5jOddJZBvFge9WRDr3F2SMRdyY6eYEk=",
+        "ref": "refs/heads/master",
+        "rev": "91a074b93ac2f18f192ac8d7e4cdd48260524ac3",
+        "revCount": 29,
+        "type": "git",
+        "url": "file:///etc/nixos/secrets"
       },
       "original": {
-        "path": "./secrets",
-        "type": "path"
-      },
-      "parent": []
+        "type": "git",
+        "url": "file:///etc/nixos/secrets"
+      }
     },
     "nixCats": {
       "locked": {
@@ -110,11 +114,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1751943650,
-        "narHash": "sha256-7orTnNqkGGru8Je6Un6mq1T8YVVU/O5kyW4+f9C1mZQ=",
+        "lastModified": 1752162966,
+        "narHash": "sha256-3MxxkU8ZXMHXcbFz7UE4M6qnIPTYGcE/7EMqlZNnVDE=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "88983d4b665fb491861005137ce2b11a9f89f203",
+        "rev": "10e687235226880ed5e9f33f1ffa71fe60f2638a",
         "type": "github"
       },
       "original": {
