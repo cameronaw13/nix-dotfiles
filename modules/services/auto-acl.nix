@@ -1,4 +1,4 @@
-{ lib, config, pkgs, repopath, ... }:
+{ lib, config, pkgs, repoPath, ... }:
 let
   inherit (config.local) services;
 in
@@ -10,19 +10,21 @@ in
     };
   };
 
-  config = lib.mkIf services.auto-acl.enable {
+  config = {
     systemd.services.auto-acl = {
+      inherit (services.auto-acl) enable;
       description = "NixOS declarative acl service";
       serviceConfig.Type = "oneshot";
 
       script = let
         setfacl = "${pkgs.acl}/bin/setfacl";
       in ''
-        chgrp -R wheel "${repopath}"
-        chmod -R g+s "${repopath}"
-        chmod -R u=rwX,g=rwX,o=rX "${repopath}"
-	chmod -R o= "${repopath}/secrets"
-        ${setfacl} -dRm g::rw "${repopath}"
+        set -x
+        chgrp -R wheel "${repoPath}"
+        chmod -R g+s "${repoPath}"
+        chmod -R u=rwX,g=rwX,o=rX "${repoPath}"
+        chmod -R o= "${repoPath}/secrets"
+        ${setfacl} -dRm g::rw "${repoPath}"
       '';
 
       wantedBy = [ "default.target" ];

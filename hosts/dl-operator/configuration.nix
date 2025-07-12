@@ -1,9 +1,9 @@
-{ lib, pkgs, pkgsUnstable, inputs, ... }:
+{ pkgs, inputs, ... }:
 {
   imports = [ 
     ./hardware-configuration.nix
-    ./extra-hardware-conf.nix
-    ../../modules/default.nix
+    ./extra-hardware.nix
+    ../../modules
     inputs.sops-nix.nixosModules.sops
   ];
 
@@ -23,19 +23,13 @@
       uid = 1000;
       extraGroups = [ "wheel" ];
       linger = true;
-      sopsNix = true;
+      sops = true;
       authorizedKeys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG+F0TjRt4MED8xhkzDL0VZo5XGspRlGkQgTTNcwacRR cameron@ye-olde-workhorse"
       ];
       userPackages = builtins.attrValues {
         inherit (pkgs)
         sops
-        age
-        shellcheck
-        ;
-      } ++ builtins.attrValues {
-        inherit (pkgsUnstable)
-        glab
         ;
       };
       homePackages = {
@@ -43,24 +37,31 @@
           fullrebuild.enable = true;
           createpr.enable = true;
         };
-        neovim = {
-          enable = true;
-          defaultEditor = true;
-        };
         vcs = {
           enable = true;
-          username = "cameronaw13";
+          # git.delta.enable = false;
+          name = "cameronaw13";
           email = "cameronawichman@gmail.com";
           signing = true;
         };
+        nvim = {
+          enable = true;
+          aliases = [ "nvim" "vim" "vi" ];
+          defaultEditor = true;
+        };
+        zellij.enable = true;
       };
     };
     ## Filesystem ##
     users.filesystem = {
       uid = 1001;
-      sopsNix = true;
+      sops = true;
+      userPackages = builtins.attrValues {
+        inherit (pkgs)
+        ;
+      };
       homePackages = {
-        neovim.enable = true;
+        nvim.enable = true;
       };
     };
     ## Services ##
@@ -107,7 +108,7 @@
   # microvm.autostart = [ "dl-caddy" ];
 
   /* Secrets */
-  sops = {
+  /* sops = {
     defaultSopsFile = "${inputs.nix-secrets}/secrets.yaml";
     age = {
       # Generate private age key per host
@@ -115,7 +116,7 @@
       keyFile = "/var/lib/sops-nix/keys.txt";
       generateKey = true;
     };
-  };
+  }; */
 
   /* Virtual Console */
   console = {
@@ -145,9 +146,9 @@
   };
   boot = {
     tmp.cleanOnBoot = true;
-    loader = {
-      grub.configurationLimit = 64;
-      systemd-boot.configurationLimit = 64;
-    };
+    /*loader = {
+      grub.configurationLimit = 100;
+      systemd-boot.configurationLimit = 100;
+    };*/
   };
 }

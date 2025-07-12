@@ -1,4 +1,4 @@
-{ lib, config, pkgs, ... }:
+{ lib, config, pkgs, repoPath, ... }:
 let
   inherit (config.local) homepkgs;
   inherit (homepkgs.bash) scripts;
@@ -23,7 +23,7 @@ in
 
   config = {
     programs.bash = {
-      enable = homepkgs.bash.enable;
+      inherit (homepkgs.bash) enable;
       shellAliases = lib.mkDefault {
         sudo = "sudo --preserve-env=EDITOR ";
       };
@@ -37,9 +37,9 @@ in
           pkgs.gitMinimal
         ];
         runtimeEnv = {
-          SCRIPT_PATH = homepkgs.repopath;
+          REPO_PATH = repoPath;
         };
-        text = (builtins.readFile ../scripts/fullrebuild.sh);
+        text = builtins.readFile ./fullrebuild.sh;
       };
       createpr = pkgs.writeShellApplication {
         name = "home-createpr";
@@ -49,14 +49,13 @@ in
           pkgs.gh
         ];
         runtimeEnv = {
-          SCRIPT_PATH = homepkgs.repopath;
+          REPO_PATH = repoPath;
         };
         excludeShellChecks = [ "SC2001" ];
-        text = (builtins.readFile ../scripts/createpr.sh);
+        text = builtins.readFile ./createpr.sh;
       };
-    in (
-      lib.lists.optional scripts.fullrebuild.enable (fullrebuild)
-      ++ lib.lists.optional scripts.createpr.enable (createpr)
-    );
+    in
+      lib.lists.optional scripts.fullrebuild.enable fullrebuild
+      ++ lib.lists.optional scripts.createpr.enable createpr;
   };
 }

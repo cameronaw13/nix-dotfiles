@@ -1,9 +1,9 @@
-{ lib, config, repopath, inputs, ... }:
+{ lib, config, repoPath, stateVersion, inputs, ... }:
 {
   imports = [
     inputs.home-manager.nixosModules.home-manager
   ];
-  
+
   options.local.users = lib.mkOption {
     type = lib.types.attrsOf (lib.types.submodule ({ name, lib, ... }: {
       options = {
@@ -23,7 +23,7 @@
           type = lib.types.bool;
           default = false;
         };
-        sopsNix = lib.mkOption {
+        sops = lib.mkOption {
           type = lib.types.bool;
           default = false;
         };
@@ -51,50 +51,56 @@
     lib.mapAttrs (_: list: lib.mkMerge list) (lib.foldAttrs (name: accu: [ name ] ++ accu) [ ] (
     map (username: let
       currUser = config.local.users.${username};
-      sopsDir = "${hostName}/${username}";
+      sopsPath = "${hostName}/${username}";
     in {
       users.users.${username} = {
-        isNormalUser = true;
-        description = username;
         inherit (currUser) uid extraGroups linger;
+        isNormalUser = true;
+        description = lib.mkDefault username;
         hashedPasswordFile = lib.mkIf (
-          builtins.hasAttr "${sopsDir}/hashedPassword" config.sops.secrets
-          ) config.sops.secrets."${sopsDir}/hashedPassword".path;
+          builtins.hasAttr "${sopsPath}/hashedPassword" config.sops.secrets
+          ) config.sops.secrets."${sopsPath}/hashedPassword".path;
         openssh.authorizedKeys.keys = currUser.authorizedKeys ++ lib.optionals (
-          builtins.hasAttr "${sopsDir}/authorizedKeys" config.sops.secrets
-          ) (lib.splitString "\n" (builtins.readFile config.sops.secrets."${sopsDir}/authorizedKeys".path)
+          builtins.hasAttr "${sopsPath}/authorizedKeys" config.sops.secrets
+          ) (lib.splitString "\n" (builtins.readFile config.sops.secrets."${sopsPath}/authorizedKeys".path)
         );
       };
 
-      home-manager.users.${username} = {
-         home = {
-          inherit (username);
-          homeDirectory = "/home/${username}";
-          stateVersion = "25.05";
-          packages = currUser.userPackages;
+      home-manager = {
+        extraSpecialArgs = {
+          inherit inputs repoPath;
         };
-        
-        imports = [
-          ./homepkgs/default.nix
-        ];
-        
-        local.homepkgs = lib.mkMerge [
-          { 
-            inherit repopath hostName sopsDir ;
-            inherit (currUser) sopsNix;
-            isWheel = builtins.elem "wheel" currUser.extraGroups;
-          }
-          currUser.homePackages
-        ];
-        
-        sops = lib.mkIf currUser.sopsNix {
-          age.keyFile = "/home/${username}/.config/sops/age/keys.txt";
-          defaultSopsFile = "${inputs.nix-secrets}/secrets.yaml";
+        users.${username} = {
+          home = {
+            inherit username stateVersion;
+            homeDirectory = "/home/${username}";
+            packages = currUser.userPackages;
+          };
+          
+          imports = [
+            ./homepkgs/default.nix
+          ];
+          
+          local.homepkgs = lib.mkMerge [
+            { 
+              sops = {
+                enable = currUser.sops;
+                path = sopsPath;
+              };
+              isWheel = builtins.elem "wheel" currUser.extraGroups;
+            }
+            currUser.homePackages
+          ];
+          
+          sops = lib.mkIf currUser.sops {
+            age.keyFile = "/home/${username}/.config/sops/age/keys.txt";
+            defaultSopsFile = "${inputs.nix-secrets}/secrets.yaml";
+          };
         };
       };
       
-      sops.secrets = lib.mkIf currUser.sopsNix {
-        "${sopsDir}/hashedPassword".neededForUsers = true;
+      sops.secrets = lib.mkIf currUser.sops {
+        "${sopsPath}/hashedPassword".neededForUsers = true;
       };
     }) userList))
   );

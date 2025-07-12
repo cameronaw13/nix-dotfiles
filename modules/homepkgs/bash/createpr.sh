@@ -6,8 +6,8 @@ type -P git >/dev/null \
 
 tabs 4
 toplevel="$("${git[@]}" rev-parse --show-toplevel)"
-if [ "$toplevel" != "$SCRIPT_PATH" ]; then
-  echo "Please run within the '$SCRIPT_PATH' directory"
+if [ "$toplevel" != "$REPO_PATH" ]; then
+  echo "Please run within the '$REPO_PATH' directory"
   exit 1
 fi
 base="master"

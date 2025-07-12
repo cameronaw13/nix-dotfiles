@@ -14,11 +14,15 @@
     };
   };
   disko.devices.disk = {
-    # eg: root-disk.device = "/dev/sda";
+    #<<<<<<< EXAMPLE <<<<<<<
+    root-disk.device = "/dev/sda";
+    #>>>>> DO NOT KEEP >>>>>
   };
 
   networking = {
-    # eg: hostName = "nixos";
-    #     hostId = "01234567";
+    #<<<<<<< EXAMPLE <<<<<<<
+    hostName = "nixos";
+    hostId = "01234567";
+    #>>>>> DO NOT KEEP >>>>>
   };
 }

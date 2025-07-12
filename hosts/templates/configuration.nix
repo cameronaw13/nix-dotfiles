@@ -2,17 +2,16 @@
 {
   imports = [
     #./hardware-configuration.nix
-    ./extra-hardware-conf.nix
+    ./extra-hardware.nix
     ../../modules/default.nix
     inputs.sops-nix.nixosModules.sops
-    # inputs.microvm.nixosModules.host
+    #inputs.microvm.nixosModules.host
   ];
 
   /* Local Config */
   local = {
     users.bootstrap = {
       extraGroups = [ "wheel" ];
-      sudoBypass = true;
       userPackages = builtins.attrValues {
         inherit (pkgs)
         gitMinimal
@@ -20,7 +19,9 @@
         ;
       };
       authorizedKeys = [
-        # eg: "ssh-ed25519 AAAA... nixos@dotfiles"
+        #<<<<<<< EXAMPLE <<<<<<<
+        "ssh-ed25519 AAAA... nixos@dotfiles"
+        #>>>>> DO NOT KEEP >>>>>
       ];
     };
     services.openssh.enable = true;

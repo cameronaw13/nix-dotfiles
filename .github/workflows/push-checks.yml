@@ -1,0 +1,182 @@
+name: Push Checks
+
+on:
+  pull_request:
+    types: opened
+  push:
+  
+permissions:
+  actions: write
+
+env:
+  NIX_CONF: |
+    keep-env-derivations = true
+    keep-outputs = true
+
+jobs:
+  statix-lint:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: statix-lint
+      cancel-in-progress: true
+    steps:
+      - name: Checkout pushed repo
+        uses: actions/checkout@v4.2.2
+
+      - name: Cleanup workflow runner
+        uses: wimpysworld/nothing-but-nix@v6
+        with:
+          nix-permission-edict: true
+
+      # TODO: Remove on nothing-but-nix@v7
+      - name: Grant user ownership of $TMPDIR
+        run: |
+          sudo chown "$(id --user)":"$(id --group)" "$TMPDIR"
+
+      - name: Install nix
+        uses: nixbuild/nix-quick-install-action@v32
+        with:
+          nix_conf: ${{ env.NIX_CONF }}
+
+      - name: Restore nix cache
+        id: restore-nix-cache
+        uses: nix-community/cache-nix-action/restore@v6.1.3
+        with:
+          primary-key: nix-statix-${{ hashFiles('**/flake.lock') }}
+          # If cache wasnt found, restore most similar cache
+          restore-prefixes-first-match: nix-statix-
+
+      - name: Run statix check
+        run: nix run nixpkgs#statix -- check --ignore hardware-configuration.nix
+
+      - name: Save/purge/gc nix cache
+        if: always() && steps.restore-nix-cache.outputs.hit-primary-key == false
+        uses: nix-community/cache-nix-action/save@v6.1.3
+        with:
+          primary-key: ${{ steps.restore-nix-cache.outputs.primary-key }}
+          purge: true
+          # Purge all cache versions
+          purge-prefixes: nix-statix-
+          # Purge cache created since now
+          purge-created: 0
+          # Except if cache has current key
+          purge-primary-key: never
+          # Clean all unused cache
+          gc-max-store-size: 0
+
+  deadnix-lint:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deadnix-lint
+      cancel-in-progress: true
+    steps:
+      - name: Checkout pushed repo
+        uses: actions/checkout@v4.2.2
+      
+      - name: Cleanup workflow runner
+        uses: wimpysworld/nothing-but-nix@v6
+        with:
+          nix-permission-edict: true
+      
+      # TODO: Remove on nothing-but-nix@v7
+      - name: Grant user ownership of $TMPDIR
+        run: |
+          sudo chown "$(id --user)":"$(id --group)" "$TMPDIR"
+      
+      - name: Install nix
+        uses: nixbuild/nix-quick-install-action@v32
+        with:
+          nix_conf: ${{ env.NIX_CONF }}
+
+      - name: Restore nix cache
+        id: restore-nix-cache
+        uses: nix-community/cache-nix-action/restore@v6.1.3
+        with:
+          primary-key: nix-deadnix-${{ hashFiles('**/flake.lock') }}
+          # If cache wasnt found, restore most similar cache
+          restore-prefixes-first-match: nix-deadnix-
+
+      - name: Run deadnix
+        run: nix run nixpkgs#deadnix -- --fail --exclude hosts/*/hardware-configuration.nix /etc/nixos 
+
+      - name: Save/purge/gc nix cache
+        if: always() && steps.restore-nix-cache.outputs.hit-primary-key == 'false'
+        uses: nix-community/cache-nix-action/save@v6.1.3
+        with:
+          primary-key: ${{ steps.restore-nix-cache.outputs.primary-key }}
+          purge: true
+          # Purge all cache versions
+          purge-prefixes: nix-deadnix-
+          # Purge cache created since now
+          purge-created: 0
+          # Except if cache has current key
+          purge-primary-key: never
+          # Clean all unused cache
+          gc-max-store-size: 0
+          
+  omnix-ci:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: omnix-ci
+      cancel-in-progress: true
+    env:
+      REPO_PATH: /etc/nixos
+      SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+    steps:
+      - name: Add deploy key to ssh-agent
+        run: |
+          ssh-agent -a "$SSH_AUTH_SOCK" >/dev/null
+          ssh-add - <<< "${{ secrets.NIX_SECRETS_DEPLOY_KEY }}"
+        
+      - name: Checkout pushed repo
+        uses: actions/checkout@v4.2.2
+        with:
+          submodules: recursive
+          ssh-key: "${{ secrets.NIX_SECRETS_DEPLOY_KEY }}"
+      
+      - name: Cleanup workflow runner
+        uses: wimpysworld/nothing-but-nix@v6
+        with:
+          nix-permission-edict: true
+
+      # TODO: Remove on nothing-but-nix@v7
+      - name: Grant user ownership of $TMPDIR 
+        run: |
+          sudo chown "$(id --user)":"$(id --group)" "$TMPDIR"
+
+      - name: Install nix
+        uses: nixbuild/nix-quick-install-action@v32
+        with:
+          nix_conf: ${{ env.NIX_CONF }}
+
+      - name: Restore nix cache
+        id: restore-nix-cache
+        uses: nix-community/cache-nix-action/restore@v6.1.3
+        with:
+          primary-key: nix-omnix-${{ hashFiles('**/flake.lock') }}
+          # If cache wasnt found, restore most similar cache
+          restore-prefixes-first-match: nix-omnix-
+
+      - name: Copy repository to ${{ env.REPO_PATH }}
+        run: |
+          sudo mkdir -p ${{ env.REPO_PATH }}
+          sudo cp -r "$GITHUB_WORKSPACE/." ${{ env.REPO_PATH }}
+      
+      - name: Run omnix ci
+        run: |
+          nix run nixpkgs#omnix -- ci run -d ${{ env.REPO_PATH}}
+      
+      - name: Save/purge/gc nix cache
+        if: always() && steps.restore-nix-cache.outputs.hit-primary-key == 'false'
+        uses: nix-community/cache-nix-action/save@v6.1.3
+        with:
+          primary-key: ${{ steps.restore-nix-cache.outputs.primary-key }}
+          purge: true
+          # Purge all cache versions
+          purge-prefixes: nix-omnix-
+          # Purge cache created since now
+          purge-created: 0
+          # Except if cache has current key
+          purge-primary-key: never
+          # Clean all unused cache
+          gc-max-store-size: 0

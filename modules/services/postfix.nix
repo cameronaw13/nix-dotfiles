@@ -8,7 +8,7 @@ in
 {
   options.local.services.postfix = {
     enable = lib.mkOption {
-      type = lib.types.addCheck lib.types.bool (x: !x || builtins.hasAttr "sops" config);
+      type = lib.types.bool;
       default = false;
     };
     sender = lib.mkOption {
@@ -21,9 +21,9 @@ in
     };
   };
 
-  config = lib.mkIf services.postfix.enable {
+  config = {
     services.postfix = {
-      enable = true;
+    inherit (services.postfix) enable;
       relayHost = "smtp.gmail.com";
       relayPort = 587;
       config = {
@@ -36,13 +36,15 @@ in
         smtp_header_checks = "pcre:/etc/postfix/header_checks";
       };
       enableHeaderChecks = lib.mkDefault true;
-      headerChecks = [ { 
+      headerChecks = [
+        { 
           action = "REPLACE From: ${hostName} <${sender}>";
           pattern = "/^From:.*/";
-      } ];
+        } 
+      ];
     };
 
-    sops.secrets."${hostName}/sasl-passwd" = {
+    sops.secrets."${hostName}/sasl-passwd" = lib.mkIf services.postfix.enable {
       owner = config.services.postfix.user;
     };
   };

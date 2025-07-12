@@ -1,9 +1,9 @@
-{ lib, pkgs, inputs, ... }:
+{ lib, pkgs, repoPath, stateVersion, inputs, ... }:
 {
   imports = [
     ./activate.nix
     ./users.nix
-    ./services/default.nix
+    ./services
   ];
 
   /* Environment */
@@ -11,19 +11,21 @@
     # Multi-host system packages
     systemPackages = builtins.attrValues {
       inherit (pkgs)
+      nh
       trash-cli
       ;
     };
+    variables = {
+      NH_FLAKE = repoPath;
+    };
     shellAliases = {
-      rm = "echo Consider using 'trash' or use the full command: \''\$(type -P rm)'\'";
+      l = "ls -a --color=tty";
+      ll = "ls -lha --color=tty";
+      rm = "echo \"Use the safer 'trash' or use '\\$(type -P rm)'\"";
       mv = "mv -i";
       cp = "cp -i";
     };
   };
-
-  /* Locale */
-  time.timeZone = lib.mkDefault "America/Los_Angeles";
-  i18n.defaultLocale = lib.mkDefault "en_US.UTF-8";
 
   /* Nix Settings */
   nix = {
@@ -63,12 +65,28 @@
   users.mutableUsers = lib.mkDefault false;
   home-manager.sharedModules = [
     inputs.sops-nix.homeManagerModules.sops
+    inputs.nixCats.homeModule
   ];
+
+  /* Secrets */
+  sops = {
+    defaultSopsFile = "${inputs.nix-secrets}/secrets.yaml";
+    age = {
+      sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+      keyFile = "/var/lib/sops-nix/keys.txt";
+      generateKey = false;
+    };
+  };
 
   /* Known Hosts */
   programs.ssh.knownHosts = {
     "github.com".publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
+    "gitlab.com".publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAfuCHKVTjquxvt6CM6tdG4SLp1Btn/nOeHHE5UOzRdf";
   };
+
+  /* Locale */
+  time.timeZone = lib.mkDefault "America/Los_Angeles";
+  i18n.defaultLocale = lib.mkDefault "en_US.UTF-8";
 
   /* "Debloat" */
   fonts.fontconfig.enable = lib.mkDefault false;
@@ -85,5 +103,5 @@
   systemd.services.nix-daemon.serviceConfig.OOMScoreAdjust = lib.mkDefault 250; # kill nix builds before user services
 
   /* Statever */
-  system.stateVersion = "25.05";
+  system = { inherit stateVersion; };
 }

@@ -5,8 +5,8 @@ type -P git >/dev/null \
   || git=(nix run nixpkgs\#gitMinimal -- )
 
 toplevel=$("${git[@]}" rev-parse --show-toplevel)
-if [ "$toplevel" != "$SCRIPT_PATH" ]; then
-  echo "Please run within '$SCRIPT_PATH' directory"
+if [ "$toplevel" != "$REPO_PATH" ]; then
+  echo "Please run within '$REPO_PATH' directory"
   exit 1
 fi
 if [ -z "$1" ]; then
